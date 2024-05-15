@@ -70,6 +70,14 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(ProjectDir)src/ThirdParty/SDL2/;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)ThirdParty\SDL2\lib\;$(ProjectDir)ThirdParty\SDL2_image\lib\;$(ProjectDir)ThirdParty\SDL2_mixer\lib\;$(ProjectDir)ThirdParty\SDL2_ttf\lib\;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(ProjectDir)src/ThirdParty/SDL2/;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)ThirdParty\SDL2\lib\;$(ProjectDir)ThirdParty\SDL2_image\lib\;$(ProjectDir)ThirdParty\SDL2_mixer\lib\;$(ProjectDir)ThirdParty\SDL2_ttf\lib\;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -104,13 +112,16 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>%(ProjectDir);%(ProjcetDir)src/ThirdParty/lua-5.4.6;%(ProjectDir)src/ThirdParty/sol2-3.3.0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(ProjectDir);%(ProjcetDir)src/ThirdParty/lua-5.4.6;%(ProjectDir)src/ThirdParty/sol2-3.3.0;%(ProjcetDIr)src/ThirdParty/box2d-2.4.1/box2d;%(ProjcetDIr)src/ThirdParty/box2d-2.4.1/src;%(ProjcetDIr)src/ThirdParty/box2d-2.4.1;%(ProjcetDIr)src/ThirdParty/SDL2_ttf/lib;%(ProjcetDIr)src/ThirdParty/SDL2_ttf;%(ProjcetDIr)src/ThirdParty/SDL2_mixer/lib;%(ProjcetDIr)src/ThirdParty/SDL2_mixer;%(ProjcetDIr)src/ThirdParty/SDL2_image/lib;%(ProjcetDIr)src/ThirdParty/SDL2_image;%(ProjcetDIr)src/ThirdParty/SDL2/lib;%(ProjcetDIr)src/ThirdParty/SDL2;%(ProjcetDir)src/ThirdParty/rapidjson-1.1.0/include;%(ProjcetDir)src/ThirdParty/glm</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>copy dlls\* $(OutDir)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -120,7 +131,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>%(ProjectDir);%(ProjcetDir)src/ThirdParty/lua-5.4.6;%(ProjectDir)src/ThirdParty/sol2-3.3.0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(ProjectDir);%(ProjcetDir)src/ThirdParty/lua-5.4.6;%(ProjectDir)src/ThirdParty/sol2-3.3.0;%(ProjcetDIr)src/ThirdParty/box2d-2.4.1/box2d;%(ProjcetDIr)src/ThirdParty/box2d-2.4.1/src;%(ProjcetDIr)src/ThirdParty/box2d-2.4.1;%(ProjcetDIr)src/ThirdParty/SDL2_ttf/lib;%(ProjcetDIr)src/ThirdParty/SDL2_ttf;%(ProjcetDIr)src/ThirdParty/SDL2_mixer/lib;%(ProjcetDIr)src/ThirdParty/SDL2_mixer;%(ProjcetDIr)src/ThirdParty/SDL2_image/lib;%(ProjcetDIr)src/ThirdParty/SDL2_image;%(ProjcetDIr)src/ThirdParty/SDL2/lib;%(ProjcetDIr)src/ThirdParty/SDL2;%(ProjcetDir)src/ThirdParty/rapidjson-1.1.0/include;%(ProjcetDir)src/ThirdParty/glm</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -129,6 +140,9 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>copy dlls\* $(OutDir)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\FirstParty\src\main.cpp" />
