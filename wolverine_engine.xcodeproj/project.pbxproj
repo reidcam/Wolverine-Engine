@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		8974C5582BFB843F00DCA906 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8974C5572BFB843F00DCA906 /* main.cpp */; };
 		8974C5752BFB94E100DCA906 /* SDL2_image.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8974C5692BFB8C0800DCA906 /* SDL2_image.framework */; };
 		8974C5772BFB94E100DCA906 /* SDL2_mixer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8974C56A2BFB8C0800DCA906 /* SDL2_mixer.framework */; };
 		8974C5792BFB94E100DCA906 /* SDL2_ttf.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8974C56B2BFB8C0800DCA906 /* SDL2_ttf.framework */; };
@@ -89,6 +88,8 @@
 		8974C61B2BFBA27C00DCA906 /* b2_edge_circle_contact.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8974C6012BFBA27C00DCA906 /* b2_edge_circle_contact.cpp */; };
 		8974C61C2BFBA27C00DCA906 /* b2_distance_joint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8974C6022BFBA27C00DCA906 /* b2_distance_joint.cpp */; };
 		8974C61E2BFBA2A700DCA906 /* b2_rope.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8974C61D2BFBA2A700DCA906 /* b2_rope.cpp */; };
+		8974C6232BFBA4C900DCA906 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8974C6222BFBA4C900DCA906 /* main.cpp */; };
+		89D484962BFBB0DB00E27B91 /* Engine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 89D484952BFBB0DB00E27B91 /* Engine.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -105,7 +106,6 @@
 
 /* Begin PBXFileReference section */
 		8974C5482BFB833F00DCA906 /* wolverine_engine */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = wolverine_engine; sourceTree = BUILT_PRODUCTS_DIR; };
-		8974C5572BFB843F00DCA906 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = src/FirstParty/src/main.cpp; sourceTree = "<group>"; };
 		8974C5672BFB890700DCA906 /* wolverine_engine.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = wolverine_engine.entitlements; sourceTree = "<group>"; };
 		8974C5682BFB8C0800DCA906 /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = src/ThirdParty/frameworks/SDL2.framework; sourceTree = "<group>"; };
 		8974C5692BFB8C0800DCA906 /* SDL2_image.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_image.framework; path = src/ThirdParty/frameworks/SDL2_image.framework; sourceTree = "<group>"; };
@@ -188,6 +188,9 @@
 		8974C6012BFBA27C00DCA906 /* b2_edge_circle_contact.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = b2_edge_circle_contact.cpp; path = "src/ThirdParty/box2d-2.4.1/src/dynamics/b2_edge_circle_contact.cpp"; sourceTree = "<group>"; };
 		8974C6022BFBA27C00DCA906 /* b2_distance_joint.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = b2_distance_joint.cpp; path = "src/ThirdParty/box2d-2.4.1/src/dynamics/b2_distance_joint.cpp"; sourceTree = "<group>"; };
 		8974C61D2BFBA2A700DCA906 /* b2_rope.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = b2_rope.cpp; path = "src/ThirdParty/box2d-2.4.1/src/rope/b2_rope.cpp"; sourceTree = "<group>"; };
+		8974C6222BFBA4C900DCA906 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = src/FirstParty/src/main.cpp; sourceTree = "<group>"; };
+		89D484952BFBB0DB00E27B91 /* Engine.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Engine.cpp; path = src/FirstParty/src/Engine.cpp; sourceTree = "<group>"; };
+		89D484972BFBB37700E27B91 /* FirstParty */ = {isa = PBXFileReference; lastKnownFileType = folder; name = FirstParty; path = src/FirstParty; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -208,8 +211,10 @@
 		8974C53F2BFB833F00DCA906 = {
 			isa = PBXGroup;
 			children = (
+				89D484972BFBB37700E27B91 /* FirstParty */,
 				8974C5672BFB890700DCA906 /* wolverine_engine.entitlements */,
-				8974C5572BFB843F00DCA906 /* main.cpp */,
+				8974C6222BFBA4C900DCA906 /* main.cpp */,
+				89D484942BFBB09C00E27B91 /* src */,
 				8974C5D72BFBA18B00DCA906 /* Box2d */,
 				8974C5BE2BFBA12900DCA906 /* Lua */,
 				8974C5492BFB833F00DCA906 /* Products */,
@@ -359,6 +364,14 @@
 			name = rope;
 			sourceTree = "<group>";
 		};
+		89D484942BFBB09C00E27B91 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				89D484952BFBB0DB00E27B91 /* Engine.cpp */,
+			);
+			name = src;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -416,6 +429,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				89D484962BFBB0DB00E27B91 /* Engine.cpp in Sources */,
+				8974C6232BFBA4C900DCA906 /* main.cpp in Sources */,
 				8974C61E2BFBA2A700DCA906 /* b2_rope.cpp in Sources */,
 				8974C6032BFBA27C00DCA906 /* b2_wheel_joint.cpp in Sources */,
 				8974C6042BFBA27C00DCA906 /* b2_edge_polygon_contact.cpp in Sources */,
@@ -493,7 +508,6 @@
 				8974C5BB2BFBA11F00DCA906 /* lvm.c in Sources */,
 				8974C5BC2BFBA11F00DCA906 /* ltablib.c in Sources */,
 				8974C5BD2BFBA11F00DCA906 /* lparser.c in Sources */,
-				8974C5582BFB843F00DCA906 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -566,6 +580,7 @@
 					"$(PROJECT_DIR)/src/ThirdParty/rapidjson-1.1.0/include/rapidjson",
 					"$(PROJECT_DIR)/src/ThirdParty/glm/glm",
 					"$(PROJECT_DIR)/src/ThirdParty/box2d-2.4.1/src",
+					"$(PROJECT_DIR)/src/FirstParty",
 				);
 				LD_RUNPATH_SEARCH_PATHS = "$(PROJECT_DIR)/src/ThirdParty/frameworks";
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
@@ -638,6 +653,7 @@
 					"$(PROJECT_DIR)/src/ThirdParty/rapidjson-1.1.0/include/rapidjson",
 					"$(PROJECT_DIR)/src/ThirdParty/glm/glm",
 					"$(PROJECT_DIR)/src/ThirdParty/box2d-2.4.1/src",
+					"$(PROJECT_DIR)/src/FirstParty",
 				);
 				LD_RUNPATH_SEARCH_PATHS = "$(PROJECT_DIR)/src/ThirdParty/frameworks";
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
