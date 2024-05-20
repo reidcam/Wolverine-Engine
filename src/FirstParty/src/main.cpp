@@ -3,6 +3,6 @@
 using namespace std;
 
 int main(int argc, char* argv[]) {
-    EngineMethods::Game();
+    Game();
 	return 0;
 }

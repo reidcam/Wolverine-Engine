@@ -17,7 +17,7 @@ SDL_Renderer* EngineData::renderer;
 /**
  * Called from the main function. Starts the game.
 */
-void EngineMethods::Game()
+void Game()
 {
     Initialize();
     
@@ -38,7 +38,7 @@ void EngineMethods::Game()
  * Called before the first game loop.
  * Prepares the engine for the first loop by initializing other parts of the engine.
 */
-void EngineMethods::Initialize()
+void Initialize()
 {
     IMG_Init(IMG_INIT_PNG);
     EngineData::window = SDL_CreateWindow("test", 0, 0, 512, 512, 0);
@@ -55,7 +55,7 @@ void EngineMethods::Initialize()
  * Every call of GameLoop is considered to be 1 frame.
  * Called once every frame by "Game".
 */
-int EngineMethods::GameLoop()
+int GameLoop()
 {
     if (EngineData::quit)
     {

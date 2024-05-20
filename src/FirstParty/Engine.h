@@ -23,30 +23,25 @@ struct EngineData
     // TODO: Move these variables to the renderer scripts
     static SDL_Window* window;  // The window that the game is displayed on
     static SDL_Renderer* renderer;
+    
 }; // EngineData
 
-class EngineMethods
-{
-public:
-    /**
-     * Called from the main function. Starts the game.
-    */
-    static void Game();
-    
-private:
-    /**
-     * Called before the first game loop.
-     * Prepares the engine for the first loop by initializing other parts of the engine.
-    */
-    static void Initialize();
-    
-    /**
-     * Responsible for running the engine correctly on each frame.
-     * Every call of GameLoop is considered to be 1 frame.
-     * Called once every frame by "Game".
-    */
-    static int GameLoop();
-    
-}; // EngineMethods
+/**
+ * Called from the main function. Starts the game.
+*/
+void Game();
+
+/**
+ * Called before the first game loop.
+ * Prepares the engine for the first loop by initializing other parts of the engine.
+*/
+void Initialize();
+
+/**
+ * Responsible for running the engine correctly on each frame.
+ * Every call of GameLoop is considered to be 1 frame.
+ * Called once every frame by "Game".
+*/
+int GameLoop();
 
 #endif /* Engine_h */
