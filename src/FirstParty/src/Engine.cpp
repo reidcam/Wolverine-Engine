@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include "Engine.h"
+#include "EngineUtils.h"
 
 bool EngineData::quit = false;   // True if the game should be quit out of.
 SDL_Window* EngineData::window;  // The window that the game is displayed on
@@ -44,8 +45,43 @@ void Initialize()
     EngineData::window = SDL_CreateWindow("test", 0, 0, 512, 512, 0);
     EngineData::renderer = SDL_CreateRenderer(EngineData::window, -1, SDL_RENDERER_PRESENTVSYNC + SDL_RENDERER_ACCELERATED);
     SDL_SetRenderDrawColor(EngineData::renderer, 255, 255, 255, 255); // set renderer draw color
+    if( CheckConfigFiles() != 0 ) {
+        // error with config files
+    }
     // TODO: Initialize
 } // Initialize()
+
+/**
+ * Checks validity of game.config and rendering.config, and records their contents
+ */
+int CheckConfigFiles()
+{
+    if( !EngineUtils::DirectoryExists("resources") ) {
+        std::cout << "error: resources/ missing";
+        return 1;
+    }
+    if( CheckGameConfig() && CheckRenderingConfig() )
+        return 0;
+    return 1;
+}
+
+bool CheckGameConfig()
+{
+    if( !EngineUtils::DirectoryExists("resources/game.config") ) {
+        std::cout << "error: resources/game.config missing";
+        return false;
+    }
+    return true;
+}
+
+bool CheckRenderingConfig()
+{
+    if( !EngineUtils::DirectoryExists("resources/rendering.config") ) {
+        std::cout << "error: resources/rendering.config missing";
+        return false;
+    }
+    return true;
+}
 
 
 //-------------------------------------------------------

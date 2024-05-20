@@ -38,6 +38,13 @@ void Game();
 void Initialize();
 
 /**
+ * Checks validity of game.config and rendering.config, and records their contents
+ */
+int CheckConfigFiles();
+bool CheckGameConfig();
+bool CheckRenderingConfig();
+
+/**
  * Responsible for running the engine correctly on each frame.
  * Every call of GameLoop is considered to be 1 frame.
  * Called once every frame by "Game".
