@@ -557,7 +557,7 @@
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/src/ThirdParty/sol2-3.3.0",
 					"$(PROJECT_DIR)/src/ThirdParty/lua-5.4.6",
-					"$(PROJECT_DIR)/src/ThirdParty/box2d-2.4.1/box2d",
+					"$(PROJECT_DIR)/src/ThirdParty/box2d-2.4.1",
 					"$(PROJECT_DIR)/src/ThirdParty",
 					"$(PROJECT_DIR)/src/ThirdParty/SDL2",
 					"$(PROJECT_DIR)/src/ThirdParty/SDL2_image",
@@ -565,6 +565,7 @@
 					"$(PROJECT_DIR)/src/ThirdParty/SDL2_ttf",
 					"$(PROJECT_DIR)/src/ThirdParty/rapidjson-1.1.0/include/rapidjson",
 					"$(PROJECT_DIR)/src/ThirdParty/glm/glm",
+					"$(PROJECT_DIR)/src/ThirdParty/box2d-2.4.1/src",
 				);
 				LD_RUNPATH_SEARCH_PATHS = "$(PROJECT_DIR)/src/ThirdParty/frameworks";
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
@@ -628,7 +629,7 @@
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/src/ThirdParty/sol2-3.3.0",
 					"$(PROJECT_DIR)/src/ThirdParty/lua-5.4.6",
-					"$(PROJECT_DIR)/src/ThirdParty/box2d-2.4.1/box2d",
+					"$(PROJECT_DIR)/src/ThirdParty/box2d-2.4.1",
 					"$(PROJECT_DIR)/src/ThirdParty",
 					"$(PROJECT_DIR)/src/ThirdParty/SDL2",
 					"$(PROJECT_DIR)/src/ThirdParty/SDL2_image",
@@ -636,6 +637,7 @@
 					"$(PROJECT_DIR)/src/ThirdParty/SDL2_ttf",
 					"$(PROJECT_DIR)/src/ThirdParty/rapidjson-1.1.0/include/rapidjson",
 					"$(PROJECT_DIR)/src/ThirdParty/glm/glm",
+					"$(PROJECT_DIR)/src/ThirdParty/box2d-2.4.1/src",
 				);
 				LD_RUNPATH_SEARCH_PATHS = "$(PROJECT_DIR)/src/ThirdParty/frameworks";
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
