@@ -6,6 +6,9 @@
 //  The highest level script in this engine.
 
 #include <stdio.h>
+
+#include "ImageDB.h"
+
 #include "Engine.h"
 #include "EngineUtils.h"
 
@@ -48,8 +51,12 @@ void Initialize()
     if( CheckConfigFiles() != 0 ) {
         // error with config files
     }
+    
     // TODO: Initialize
+    LoadImages();
 } // Initialize()
+
+//-------------------------------------------------------
 
 /**
  * Checks validity of game.config and rendering.config, and records their contents
@@ -83,7 +90,6 @@ bool CheckRenderingConfig()
     return true;
 }
 
-
 //-------------------------------------------------------
 
 /**
@@ -109,7 +115,8 @@ int GameLoop()
     }
     
     SDL_RenderClear(EngineData::renderer); // clear the renderer with the render clear color
+    
     SDL_RenderPresent(EngineData::renderer); // present the frame into the window
     
     return 0;
-}
+} // GameLoop()

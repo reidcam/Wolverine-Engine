@@ -90,6 +90,7 @@
 		8974C61E2BFBA2A700DCA906 /* b2_rope.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8974C61D2BFBA2A700DCA906 /* b2_rope.cpp */; };
 		8974C6232BFBA4C900DCA906 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8974C6222BFBA4C900DCA906 /* main.cpp */; };
 		89D484962BFBB0DB00E27B91 /* Engine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 89D484952BFBB0DB00E27B91 /* Engine.cpp */; };
+		89D4849D2BFCEE3600E27B91 /* Databases.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 89D4849C2BFCEE3600E27B91 /* Databases.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -191,6 +192,7 @@
 		8974C6222BFBA4C900DCA906 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = src/FirstParty/src/main.cpp; sourceTree = "<group>"; };
 		89D484952BFBB0DB00E27B91 /* Engine.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Engine.cpp; path = src/FirstParty/src/Engine.cpp; sourceTree = "<group>"; };
 		89D484972BFBB37700E27B91 /* FirstParty */ = {isa = PBXFileReference; lastKnownFileType = folder; name = FirstParty; path = src/FirstParty; sourceTree = "<group>"; };
+		89D4849C2BFCEE3600E27B91 /* Databases.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Databases.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -367,6 +369,7 @@
 		89D484942BFBB09C00E27B91 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				89D4849C2BFCEE3600E27B91 /* Databases.cpp */,
 				89D484952BFBB0DB00E27B91 /* Engine.cpp */,
 			);
 			name = src;
@@ -499,6 +502,7 @@
 				8974C5B22BFBA11F00DCA906 /* lzio.c in Sources */,
 				8974C5B32BFBA11F00DCA906 /* lcorolib.c in Sources */,
 				8974C5B42BFBA11F00DCA906 /* lutf8lib.c in Sources */,
+				89D4849D2BFCEE3600E27B91 /* Databases.cpp in Sources */,
 				8974C5B52BFBA11F00DCA906 /* lmathlib.c in Sources */,
 				8974C5B62BFBA11F00DCA906 /* lstrlib.c in Sources */,
 				8974C5B72BFBA11F00DCA906 /* ldo.c in Sources */,
