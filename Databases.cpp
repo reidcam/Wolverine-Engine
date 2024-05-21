@@ -18,13 +18,17 @@
 #include <map>
 
 #include "EngineUtils.h"
+
 #include "ImageDB.h"
 #include "AudioDB.h"
+#include "TextDB.h"
+
 #include "Engine.h"
 
 // Resources
 std::unordered_map<std::string, SDL_Texture*> loaded_images; // All of the loaded images
 std::unordered_map<std::string, Mix_Chunk*> loaded_sounds; // All of the loaded sounds
+std::unordered_map<std::string, std::unordered_map<int, TTF_Font*>> loaded_fonts; // All of the loaded fonts
 
 //-------------------------------------------------------
 // Image Database
@@ -113,3 +117,55 @@ Mix_Chunk* GetSound(std::string audio_name)
     
     return loaded_sounds[audio_name];
 } // GetSound()
+
+//-------------------------------------------------------
+// Text Database
+
+/**
+ * Loads all of the fonts in the resources/fonts directory
+*/
+void LoadFonts()
+{
+    /* Load files from this path */
+    const std::string path = "resources/fonts";
+    
+    // Fills up the database if the path exists
+    if (std::filesystem::exists(path))
+    {
+        for (const auto& file : std::filesystem::directory_iterator(path))
+        {
+            if (file.path() != path + "/.DS_Store")
+            {
+                loaded_fonts[file.path().filename().stem().stem().string()][16] = TTF_OpenFont(file.path().string().c_str(), 16);
+            }
+        }
+    }
+} // LoadFonts()
+
+/**
+ * Get an font based on its size and name
+ *
+ *`@param   font_name   the name of the font to get from the database
+ * @param   font_size       the size of the font to get from the database
+ * @returns             the font with the specified name and size
+*/
+TTF_Font* GetFont(std::string font_name, int font_size)
+{
+    // Throw error if the font does not exist
+    if (loaded_fonts.find(font_name) == loaded_fonts.end())
+    {
+        std::cout << "error: font " << font_name << " missing";
+        exit(0);
+    }
+    
+    // Loads font at font_size if it does not already exist
+    if (loaded_fonts[font_name].find(font_size) == loaded_fonts[font_name].end())
+    {
+        /* Load font file from resources/fonts */
+        const std::string path = "resources/fonts/" + font_name + ".ttf";
+        // Open the font at the desired size, if not done so already
+        loaded_fonts[font_name][font_size] = TTF_OpenFont(path.c_str(), font_size);
+    }
+    
+    return loaded_fonts[font_name][font_size];
+} // GetFont()

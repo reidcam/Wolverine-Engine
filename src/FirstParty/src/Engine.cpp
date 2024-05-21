@@ -9,6 +9,7 @@
 
 #include "ImageDB.h"
 #include "AudioDB.h"
+#include "TextDB.h"
 
 #include "Engine.h"
 #include "EngineUtils.h"
@@ -46,6 +47,8 @@ void Game()
 void Initialize()
 {
     IMG_Init(IMG_INIT_PNG);
+    TTF_Init();
+    
     EngineData::window = SDL_CreateWindow("test", 0, 0, 512, 512, 0);
     EngineData::renderer = SDL_CreateRenderer(EngineData::window, -1, SDL_RENDERER_PRESENTVSYNC + SDL_RENDERER_ACCELERATED);
     SDL_SetRenderDrawColor(EngineData::renderer, 255, 255, 255, 255); // set renderer draw color
@@ -56,6 +59,7 @@ void Initialize()
     // Load Assets
     LoadImages();
     LoadSounds();
+    LoadFonts();
 } // Initialize()
 
 //-------------------------------------------------------
@@ -117,6 +121,8 @@ int GameLoop()
     }
     
     SDL_RenderClear(EngineData::renderer); // clear the renderer with the render clear color
+    
+    // RENDER STUFF HERE
     
     SDL_RenderPresent(EngineData::renderer); // present the frame into the window
     
