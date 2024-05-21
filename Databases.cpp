@@ -1,0 +1,171 @@
+//
+//  Databases.cpp
+//  wolverine_engine
+//
+//  Created by Jacob Robinson on 5/21/24.
+//  Stores all of the resources being used in the game, and gives definitions to the database functions
+//
+
+#include <stdio.h>
+
+#include <fstream>
+#include <vector>
+#include <sstream>
+#include <stdio.h>
+#include <filesystem>
+#include <cstdlib>
+#include <unordered_map>
+#include <map>
+
+#include "EngineUtils.h"
+
+#include "ImageDB.h"
+#include "AudioDB.h"
+#include "TextDB.h"
+
+#include "Engine.h"
+
+// Resources
+std::unordered_map<std::string, SDL_Texture*> loaded_images; // All of the loaded images
+std::unordered_map<std::string, Mix_Chunk*> loaded_sounds; // All of the loaded sounds
+std::unordered_map<std::string, std::unordered_map<int, TTF_Font*>> loaded_fonts; // All of the loaded fonts
+
+//-------------------------------------------------------
+// Image Database
+
+/**
+ * Loads all of the images in the resources/images directory
+*/
+void LoadImages()
+{
+    /* Load files from this path */
+    const std::string path = "resources/images";
+    
+    // Fills up the database if the path exists
+    if (std::filesystem::exists(path))
+    {
+        for (const auto& file : std::filesystem::directory_iterator(path))
+        {
+            if (file.path() != path + "/.DS_Store")
+            {
+                SDL_Renderer* r = EngineData::renderer;
+                SDL_Texture* img = IMG_LoadTexture(r, file.path().string().c_str());
+                loaded_images[file.path().filename().stem().stem().string()] = img;
+            }
+        }
+    }
+} // LoadImages()
+
+/**
+ * Get an image from loaded_images based on the images name
+ *
+ *`@param   image_name  the name of the image to get from the database
+ * @returns             the image with the specified name
+*/
+SDL_Texture* GetImage(std::string image_name)
+{
+    if (loaded_images.find(image_name) == loaded_images.end())
+    {
+        std::cout << "error: missing image " << image_name;
+        exit(0);
+    }
+    
+    return loaded_images[image_name];
+} // GetImage()
+
+//-------------------------------------------------------
+// Audio Database
+
+/**
+ * Loads all of the audio in the resources/audio directory
+*/
+void LoadSounds()
+{
+    /* Load files from this path */
+    const std::string path = "resources/audio";
+    
+    // Fills up the database if the path exists
+    if (std::filesystem::exists(path))
+    {
+        for (const auto& file : std::filesystem::directory_iterator(path))
+        {
+            if (file.path() != path + "/.DS_Store")
+            {
+                Mix_OpenAudio(48000, AUDIO_S16SYS, 1, 1024);
+                Mix_Chunk* sound = Mix_LoadWAV(file.path().string().c_str());
+                loaded_sounds[file.path().filename().stem().stem().string()] = sound;
+            }
+        }
+    }
+    
+    Mix_AllocateChannels(50);
+} // LoadSounds();
+
+/**
+ * Get an audio clip based on the clips name
+ *
+ *`@param   audio_name  the name of the audio clip to get from the database
+ * @returns             the audio clip with the specified name
+*/
+Mix_Chunk* GetSound(std::string audio_name)
+{
+    if (loaded_sounds.find(audio_name) == loaded_sounds.end())
+    {
+        std::cout << "error: missing audio clip " << audio_name;
+        exit(0);
+    }
+    
+    return loaded_sounds[audio_name];
+} // GetSound()
+
+//-------------------------------------------------------
+// Text Database
+
+/**
+ * Loads all of the fonts in the resources/fonts directory
+*/
+void LoadFonts()
+{
+    /* Load files from this path */
+    const std::string path = "resources/fonts";
+    
+    // Fills up the database if the path exists
+    if (std::filesystem::exists(path))
+    {
+        for (const auto& file : std::filesystem::directory_iterator(path))
+        {
+            if (file.path() != path + "/.DS_Store")
+            {
+                loaded_fonts[file.path().filename().stem().stem().string()][16] = TTF_OpenFont(file.path().string().c_str(), 16);
+            }
+        }
+    }
+} // LoadFonts()
+
+/**
+ * Get an font based on its size and name
+ *
+ *`@param   font_name   the name of the font to get from the database
+ * @param   font_size       the size of the font to get from the database
+ * @returns             the font with the specified name and size
+*/
+TTF_Font* GetFont(std::string font_name, int font_size)
+{
+    // Throw error if the font does not exist
+    if (loaded_fonts.find(font_name) == loaded_fonts.end())
+    {
+        std::cout << "error: font " << font_name << " missing";
+        exit(0);
+    }
+    
+    // Loads font at font_size if it does not already exist
+    if (loaded_fonts[font_name].find(font_size) == loaded_fonts[font_name].end())
+    {
+        /* Load font file from resources/fonts */
+        const std::string path = "resources/fonts/" + font_name + ".ttf";
+        // Open the font at the desired size, if not done so already
+        loaded_fonts[font_name][font_size] = TTF_OpenFont(path.c_str(), font_size);
+    }
+    
+    return loaded_fonts[font_name][font_size];
+} // GetFont()

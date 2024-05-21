@@ -35,7 +35,7 @@ public:
     }
     
     static bool DirectoryExists(const std::string& path) {
-        return std::filesystem::exists(path);
+        return std::filesystem::exists(std::filesystem::path(path));
     }
 };
 
