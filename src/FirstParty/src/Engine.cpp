@@ -8,6 +8,7 @@
 #include <stdio.h>
 
 #include "ImageDB.h"
+#include "AudioDB.h"
 
 #include "Engine.h"
 #include "EngineUtils.h"
@@ -52,8 +53,9 @@ void Initialize()
         // error with config files
     }
     
-    // TODO: Initialize
+    // Load Assets
     LoadImages();
+    LoadSounds();
 } // Initialize()
 
 //-------------------------------------------------------

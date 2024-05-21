@@ -19,7 +19,7 @@
 void LoadImages();
 
 /**
- * Get an image from loaded_images based on the images name
+ * Get an image based on the images name
  *
  *`@param   image_name  the name of the image to get from the database
  * @returns             the image with the specified name
