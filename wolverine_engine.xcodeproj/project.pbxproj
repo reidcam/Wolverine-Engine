@@ -91,6 +91,7 @@
 		8974C6232BFBA4C900DCA906 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8974C6222BFBA4C900DCA906 /* main.cpp */; };
 		89D484962BFBB0DB00E27B91 /* Engine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 89D484952BFBB0DB00E27B91 /* Engine.cpp */; };
 		89D484A32BFD0C9A00E27B91 /* Databases.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 89D484A22BFD0C9A00E27B91 /* Databases.cpp */; };
+		89D484A72BFE7A5A00E27B91 /* ActorManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 89D484A62BFE7A5A00E27B91 /* ActorManager.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -193,6 +194,7 @@
 		89D484952BFBB0DB00E27B91 /* Engine.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Engine.cpp; path = src/FirstParty/src/Engine.cpp; sourceTree = "<group>"; };
 		89D484972BFBB37700E27B91 /* FirstParty */ = {isa = PBXFileReference; lastKnownFileType = folder; name = FirstParty; path = src/FirstParty; sourceTree = "<group>"; };
 		89D484A22BFD0C9A00E27B91 /* Databases.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Databases.cpp; path = src/FirstParty/src/Databases.cpp; sourceTree = "<group>"; };
+		89D484A62BFE7A5A00E27B91 /* ActorManager.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = ActorManager.cpp; path = src/FirstParty/src/ActorManager.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -369,6 +371,7 @@
 		89D484942BFBB09C00E27B91 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				89D484A62BFE7A5A00E27B91 /* ActorManager.cpp */,
 				89D484A22BFD0C9A00E27B91 /* Databases.cpp */,
 				89D484952BFBB0DB00E27B91 /* Engine.cpp */,
 			);
@@ -479,6 +482,7 @@
 				8974C5D32BFBA18600DCA906 /* b2_chain_shape.cpp in Sources */,
 				8974C5D42BFBA18600DCA906 /* b2_distance.cpp in Sources */,
 				8974C5D52BFBA18600DCA906 /* b2_dynamic_tree.cpp in Sources */,
+				89D484A72BFE7A5A00E27B91 /* ActorManager.cpp in Sources */,
 				8974C5D62BFBA18600DCA906 /* b2_time_of_impact.cpp in Sources */,
 				8974C59E2BFBA11F00DCA906 /* lgc.c in Sources */,
 				8974C59F2BFBA11F00DCA906 /* lauxlib.c in Sources */,

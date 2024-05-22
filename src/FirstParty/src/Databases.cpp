@@ -197,7 +197,7 @@ void LoadTemplates()
             }
         }
     }
-}
+} // LoadTemplates()
 
 /**
  * Get a template based on the templates name
@@ -214,4 +214,4 @@ rapidjson::Document* GetTemplate(std::string template_name)
     }
     
     return loaded_templates[template_name];
-}
+} // GetTemplate()
