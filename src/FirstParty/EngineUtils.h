@@ -16,6 +16,9 @@
 
 class EngineUtils {
 public:
+    /**
+     * Reads a json file located at `path` into `out_document`
+     */
     static void ReadJsonFile(const std::string& path, rapidjson::Document& out_document) {
         FILE* file_pointer = nullptr;
     #ifdef _WIN32
@@ -34,6 +37,9 @@ public:
         }
     }
     
+    /**
+     * returns true if a given directory exists
+     */
     static bool DirectoryExists(const std::string& path) {
         return std::filesystem::exists(std::filesystem::path(path));
     }

@@ -7,6 +7,8 @@
 
 #include <stdio.h>
 
+#include "InputManager.h"
+
 #include "ImageDB.h"
 #include "AudioDB.h"
 #include "TextDB.h"
