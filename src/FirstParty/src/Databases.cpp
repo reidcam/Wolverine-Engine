@@ -104,7 +104,7 @@ void LoadSounds()
 /**
  * Get an audio clip based on the clips name
  *
- *`@param   audio_name  the name of the audio clip to get from the database
+ * @param   audio_name  the name of the audio clip to get from the database
  * @returns             the audio clip with the specified name
 */
 Mix_Chunk* GetSound(std::string audio_name)
@@ -145,7 +145,7 @@ void LoadFonts()
 /**
  * Get an font based on its size and name
  *
- *`@param   font_name   the name of the font to get from the database
+ * @param   font_name   the name of the font to get from the database
  * @param   font_size       the size of the font to get from the database
  * @returns             the font with the specified name and size
 */
