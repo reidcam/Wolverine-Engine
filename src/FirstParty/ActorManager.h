@@ -95,6 +95,6 @@ public:
      * @param   actor_data  the JSON that will be processed into a new actor
     */
     static void LoadActorWithJSON(const rapidjson::Value& actor_data);
-}; // ActorDB
+}; // Actors
 
 #endif /* ActorManager_h */

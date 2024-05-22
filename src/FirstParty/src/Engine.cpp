@@ -4,6 +4,7 @@
 //
 //  Created by Jacob Robinson on 5/20/24.
 //  The highest level script in this engine.
+//
 
 #include <stdio.h>
 
@@ -13,7 +14,7 @@
 #include "AudioDB.h"
 #include "TextDB.h"
 #include "TemplateDB.h"
-#include "ActorManager.h"
+#include "SceneManager.h"
 
 #include "Engine.h"
 #include "EngineUtils.h"
@@ -128,7 +129,7 @@ int GameLoop()
     SDL_RenderClear(EngineData::renderer); // clear the renderer with the render clear color
     
     // RENDER STUFF HERE
-    Actors::LoadActorWithJSON(*GetTemplate("BouncyBox"));
+    //Actors::LoadActorWithJSON(*GetTemplate("BouncyBox"));
     
     SDL_RenderPresent(EngineData::renderer); // present the frame into the window
     

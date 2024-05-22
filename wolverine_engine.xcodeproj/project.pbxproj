@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		890816CE2BFE99E20057ED15 /* SceneManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 890816CD2BFE99E20057ED15 /* SceneManager.cpp */; };
 		8974C5752BFB94E100DCA906 /* SDL2_image.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8974C5692BFB8C0800DCA906 /* SDL2_image.framework */; };
 		8974C5772BFB94E100DCA906 /* SDL2_mixer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8974C56A2BFB8C0800DCA906 /* SDL2_mixer.framework */; };
 		8974C5792BFB94E100DCA906 /* SDL2_ttf.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8974C56B2BFB8C0800DCA906 /* SDL2_ttf.framework */; };
@@ -107,6 +108,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		890816CD2BFE99E20057ED15 /* SceneManager.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = SceneManager.cpp; path = src/FirstParty/src/SceneManager.cpp; sourceTree = "<group>"; };
 		8974C5482BFB833F00DCA906 /* wolverine_engine */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = wolverine_engine; sourceTree = BUILT_PRODUCTS_DIR; };
 		8974C5672BFB890700DCA906 /* wolverine_engine.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = wolverine_engine.entitlements; sourceTree = "<group>"; };
 		8974C5682BFB8C0800DCA906 /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = src/ThirdParty/frameworks/SDL2.framework; sourceTree = "<group>"; };
@@ -371,6 +373,7 @@
 		89D484942BFBB09C00E27B91 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				890816CD2BFE99E20057ED15 /* SceneManager.cpp */,
 				89D484A62BFE7A5A00E27B91 /* ActorManager.cpp */,
 				89D484A22BFD0C9A00E27B91 /* Databases.cpp */,
 				89D484952BFBB0DB00E27B91 /* Engine.cpp */,
@@ -459,6 +462,7 @@
 				8974C6142BFBA27C00DCA906 /* b2_chain_polygon_contact.cpp in Sources */,
 				8974C6152BFBA27C00DCA906 /* b2_circle_contact.cpp in Sources */,
 				8974C6162BFBA27C00DCA906 /* b2_pulley_joint.cpp in Sources */,
+				890816CE2BFE99E20057ED15 /* SceneManager.cpp in Sources */,
 				8974C6172BFBA27C00DCA906 /* b2_joint.cpp in Sources */,
 				8974C6182BFBA27C00DCA906 /* b2_polygon_contact.cpp in Sources */,
 				8974C6192BFBA27C00DCA906 /* b2_weld_joint.cpp in Sources */,
