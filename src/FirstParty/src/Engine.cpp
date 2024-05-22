@@ -12,6 +12,7 @@
 #include "ImageDB.h"
 #include "AudioDB.h"
 #include "TextDB.h"
+#include "TemplateDB.h"
 
 #include "Engine.h"
 #include "EngineUtils.h"
@@ -62,6 +63,7 @@ void Initialize()
     LoadImages();
     LoadSounds();
     LoadFonts();
+    LoadTemplates();
 } // Initialize()
 
 //-------------------------------------------------------

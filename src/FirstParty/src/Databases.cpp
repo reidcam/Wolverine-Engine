@@ -22,6 +22,7 @@
 #include "ImageDB.h"
 #include "AudioDB.h"
 #include "TextDB.h"
+#include "TemplateDB.h"
 
 #include "Engine.h"
 
@@ -29,6 +30,7 @@
 std::unordered_map<std::string, SDL_Texture*> loaded_images; // All of the loaded images
 std::unordered_map<std::string, Mix_Chunk*> loaded_sounds; // All of the loaded sounds
 std::unordered_map<std::string, std::unordered_map<int, TTF_Font*>> loaded_fonts; // All of the loaded fonts
+std::unordered_map<std::string, rapidjson::Document*> loaded_templates; // All of the loaded templates
 
 //-------------------------------------------------------
 // Image Database
@@ -169,3 +171,47 @@ TTF_Font* GetFont(std::string font_name, int font_size)
     
     return loaded_fonts[font_name][font_size];
 } // GetFont()
+
+//-------------------------------------------------------
+// Template Database
+
+/**
+ * Loads all of the templates in the resources/actor_templates directory
+*/
+void LoadTemplates()
+{
+    /* Load files from this path */
+    const std::string path = "resources/actor_templates";
+    
+    // Fills up the database if the path exists
+    if (std::filesystem::exists(path))
+    {
+        for (const auto& file : std::filesystem::directory_iterator(path))
+        {
+            if (file.path() != path + "/.DS_Store")
+            {
+                rapidjson::Document* template_document = new rapidjson::Document;
+                EngineUtils::ReadJsonFile(file.path().string(), *template_document);
+                
+                loaded_templates[file.path().filename().stem().stem().string()] = template_document;
+            }
+        }
+    }
+}
+
+/**
+ * Get a template based on the templates name
+ *
+ *`@param   template_name   the name of the template to get from the database
+ * @returns                 the template with the specified name
+*/
+rapidjson::Document* GetTemplate(std::string template_name)
+{
+    if (loaded_templates.find(template_name) == loaded_templates.end())
+    {
+        std::cout << "error: missing template " << template_name;
+        exit(0);
+    }
+    
+    return loaded_templates[template_name];
+}
