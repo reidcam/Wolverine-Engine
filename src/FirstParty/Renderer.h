@@ -12,10 +12,12 @@
 
 #include "SDL.h"
 #include "SDL_image.h"
+#include "SDL_ttf.h"
 #include "glm/glm.hpp"
 
 #include "RenderRequests.h"
 #include "ImageDB.h"
+#include "TextDB.h"
 
 class RendererData
 {
@@ -56,6 +58,18 @@ private:
 	*/
 	inline static void SetWindow(SDL_Window* new_window) { RendererData::window = new_window; } // SetWindow()
 
+	/*
+	Turns a string into an SDL_Texture using the specified font perameters
+
+	@param		renderer	SDL_Renderer* to the renderer
+	@param		text		the string of text that is going to be turned into a SDL_Texture
+	@param		font_color	A SDL_Color for the color of the text
+	@param		font_name	The name of the font to be used
+	@param		font_size	The size of the font
+	@returns	A SDL_Texture* to a SDL_Texture
+	*/
+	static SDL_Texture* ConvertTextToTexture(SDL_Renderer* renderer, const std::string& text, const SDL_Color& font_color, const std::string font_name, const int font_size);
+
 public:
 	/*
 	Returns a pointer to the SDL_Window
@@ -92,10 +106,86 @@ public:
 	Renders all image draw requests in the image_draw_request_queue
 	*/
 	static void RenderAndClearAllImageRequests();
+
+	/*
+	Renders all text draw requests in the text_draw_request_queue
+	*/
+	static void RenderAndClearAllTextRequests();
+
+	/*
+	Renders all UI draw requests in the ui_draw_request_queue
+	*/
+	static void RenderAndClearAllUI();
+
+	/*
+	Renders all of the pixel draw requests in the pixel_draw_request_queue
+	*/
+	static void RenderAndClearAllPixels();
+
+	/*
+	Creates a UI draw request at the specified screen position using the image with name 'image_name'
+
+	@param	image_name	The name of the image to be draw
+	@param	x			The x position to draw the image at
+	@param	y			The y position to draw the image at
+	*/
+	static void DrawUI(const std::string& image_name, const float x, const float y);
+
+	/*
+	Creates a UI draw request at the specified screen position, with the color {r, g, b, a},
+	and in the given sorting layer
+
+	@param	image_name		The name of the image to be draw
+	@param	x				The x position to draw the image at
+	@param	y				The y position to draw the image at
+	@param	r				[0, 255] How red the image is
+	@param	g				[0, 255] How green the image is
+	@param	b				[0, 255] How blue the image is
+	@param	a				[0, 255] The alpha value of the image
+	@param	sorting_order	The sorting layer that the image should be drawn in
+	*/
+	static void DrawUIEx(const std::string& image_name, const float x, const float y, const float r, const float g,
+		const float b, const float a, const float sorting_order);
+
+	/*
+	Creates an image draw request at the specified screen position using the image with name 'image_name'
+
+	@param	image_name	The name of the image to be drawn
+	@param	x			The x position to draw the image at
+	@param	y			The y position to draw the iamge at
+	*/
+	static void DrawImage(const std::string& image_name, const float x, const float y);
+
+	/*
+	Creates an image draw request for the image with name 'image_name' with more control than DrawImage
+
+	@param	image_name			The name of the image to be drawn
+	@param	x					The x position to draw the image at
+	@param	y					The y position to draw the iamge at
+	@param	rotation_degrees	The rotation of the image in degrees
+	@param	scale_x				The scale to draw the x-axis. 1 is normal
+	@param	scale_y				The scale to draw the y-axis. 1 is normal
+	@param	pivot_x				[0, 1] Where on the x position of the image should be located. 0 is the left side of the image and 1 is the right.
+	@param	pivot_y				[0, 1] Where on the y position of the image should be located. 0 is the top side of the image and 1 is the bottom.
+	@param	r					[0, 255] How red the image is
+	@param	g					[0, 255] How green the image is
+	@param	b					[0, 255] How blue the image is
+	@param	a					[0, 255] The alpha value of the image
+	@param	sorting_order		The sorting layer that the image should be drawn in			
+	*/
+	static void DrawImageEx(const std::string& image_name, const float x, const float y, const float rotation_degrees,
+		const float scale_x, const float scale_y, const float pivot_x, const float pivot_y, const float r, const float g,
+		const float b, const float a, const float sorting_order);
 };
 
 struct CompareImageRequests {
 	bool operator() (const ImageDrawRequest& request1, const ImageDrawRequest& request2) {
+		return request1.sorting_order < request2.sorting_order;
+	}
+};
+
+struct CompareUIRequests {
+	bool operator() (const UIRenderRequest& request1, const UIRenderRequest& request2) {
 		return request1.sorting_order < request2.sorting_order;
 	}
 };
