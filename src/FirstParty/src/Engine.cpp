@@ -20,8 +20,6 @@
 #include "EngineUtils.h"
 
 bool EngineData::quit = false;   // True if the game should be quit out of.
-SDL_Window* EngineData::window;  // The window that the game is displayed on
-SDL_Renderer* EngineData::renderer;
 
 //-------------------------------------------------------
 
@@ -54,12 +52,12 @@ void Initialize()
     IMG_Init(IMG_INIT_PNG);
     TTF_Init();
     
-    EngineData::window = SDL_CreateWindow("test", 0, 0, 512, 512, 0);
-    EngineData::renderer = SDL_CreateRenderer(EngineData::window, -1, SDL_RENDERER_PRESENTVSYNC + SDL_RENDERER_ACCELERATED);
-    SDL_SetRenderDrawColor(EngineData::renderer, 255, 255, 255, 255); // set renderer draw color
     if( CheckConfigFiles() != 0 ) {
         // error with config files
     }
+
+    RendererData::LoadCameraSettings();
+    RendererData::Init();
     
     // Load Assets
     LoadImages();
@@ -126,12 +124,12 @@ int GameLoop()
         }
     }
     
-    SDL_RenderClear(EngineData::renderer); // clear the renderer with the render clear color
+    SDL_RenderClear(RendererData::GetRenderer()); // clear the renderer with the render clear color
     
     // RENDER STUFF HERE
     //Actors::LoadActorWithJSON(*GetTemplate("BouncyBox"));
     
-    SDL_RenderPresent(EngineData::renderer); // present the frame into the window
+    SDL_RenderPresent(RendererData::GetRenderer()); // present the frame into the window
     
     return 0;
 } // GameLoop()

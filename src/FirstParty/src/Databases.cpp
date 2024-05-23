@@ -50,7 +50,7 @@ void LoadImages()
         {
             if (file.path() != path + "/.DS_Store")
             {
-                SDL_Renderer* r = EngineData::renderer;
+                SDL_Renderer* r = RendererData::GetRenderer();
                 SDL_Texture* img = IMG_LoadTexture(r, file.path().string().c_str());
                 loaded_images[file.path().filename().stem().stem().string()] = img;
             }

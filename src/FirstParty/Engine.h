@@ -14,17 +14,13 @@
 
 #include "SDL.h"
 #include "SDL_image.h"
+#include "Renderer.h"
 
 using namespace std;
 
 struct EngineData
 {
-    static bool quit;   // True if the game should be quit out of.
-    
-    // TODO: Move these variables to the renderer scripts
-    static SDL_Window* window;  // The window that the game is displayed on
-    static SDL_Renderer* renderer;
-    
+    static bool quit;   // True if the game should be quit out of. 
 }; // EngineData
 
 /**

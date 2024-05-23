@@ -5,7 +5,7 @@
 //  Created by Nicholas Way on 5/21/24.
 //
 
-#include "InputManager.hpp"
+#include "InputManager.h"
 #include "Engine.h"
 
 void Input::Init(){
