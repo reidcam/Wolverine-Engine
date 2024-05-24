@@ -132,4 +132,5 @@ void Actors::LoadActorWithJSON(const rapidjson::Value& actor_data)
     
     // Update the number of loaded actors.
     num_loaded_actors++;
+    num_total_actors++;
 }

@@ -80,6 +80,57 @@ void Scene::UpdateActors()
 void Scene::LoadScene(std::string scene_name)
 {
     
+    // TODO: Scene path database so that this code doesn't have to search for the scene path every time.
+    /* Load files from this path */
+    const std::string path = "resources/scenes";
+    
+    // Fills up the database if the path exists
+    if (std::filesystem::exists(path))
+    {
+        for (const auto& file : std::filesystem::directory_iterator(path))
+        {
+            // If this scene matches the name of the one to be loaded
+            if (file.path().filename().stem().stem().string() == scene_name)
+            {
+                rapidjson::Document scene_document;
+                EngineUtils::ReadJsonFile(file.path().string(), scene_document);
+                
+                if (scene_document.HasMember("actors"))
+                {
+                    // Load all of the new actors into the game
+                    for (auto& member : (scene_document)["actors"].GetArray())
+                    {
+                        // If the actor has a value for template, combine the actor with the template before loading it
+                        if (member.HasMember("template"))
+                        {
+                            rapidjson::Document combined_actor;
+                            
+                            rapidjson::Document lhs;
+                            lhs.CopyFrom(member, lhs.GetAllocator());
+                            rapidjson::Document rhs;
+                            rhs.CopyFrom(*GetTemplate(member["template"].GetString()), rhs.GetAllocator());
+
+                            EngineUtils::CombineJsonDocuments(lhs, rhs, combined_actor);
+                            
+                            // FOR TESTS: Output the combined JSON as a string
+//                            rapidjson::StringBuffer buffer;
+//                            rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+//                            combined_actor.Accept(writer);
+//                            std::cout << buffer.GetString() << std::endl;
+                            
+                            Actors::LoadActorWithJSON(combined_actor);
+                        }
+                        else
+                        {
+                            Actors::LoadActorWithJSON(member);
+                        }
+                    }
+                }
+                // Return after loading the needed scene
+                return;
+            }
+        }
+    }
 }
 
 /**

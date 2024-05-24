@@ -66,6 +66,8 @@ void Initialize()
     LoadSounds();
     LoadFonts();
     LoadTemplates();
+    
+    Scene::LoadScene("test");
 } // Initialize()
 
 //-------------------------------------------------------
@@ -129,7 +131,7 @@ int GameLoop()
     SDL_RenderClear(EngineData::renderer); // clear the renderer with the render clear color
     
     // RENDER STUFF HERE
-    //Actors::LoadActorWithJSON(*GetTemplate("BouncyBox"));
+    //Scene::Instantiate("BouncyBox");
     
     SDL_RenderPresent(EngineData::renderer); // present the frame into the window
     
