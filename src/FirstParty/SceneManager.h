@@ -14,7 +14,7 @@
 class Scene
 {
 private:
-    static std::string scene_name; // The name of this scene
+    static std::string current_scene_name; // The name of this scene
     
     static std::vector<int> actors; // A list of active actors indexes
     static std::vector<int> new_actors; // A list of actors that need to be initialized this frame
