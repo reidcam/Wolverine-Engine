@@ -106,6 +106,8 @@ public:
     
     /**
      * Loads the data from JSON into the actor database to create a new actor
+     * DO NOT USE: This function is for use inside of the scene and actor managers only.
+     * In order to create a new actor please use the "'instantiate' function instead
      *
      * @param   actor_data  the JSON that will be processed into a new actor
      * @return             returns the id of the newly created actor
@@ -114,6 +116,8 @@ public:
     
     /**
      * Destroys an actor
+     * DO NOT USE: This function is for use inside of the scene and actor managers only.
+     * In order to destroy an actor please use the "'destroy' function instead
      *
      * @param   actor_id        the id of the actor that this function is acting on
     */

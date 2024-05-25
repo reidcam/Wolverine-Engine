@@ -130,9 +130,9 @@ int GameLoop()
     
     SDL_RenderClear(EngineData::renderer); // clear the renderer with the render clear color
     
-    // RENDER STUFF HERE
-    
     Scene::UpdateActors();
+    
+    // RENDER STUFF HERE
     
     SDL_RenderPresent(EngineData::renderer); // present the frame into the window
     

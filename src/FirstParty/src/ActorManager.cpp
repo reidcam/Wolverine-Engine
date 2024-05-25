@@ -61,6 +61,7 @@ void Actors::Cleanup()
 void Actors::Start(int actor_id)
 {
     int actor_index = GetIndex(actor_id);
+    
     // TODO: ???
 }
 
@@ -72,7 +73,13 @@ void Actors::Start(int actor_id)
 void Actors::ProcessAddedComponents(int actor_id)
 {
     int actor_index = GetIndex(actor_id);
-    // TODO: This function
+    
+    // Skip this function if the actor isn't enabled
+    if (!actor_enabled[actor_index])
+    {
+        return;
+    }
+    // TODO: Call "OnStart" for every component on this actor that has it.
 }
 
 /**
@@ -83,7 +90,15 @@ void Actors::ProcessAddedComponents(int actor_id)
 void Actors::Update(int actor_id)
 {
     int actor_index = GetIndex(actor_id);
-    // TODO: This function
+    
+    // Skip this function if the actor isn't enabled
+    if (!actor_enabled[actor_index])
+    {
+        return;
+    }
+    
+    //std::cout << GetID(actor_id) << std::endl;
+    // TODO: Call "OnUpdate" for every component on this actor that has it.
 }
 
 /**
@@ -94,7 +109,13 @@ void Actors::Update(int actor_id)
 void Actors::LateUpdate(int actor_id)
 {
     int actor_index = GetIndex(actor_id);
-    // TODO: This function
+    
+    // Skip this function if the actor isn't enabled
+    if (!actor_enabled[actor_index])
+    {
+        return;
+    }
+    // TODO: Call "OnLateUpdate" for every component on this actor that has it.
 }
 
 /**
@@ -105,7 +126,10 @@ void Actors::LateUpdate(int actor_id)
 void Actors::ProcessRemovedComponents(int actor_id)
 {
     int actor_index = GetIndex(actor_id);
-    // TODO: This function
+
+    // TODO: Call "OnDestroy" for every component on this actor that has it.
+    // What if the dev calls destroy in OnDestroy? The components in the destroyed actor wouldn't be processed correctly
+    // Maybe call "OnDestroy" right when the component is destroyed?
 }
 
 //-------------------------------------------------------
@@ -138,6 +162,8 @@ int Actors::GetID(int actor_id)
 
 /**
  * Loads the data from JSON into the actor database to create a new actor
+ * DO NOT USE: This function is for use inside of the scene and actor managers only.
+ * In order to create a new actor please use the "'instantiate' function instead
  *
  * @param   actor_data  the JSON that will be processed into a new actor
  * @return             returns the id of the newly created actor
@@ -178,6 +204,8 @@ int Actors::LoadActorWithJSON(const rapidjson::Value& actor_data)
 
 /**
  * Destroys an actor
+ * DO NOT USE: This function is for use inside of the scene and actor managers only.
+ * In order to destroy an actor please use the "'destroy' function instead
  *
  * @param   actor_id        the id of the actor that this function is acting on
 */
@@ -204,6 +232,6 @@ int Actors::GetIndex(int actor_id)
         return id_to_index[actor_id];
     }
     
-    std::cout << "error: attempt to access a nonexistant actor with ID: " << actor_id << std::endl;
+    //std::cout << "error: attempt to access a nonexistant actor with ID: " << actor_id << std::endl;
     return -1;
 }

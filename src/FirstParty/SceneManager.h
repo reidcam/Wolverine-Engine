@@ -15,6 +15,7 @@ class Scene
 {
 private:
     static std::string current_scene_name; // The name of this scene
+    static int current_scene_lifetime; // The number of frames this scene has been active for
     
     static std::vector<int> actors; // A list of active actors indexes
     static std::vector<int> new_actors; // A list of actors that need to be initialized this frame
@@ -45,6 +46,13 @@ public:
      * @returns                     the index of the newly created actor
     */
     static int Instantiate(std::string actor_template_name);
+    
+    /**
+     * destroys an actor and then removes it from the scene
+     *
+     * @param   actor_id    the id of the actor to be destroyed
+    */
+    static void Destroy(int actor_id);
     
     //-------------------------------------------------------
     // Getters/Setters
