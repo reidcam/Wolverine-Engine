@@ -20,6 +20,7 @@
 #include "EngineUtils.h"
 
 bool EngineData::quit = false;   // True if the game should be quit out of.
+std::string EngineData::game_title = "";
 SDL_Window* EngineData::window;  // The window that the game is displayed on
 SDL_Renderer* EngineData::renderer;
 
@@ -92,6 +93,20 @@ bool CheckGameConfig()
         std::cout << "error: resources/game.config missing";
         return false;
     }
+    rapidjson::Document game_config;
+    EngineUtils::ReadJsonFile("resources/game.config", game_config);
+    
+    if(game_config.HasMember("game_title")){
+        EngineData::game_title = game_config["game_title"].GetString();
+    }
+    if(game_config.HasMember("initial_scene")){
+        std::string initial_scene = game_config["initial_scene"].GetString();
+        Scene::LoadScene(initial_scene);
+    }
+    else {
+        std::cout << "error: initial scene unspecified";
+        exit(0);
+    }
     return true;
 }
 
@@ -100,6 +115,28 @@ bool CheckRenderingConfig()
     if( !EngineUtils::DirectoryExists("resources/rendering.config") ) {
         std::cout << "error: resources/rendering.config missing";
         return false;
+    }
+    rapidjson::Document rendering_config;
+    EngineUtils::ReadJsonFile("resources/rendering.config", rendering_config);
+
+    if(rendering_config.HasMember("x_resolution")){
+        EngineData::cam_x_resolution = rendering_config["x_resolution"].GetInt();
+    }
+    if(rendering_config.HasMember("y_resolution")){
+        EngineData::cam_y_resolution = rendering_config["y_resolution"].GetInt();
+    }
+    // read clear color
+    if(rendering_config.HasMember("clear_color_r")){
+        EngineData::clear_color[0] = rendering_config["clear_color_r"].GetInt();
+    }
+    if(rendering_config.HasMember("clear_color_g")){
+        EngineData::clear_color[1] = rendering_config["clear_color_g"].GetInt();
+    }
+    if(rendering_config.HasMember("clear_color_b")){
+        EngineData::clear_color[2] = rendering_config["clear_color_b"].GetInt();
+    }
+    if(rendering_config.HasMember("zoom_factor")){
+        EngineData::zoom_factor = rendering_config["zoom_factor"].GetDouble();
     }
     return true;
 }
