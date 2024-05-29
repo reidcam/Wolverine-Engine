@@ -50,12 +50,12 @@ void Initialize();
 int CheckConfigFiles();
 /**
  * resources/game.config accepts fields:
- * **game_title** and **initial_scene**
+ * `game_title` and `initial_scene`
  */
 bool CheckGameConfig();
 /**
  * resources/rendering.config accepts fields:
- * **x_resolution, y_resolution, zoom_factor, clear_color_r, clear_color_g, clear_color_b**
+ * `x_resolution`, `y_resolution`, `zoom_factor`, `clear_color_r`, `clear_color_g`, `clear_color_b`
  */
 bool CheckRenderingConfig();
 
