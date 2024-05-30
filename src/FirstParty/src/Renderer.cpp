@@ -81,9 +81,12 @@ bool RendererData::LoadRenderingConfig()
 }
 
 /*
-Puts the window in the specified fullscreen mode
+Puts the window in the specified fullscreen mode.
+SDL_WINDOW_FULLSCREEN:			creates a zoomed in fullscreen that creates the largest possible square screen
+SDL_WINDOW_FULLSCREEN_DESKTOP:	makes the window the size of the current screen
+0:								returns the window to its non-full-screen size
 
-@param	flag	can be SDL_WINDOW_FULLSCREEN, SDL_WINDOW_FULLSCREEN_DESKTOP, or 0
+@param	flag					can be SDL_WINDOW_FULLSCREEN, SDL_WINDOW_FULLSCREEN_DESKTOP, or 0
 */
 void RendererData::SetWindowFullscreen(int flag)
 {
