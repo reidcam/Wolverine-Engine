@@ -82,6 +82,8 @@ bool RendererData::LoadRenderingConfig()
 
 /*
 Puts the window in the specified fullscreen mode.
+More info: https://wiki.libsdl.org/SDL2/SDL_SetWindowFullscreen
+
 SDL_WINDOW_FULLSCREEN:			creates a zoomed in fullscreen that creates the largest possible square screen
 SDL_WINDOW_FULLSCREEN_DESKTOP:	makes the window the size of the current screen
 0:								returns the window to its non-full-screen size
@@ -92,6 +94,30 @@ void RendererData::SetWindowFullscreen(int flag)
 {
 	//TODO: add SDL error checking
 	SDL_SetWindowFullscreen(GetWindow(), flag);
+}
+
+/*
+Resizes the window when the window is not in full screen mode
+More info: https://wiki.libsdl.org/SDL2/SDL_SetWindowSize
+
+@param	w	the new width of the window
+@param	h	the new height of the window
+*/
+void RendererData::SetNonFullScreenWindowSize(int w, int h)
+{
+	SDL_SetWindowSize(GetWindow(), w, h);
+}
+
+/*
+Resizes the window when the window is in full screen mode.
+More info: https://wiki.libsdl.org/SDL2/SDL_SetWindowDisplayMode
+		   https://wiki.libsdl.org/SDL2/SDL_DisplayMode
+
+@param	display_mode	a SDL_DisplayMode* representing the mode to use
+*/
+void RendererData::SetFullScreenWindowSize(const SDL_DisplayMode* display_mode)
+{
+	SDL_SetWindowDisplayMode(GetWindow(), display_mode);
 }
 
 /*

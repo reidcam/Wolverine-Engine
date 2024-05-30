@@ -101,6 +101,8 @@ public:
 
 	/*
 	Puts the window in the specified fullscreen mode.
+	More info: https://wiki.libsdl.org/SDL2/SDL_SetWindowFullscreen
+
 	SDL_WINDOW_FULLSCREEN:			creates a zoomed in fullscreen that creates the largest possible square screen
 	SDL_WINDOW_FULLSCREEN_DESKTOP:	makes the window the size of the current screen
 	0:								returns the window to its non-full-screen size
@@ -108,6 +110,24 @@ public:
 	@param	flag					can be SDL_WINDOW_FULLSCREEN, SDL_WINDOW_FULLSCREEN_DESKTOP, or 0
 	*/
 	static void SetWindowFullscreen(int flag);
+
+	/*
+	Resizes the window when the window is not in full screen mode
+	More info: https://wiki.libsdl.org/SDL2/SDL_SetWindowSize
+
+	@param	w	the new width of the window
+	@param	h	the new height of the window
+	*/
+	static void SetNonFullScreenWindowSize(int w, int h);
+
+	/*
+	Resizes the window when the window is in full screen mode.
+	More info: https://wiki.libsdl.org/SDL2/SDL_SetWindowDisplayMode
+			   https://wiki.libsdl.org/SDL2/SDL_DisplayMode
+
+	@param	display_mode	a SDL_DisplayMode* representing the mode to use
+	*/
+	static void SetFullScreenWindowSize(const SDL_DisplayMode* display_mode);
 
 	/*
 	Renders all image draw requests in the image_draw_request_queue
