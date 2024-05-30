@@ -10,7 +10,8 @@
 
 #include "SceneManager.h"
 
-std::string Scene::scene_name; // The name of this scene
+std::string Scene::current_scene_name = ""; // The name of this scene
+int Scene::current_scene_lifetime = 0; // The number of frames this scene has been active for
 
 std::vector<int> Scene::actors; // A list of active actors indexes
 std::vector<int> Scene::new_actors; // A list of actors that need to be initialized this frame
@@ -24,47 +25,83 @@ std::vector<int> Scene::dead_actors; // A list of actors that need to be deleted
 */
 void Scene::UpdateActors()
 {
-    // Add all of the new actors to this scene
-    for (auto actor_index : new_actors)
+    current_scene_lifetime++;
+    
+    // Cleans up all of the dead actors in the actor database
+    if (current_scene_lifetime % 60 == 0)
     {
-        Actors::Start(actor_index);
+        Actors::Cleanup();
+    }
+    
+    // Add all of the new actors to this scene
+    for (auto actor : new_actors)
+    {
+        Actors::Start(actor);
         
         // TODO: Initialize all components added to new actors at runtime.
         
-        actors.push_back(actor_index);
+        actors.push_back(actor);
     }
     new_actors.clear();
     
     // Process all of the components added to actors this frame
-    for (auto actor_index : actors)
+    for (auto actor : actors)
     {
-        Actors::ProcessAddedComponents(actor_index);
+        Actors::ProcessAddedComponents(actor);
     }
     
     // Update all actors
-    for (auto actor_index : actors)
+    for (auto actor : actors)
     {
-        Actors::Update(actor_index);
+        Actors::Update(actor);
     }
     
     // Late update all actors
-    for (auto actor_index : actors)
+    for (auto actor : actors)
     {
-        Actors::LateUpdate(actor_index);
+        Actors::LateUpdate(actor);
         
         // TODO: Initialize all components added to new actors at runtime.
     }
     
     // Processes all of the components removed from actors this frame
-    for (auto actor_index : actors)
+    for (auto actor : actors)
     {
-        Actors::ProcessRemovedComponents(actor_index);
+        Actors::ProcessRemovedComponents(actor);
     }
     
-    // Destroys all of the needed actors
-    for (auto actor_index : dead_actors)
+    // Destroys all of the dead actors
+    // TODO: Take another look at how to remove dead actors from a scene, this feels VERY slow
+    for (auto actor : dead_actors)
     {
-        //delete actor;
+        int index_to_remove = -1;
+        // Find the index of the actor within 'actors' and delete it
+        for (int i = 0; i < actors.size(); i++)
+        {
+            if (actor == actors[i])
+            {
+                index_to_remove = i;
+                break;
+            }
+        }
+        
+        // Erase the dead actor
+        if (index_to_remove != -1) { actors.erase(actors.begin() + index_to_remove); }
+        else
+        {
+            // If the actor isn't in 'actors' check 'new_actors'
+            // Find the index of the actor within 'new_actors' and delete it
+            for (int i = 0; i < new_actors.size(); i++)
+            {
+                if (actor == new_actors[i])
+                {
+                    index_to_remove = i;
+                    break;
+                }
+            }
+            
+            if (index_to_remove != -1) { new_actors.erase(new_actors.begin() + index_to_remove); }
+        }
     }
     dead_actors.clear();
 }
@@ -79,21 +116,88 @@ void Scene::UpdateActors()
 */
 void Scene::LoadScene(std::string scene_name)
 {
+    // TODO: Scene path database so that this code doesn't have to search for the scene path every time.
+    /* Load files from this path */
+    const std::string path = "resources/scenes";
     
+    // Fills up the database if the path exists
+    if (std::filesystem::exists(path))
+    {
+        for (const auto& file : std::filesystem::directory_iterator(path))
+        {
+            // If this scene matches the name of the one to be loaded
+            if (file.path().filename().stem().stem().string() == scene_name)
+            {
+                current_scene_name = scene_name;
+                current_scene_lifetime = 0;
+                
+                rapidjson::Document scene_document;
+                EngineUtils::ReadJsonFile(file.path().string(), scene_document);
+                
+                if (scene_document.HasMember("actors"))
+                {
+                    // Load all of the new actors into the game
+                    for (auto& member : (scene_document)["actors"].GetArray())
+                    {
+                        // If the actor has a value for template, combine the actor with the template before loading it
+                        if (member.HasMember("template"))
+                        {
+                            rapidjson::Document combined_actor;
+                            
+                            rapidjson::Document lhs;
+                            lhs.CopyFrom(member, lhs.GetAllocator());
+                            rapidjson::Document rhs;
+                            rhs.CopyFrom(*GetTemplate(member["template"].GetString()), rhs.GetAllocator());
+
+                            EngineUtils::CombineJsonDocuments(lhs, rhs, combined_actor);
+                            
+                            // FOR TESTS: Output the combined JSON as a string
+//                            rapidjson::StringBuffer buffer;
+//                            rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+//                            combined_actor.Accept(writer);
+//                            std::cout << buffer.GetString() << std::endl;
+                            
+                            new_actors.push_back(Actors::LoadActorWithJSON(combined_actor));
+                        }
+                        else
+                        {
+                            new_actors.push_back(Actors::LoadActorWithJSON(member));
+                        }
+                    }
+                }
+                // Return after loading the needed scene
+                return;
+            }
+        }
+    }
 }
 
 /**
  * Creates a new actor from a template and adds it to the current scene, then returns a reference to it
  *
  * @param   actor_template_name the name of the template to make a copy of in the scene
- * @returns                     the index of the newly created actor
+ * @returns                     the id of the newly created actor
 */
 int Scene::Instantiate(std::string actor_template_name)
 {
-    Actors::LoadActorWithJSON(*GetTemplate(actor_template_name));
+    // Creates the actor
+    int new_actor_id = Actors::LoadActorWithJSON(*GetTemplate(actor_template_name));
+    // Adds the actor to the scene
+    new_actors.push_back(new_actor_id);
     
-    // TODO: FInd a way to return the index of the created actor.
-    return 0;
+    return new_actor_id;
+}
+
+/**
+ * destroys an actor and then removes it from the scene
+ *
+ * @param   actor_id    the id of the actor to be destroyed
+*/
+void Scene::Destroy(int actor_id)
+{
+    dead_actors.push_back(actor_id);
+    
+    Actors::DestroyActor(actor_id);
 }
 
 //-------------------------------------------------------
@@ -106,7 +210,7 @@ int Scene::Instantiate(std::string actor_template_name)
 */
 std::string Scene::GetSceneName()
 {
-    return scene_name;
+    return current_scene_name;
 }
 
 /**

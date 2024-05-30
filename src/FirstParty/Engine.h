@@ -36,9 +36,18 @@ void Initialize();
 
 /**
  * Checks validity of game.config and rendering.config, and records their contents
+ * parameters specified in config files are currently stored in EngineData
  */
 int CheckConfigFiles();
+/**
+ * resources/game.config accepts fields:
+ * `game_title` and `initial_scene`
+ */
 bool CheckGameConfig();
+/**
+ * resources/rendering.config accepts fields:
+ * `x_resolution`, `y_resolution`, `zoom_factor`, `clear_color_r`, `clear_color_g`, `clear_color_b`
+ */
 bool CheckRenderingConfig();
 
 /**

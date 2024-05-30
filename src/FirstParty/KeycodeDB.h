@@ -2,6 +2,9 @@
 #include <string>
 #include "SDL.h"
 
+/**
+ * map of keycodes to SDL scancodes, used by input system to translate user-specified strings to input events
+ */
 const std::unordered_map<std::string, SDL_Scancode> __keycode_to_scancode = {
     // Directional (arrow) Keys
     {"up", SDL_SCANCODE_UP},
