@@ -262,3 +262,133 @@ void RendererData::DrawImage(const std::string& image_name, const float x, const
 
 	image_draw_request_queue.push_back(obj);
 }
+
+/*
+Creates an image draw request for the image with name 'image_name' with more control than DrawImage
+
+@param	image_name			The name of the image to be drawn
+@param	x					The x position to draw the image at
+@param	y					The y position to draw the iamge at
+@param	rotation_degrees	The rotation of the image in degrees
+@param	scale_x				The scale to draw the x-axis. 1 is normal
+@param	scale_y				The scale to draw the y-axis. 1 is normal
+@param	pivot_x				[0, 1] Where on the x position of the image should be located. 0 is the left side of the image and 1 is the right.
+@param	pivot_y				[0, 1] Where on the y position of the image should be located. 0 is the top side of the image and 1 is the bottom.
+@param	r					[0, 255] How red the image is
+@param	g					[0, 255] How green the image is
+@param	b					[0, 255] How blue the image is
+@param	a					[0, 255] The alpha value of the image
+@param	sorting_order		The sorting layer that the image should be drawn in
+*/
+void RendererData::DrawImageEx(const std::string& image_name, const float x, const float y, const float rotation_degrees, const float scale_x, const float scale_y, const float pivot_x, const float pivot_y, const float r, const float g, const float b, const float a, const float sorting_order)
+{
+	ImageDrawRequest obj;
+	obj.image_name = image_name;
+	obj.x = x;
+	obj.y = y;
+	obj.rotation_degrees = static_cast<int>(rotation_degrees);
+	obj.scale_x = scale_x;
+	obj.scale_y = scale_y;
+	obj.pivot_x = pivot_x;
+	obj.pivot_y = pivot_y;
+	obj.r = static_cast<int>(r);
+	obj.g = static_cast<int>(g);
+	obj.b = static_cast<int>(b);
+	obj.a = static_cast<int>(a);
+	obj.sorting_order = static_cast<int>(sorting_order);
+
+	image_draw_request_queue.push_back(obj);
+}
+
+/*
+Creates a pixel draw request at the specified (x, y) screen position with color {r, g, b, a}
+
+@param	x	the x of the screen position for the pixel to be drawn
+@param	y	the x of the screen position for the pixel to be drawn
+@param	r	the red value of the color of the pixel to be drawn [0, 255]
+@param	g	the green value of the color of the pixel to be drawn [0, 255]
+@param	b	the blue value of the color of the pixel to be drawn [0, 255]
+@param	a	the alpha value of the color of the pixel to be drawn [0, 255]
+*/
+void RendererData::DrawPixel(const float x, const float y, const float r, const float g, const float b, const float a)
+{
+	PixelDrawRequest obj;
+	obj.x = static_cast<int>(x);
+	obj.y = static_cast<int>(y);
+	obj.r = static_cast<int>(r);
+	obj.g = static_cast<int>(g);
+	obj.b = static_cast<int>(b);
+	obj.a = static_cast<int>(a);
+
+	pixel_draw_request_queue.push_back(obj);
+}
+
+/*
+Creates a text draw request for str_content at the specified (x, y) screen position
+
+@param	str_content		the text to be drawn
+@param	x				the x of the screen position for top left corner of the text
+@param	y				the y of the screen position for top left corner of the text
+@param	font_name		the name of the font to draw the text with
+@param	font_size		how large the text should be drawn
+@param	r	the red value of the color of the text to be drawn [0, 255]
+@param	g	the green value of the color of the text to be drawn [0, 255]
+@param	b	the blue value of the color of the text to be drawn [0, 255]
+@param	a	the alpha value of the color of the text to be drawn [0, 255]
+*/
+void RendererData::DrawText(const std::string str_content, int x, int y, std::string font_name, int font_size, int r, int g, int b, int a)
+{
+	TextRenderRequest obj;
+	obj.text = str_content;
+	obj.font = font_name;
+	obj.size = font_size;
+	obj.x = x;
+	obj.y = y;
+	obj.r = r;
+	obj.g = g;
+	obj.b = b;
+	obj.a = a;
+
+	text_draw_request_queue.push_back(obj);
+}
+
+/*
+Set the (x, y) position of the camera
+
+@param	x	the new x screen position of the camera
+@param	y	the new y screen position of the camera
+*/
+void RendererData::SetCameraPosition(const float x, const float y)
+{
+	current_cam_pos = { x, y };
+}
+
+/*
+Get the (x, y) position of the camera as a glm::vec2
+
+@returns	a glm::vec2 containing the camera's current position
+*/
+glm::vec2 RendererData::GetCameraPosition()
+{
+	return current_cam_pos;
+}
+
+/*
+Set the zoom factor of the camera
+
+@param	new_zoom_factor		the new zoom factor for the camera
+*/
+void RendererData::SetCameraZoom(const float new_zoom_factor)
+{
+	zoom_factor = new_zoom_factor;
+}
+
+/*
+Gets the current zoom factor of the camera
+
+@returns	the current zoom factor of the camera
+*/
+float RendererData::GetCameraZoom()
+{
+	return zoom_factor;
+}

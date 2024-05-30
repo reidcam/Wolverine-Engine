@@ -176,6 +176,63 @@ public:
 	static void DrawImageEx(const std::string& image_name, const float x, const float y, const float rotation_degrees,
 		const float scale_x, const float scale_y, const float pivot_x, const float pivot_y, const float r, const float g,
 		const float b, const float a, const float sorting_order);
+
+	/*
+	Creates a pixel draw request at the specified (x, y) screen position with color {r, g, b, a}
+
+	@param	x	the x of the screen position for the pixel to be drawn
+	@param	y	the x of the screen position for the pixel to be drawn
+	@param	r	the red value of the color of the pixel to be drawn [0, 255]
+	@param	g	the green value of the color of the pixel to be drawn [0, 255]
+	@param	b	the blue value of the color of the pixel to be drawn [0, 255]
+	@param	a	the alpha value of the color of the pixel to be drawn [0, 255]
+	*/
+	static void DrawPixel(const float x, const float y, const float r, const float g, const float b, const float a);
+
+	/*
+	Creates a text draw request for str_content at the specified (x, y) screen position
+	
+	@param	str_content		the text to be drawn
+	@param	x				the x of the screen position for top left corner of the text
+	@param	y				the y of the screen position for top left corner of the text
+	@param	font_name		the name of the font to draw the text with
+	@param	font_size		how large the text should be drawn
+	@param	r	the red value of the color of the text to be drawn [0, 255]
+	@param	g	the green value of the color of the text to be drawn [0, 255]
+	@param	b	the blue value of the color of the text to be drawn [0, 255]
+	@param	a	the alpha value of the color of the text to be drawn [0, 255]				
+	*/
+	static void DrawText(const std::string str_content, int x, int y, std::string font_name,
+		int font_size, int r, int g, int b, int a);
+
+	/*
+	Set the (x, y) position of the camera
+
+	@param	x	the new x screen position of the camera
+	@param	y	the new y screen position of the camera
+	*/
+	static void SetCameraPosition(const float x, const float y);
+
+	/*
+	Get the (x, y) position of the camera as a glm::vec2
+
+	@returns	a glm::vec2 containing the camera's current position
+	*/
+	static glm::vec2 GetCameraPosition();
+
+	/*
+	Set the zoom factor of the camera
+
+	@param	new_zoom_factor		the new zoom factor for the camera
+	*/
+	static void SetCameraZoom(const float new_zoom_factor);
+
+	/*
+	Gets the current zoom factor of the camera
+
+	@returns	the current zoom factor of the camera
+	*/
+	static float GetCameraZoom();
 };
 
 struct CompareImageRequests {
