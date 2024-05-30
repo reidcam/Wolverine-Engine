@@ -92,8 +92,10 @@ public:
 
 	/*
 	Loads in the renderer settings from the rendering config
+
+	@returns	true if there were no issues loading the rendering config. False otherwise
 	*/
-	static void LoadCameraSettings();
+	static bool LoadRenderingConfig();
 
 	/*
 	Puts the window in the specified fullscreen mode

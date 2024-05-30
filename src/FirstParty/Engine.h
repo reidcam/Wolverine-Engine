@@ -21,6 +21,7 @@ using namespace std;
 struct EngineData
 {
     static bool quit;   // True if the game should be quit out of. 
+    inline static std::string game_title = "";
 }; // EngineData
 
 /**
@@ -48,7 +49,7 @@ bool CheckGameConfig();
  * resources/rendering.config accepts fields:
  * `x_resolution`, `y_resolution`, `zoom_factor`, `clear_color_r`, `clear_color_g`, `clear_color_b`
  */
-bool CheckRenderingConfig();
+//bool CheckRenderingConfig();
 
 /**
  * Responsible for running the engine correctly on each frame.

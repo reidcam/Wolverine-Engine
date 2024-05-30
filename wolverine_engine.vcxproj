@@ -277,8 +277,8 @@
     <ClInclude Include="src\ThirdParty\SDL2_ttf\SDL_ttf.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="resoureces\game.config" />
-    <None Include="resoureces\rendering.config" />
+    <None Include="resources\game.config" />
+    <None Include="resources\rendering.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -36,12 +36,17 @@ void RendererData::Init()
 /*
 Loads in the renderer settings from the rendering config
 */
-void RendererData::LoadCameraSettings()
+bool RendererData::LoadRenderingConfig()
 {
-	rapidjson::Document doc;
 	std::string file_path = "resources/rendering.config";
 
+	if (!EngineUtils::DirectoryExists(file_path)) {
+		std::cout << "error: resources/rendering.config missing";
+		return false;
+	}
+
 	// read in the document
+	rapidjson::Document doc;
 	EngineUtils::ReadJsonFile(file_path, doc);
 
 	// parse the JSON
@@ -63,6 +68,8 @@ void RendererData::LoadCameraSettings()
 	if (doc.HasMember("zoom_factor")) {
 		zoom_factor = doc["zoom_factor"].GetFloat();
 	}
+
+	return true;
 }
 
 /*

@@ -227,7 +227,7 @@ void Actors::DestroyActor(int actor_id)
 int Actors::GetIndex(int actor_id)
 {
     // Check if its an actor that exists
-    if (id_to_index.contains(actor_id) && id_to_index[actor_id] != -1)
+    if (id_to_index.find(actor_id) != id_to_index.end() && id_to_index[actor_id] != -1)
     {
         return id_to_index[actor_id];
     }
