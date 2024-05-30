@@ -56,7 +56,7 @@ void Initialize()
         // error with config files
     }
 
-    RendererData::Init();
+    RendererData::Init(EngineData::game_title);
     
     // Load Assets
     LoadImages();

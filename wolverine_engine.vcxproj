@@ -279,6 +279,7 @@
   <ItemGroup>
     <None Include="resources\game.config" />
     <None Include="resources\rendering.config" />
+    <None Include="resources\scenes\basic.scene" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -22,12 +22,14 @@ SDL_Texture* RendererData::ConvertTextToTexture(SDL_Renderer* renderer, const st
 
 /*
 Initializes the renderer
+
+@param	title	the title of the window to create
 */
-void RendererData::Init()
+void RendererData::Init(const std::string& title)
 {
-    SDL_Window* window = SDL_CreateWindow("test", window_position.x, window_position.y, window_size.x, window_size.y, 0);
+    SDL_Window* window = SDL_CreateWindow("test", window_position.x, window_position.y, window_size.x, window_size.y, SDL_WINDOW_SHOWN);
     SetWindow(window);
-    SDL_Renderer* renderer = SDL_CreateRenderer(RendererData::window, -1, SDL_RENDERER_PRESENTVSYNC + SDL_RENDERER_ACCELERATED);
+    SDL_Renderer* renderer = SDL_CreateRenderer(RendererData::window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
     SetRenderer(renderer);
 
     SDL_SetRenderDrawColor(RendererData::GetRenderer(), clear_color_r, clear_color_g, clear_color_b, clear_color_a); // set renderer draw color
@@ -50,6 +52,12 @@ bool RendererData::LoadRenderingConfig()
 	EngineUtils::ReadJsonFile(file_path, doc);
 
 	// parse the JSON
+	if (doc.HasMember("x_position")) {
+		window_position.x = doc["x_position"].GetInt();
+	}
+	if (doc.HasMember("y_position")) {
+		window_position.y = doc["y_position"].GetInt();
+	}
 	if (doc.HasMember("x_resolution")) {
 		window_size.x = doc["x_resolution"].GetInt();
 	}

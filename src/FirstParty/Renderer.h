@@ -87,8 +87,10 @@ public:
 
 	/*
 	Initializes the renderer
+
+	@param	title	the title of the window to create
 	*/
-	static void Init();
+	static void Init(const std::string& title);
 
 	/*
 	Loads in the renderer settings from the rendering config
