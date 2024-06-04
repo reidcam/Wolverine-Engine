@@ -15,6 +15,7 @@
 #include "TextDB.h"
 #include "TemplateDB.h"
 #include "SceneManager.h"
+#include "ComponentManager.h"
 
 #include "Engine.h"
 #include "EngineUtils.h"
@@ -57,6 +58,7 @@ void Initialize()
     }
 
     RendererData::Init(EngineData::game_title);
+    ComponentManager::init();
     
     // Load Assets
     LoadImages();

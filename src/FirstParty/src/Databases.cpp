@@ -23,6 +23,7 @@
 #include "AudioDB.h"
 #include "TextDB.h"
 #include "TemplateDB.h"
+#include "ComponentDB.h"
 
 #include "Engine.h"
 
@@ -31,6 +32,7 @@ std::unordered_map<std::string, SDL_Texture*> loaded_images; // All of the loade
 std::unordered_map<std::string, Mix_Chunk*> loaded_sounds; // All of the loaded sounds
 std::unordered_map<std::string, std::unordered_map<int, TTF_Font*>> loaded_fonts; // All of the loaded fonts
 std::unordered_map<std::string, rapidjson::Document*> loaded_templates; // All of the loaded templates
+std::unordered_map<std::string, std::shared_ptr<sol::table>> loaded_component_typs; // All of the loaded component types
 
 //-------------------------------------------------------
 // Image Database
@@ -215,3 +217,39 @@ rapidjson::Document* GetTemplate(std::string template_name)
     
     return loaded_templates[template_name];
 } // GetTemplate()
+
+//-------------------------------------------------------
+// Component Type Database
+
+/**
+ * Loads all of the components in the resources/component_types directory
+*/
+void LoadComponentTypes()
+{
+    /* Load files from this path */
+    const std::string path = "resources/component_types";
+    
+    // Fills up the database if the path exists
+    if (std::filesystem::exists(path))
+    {
+        for (const auto& file : std::filesystem::directory_iterator(path))
+        {
+            if (file.path() != path + "/.DS_Store")
+            {
+                sol::table script;
+//                rapidjson::Document* template_document = new rapidjson::Document;
+//                EngineUtils::ReadJsonFile(file.path().string(), *template_document);
+//                
+//                loaded_templates[file.path().filename().stem().stem().string()] = template_document;
+            }
+        }
+    }
+}
+
+/**
+ * Get a component type based on its name
+ *
+ *`@param   component_name  the name of the component type to get from the database
+ * @returns                 the component type with the specified name
+*/
+std::shared_ptr<sol::table> GetComponentType(std::string component_name);
