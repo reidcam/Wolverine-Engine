@@ -20,9 +20,6 @@
 #include "EngineUtils.h"
 
 bool EngineData::quit = false;   // True if the game should be quit out of.
-std::string EngineData::game_title = "";
-SDL_Window* EngineData::window;  // The window that the game is displayed on
-SDL_Renderer* EngineData::renderer;
 
 //-------------------------------------------------------
 
@@ -55,12 +52,11 @@ void Initialize()
     IMG_Init(IMG_INIT_PNG);
     TTF_Init();
     
-    EngineData::window = SDL_CreateWindow("test", 0, 0, 512, 512, 0);
-    EngineData::renderer = SDL_CreateRenderer(EngineData::window, -1, SDL_RENDERER_PRESENTVSYNC + SDL_RENDERER_ACCELERATED);
-    SDL_SetRenderDrawColor(EngineData::renderer, 255, 255, 255, 255); // set renderer draw color
     if( CheckConfigFiles() != 0 ) {
         // error with config files
     }
+
+    RendererData::Init(EngineData::game_title);
     
     // Load Assets
     LoadImages();
@@ -78,11 +74,16 @@ void Initialize()
  */
 int CheckConfigFiles()
 {
-    if( !EngineUtils::DirectoryExists("resources") ) {
+    std::filesystem::path currentFile = __FILE__;
+    std::filesystem::path currentDirectory = currentFile.parent_path();
+    std::filesystem::path relativePath = currentDirectory / ".." / ".." / ".." / "resources";
+    std::filesystem::path absolutePath = std::filesystem::canonical(relativePath);
+
+    if( !EngineUtils::DirectoryExists(absolutePath.string())) {
         std::cout << "error: resources/ missing";
         return 1;
     }
-    if( CheckGameConfig() && CheckRenderingConfig() )
+    if( CheckGameConfig() && RendererData::LoadRenderingConfig() )
         return 0;
     return 1;
 }
@@ -110,36 +111,36 @@ bool CheckGameConfig()
     return true;
 }
 
-bool CheckRenderingConfig()
-{
-    if( !EngineUtils::DirectoryExists("resources/rendering.config") ) {
-        std::cout << "error: resources/rendering.config missing";
-        return false;
-    }
-    rapidjson::Document rendering_config;
-    EngineUtils::ReadJsonFile("resources/rendering.config", rendering_config);
-
-    if(rendering_config.HasMember("x_resolution")){
-        EngineData::cam_x_resolution = rendering_config["x_resolution"].GetInt();
-    }
-    if(rendering_config.HasMember("y_resolution")){
-        EngineData::cam_y_resolution = rendering_config["y_resolution"].GetInt();
-    }
-    // read clear color
-    if(rendering_config.HasMember("clear_color_r")){
-        EngineData::clear_color[0] = rendering_config["clear_color_r"].GetInt();
-    }
-    if(rendering_config.HasMember("clear_color_g")){
-        EngineData::clear_color[1] = rendering_config["clear_color_g"].GetInt();
-    }
-    if(rendering_config.HasMember("clear_color_b")){
-        EngineData::clear_color[2] = rendering_config["clear_color_b"].GetInt();
-    }
-    if(rendering_config.HasMember("zoom_factor")){
-        EngineData::zoom_factor = rendering_config["zoom_factor"].GetDouble();
-    }
-    return true;
-}
+//bool CheckRenderingConfig()
+//{
+//    if( !EngineUtils::DirectoryExists("resources/rendering.config") ) {
+//        std::cout << "error: resources/rendering.config missing";
+//        return false;
+//    }
+//    rapidjson::Document rendering_config;
+//    EngineUtils::ReadJsonFile("resources/rendering.config", rendering_config);
+//
+//    if(rendering_config.HasMember("x_resolution")){
+//        EngineData::cam_x_resolution = rendering_config["x_resolution"].GetInt();
+//    }
+//    if(rendering_config.HasMember("y_resolution")){
+//        EngineData::cam_y_resolution = rendering_config["y_resolution"].GetInt();
+//    }
+//    // read clear color
+//    if(rendering_config.HasMember("clear_color_r")){
+//        EngineData::clear_color[0] = rendering_config["clear_color_r"].GetInt();
+//    }
+//    if(rendering_config.HasMember("clear_color_g")){
+//        EngineData::clear_color[1] = rendering_config["clear_color_g"].GetInt();
+//    }
+//    if(rendering_config.HasMember("clear_color_b")){
+//        EngineData::clear_color[2] = rendering_config["clear_color_b"].GetInt();
+//    }
+//    if(rendering_config.HasMember("zoom_factor")){
+//        EngineData::zoom_factor = rendering_config["zoom_factor"].GetDouble();
+//    }
+//    return true;
+//}
 
 //-------------------------------------------------------
 
@@ -165,13 +166,13 @@ int GameLoop()
         }
     }
     
-    SDL_RenderClear(EngineData::renderer); // clear the renderer with the render clear color
+    SDL_RenderClear(RendererData::GetRenderer()); // clear the renderer with the render clear color
     
     Scene::UpdateActors();
     
     // RENDER STUFF HERE
     
-    SDL_RenderPresent(EngineData::renderer); // present the frame into the window
+    SDL_RenderPresent(RendererData::GetRenderer()); // present the frame into the window
     
     return 0;
 } // GameLoop()

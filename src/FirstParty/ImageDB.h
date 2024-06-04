@@ -22,7 +22,7 @@ void LoadImages();
 /**
  * Get an image based on the images name
  *
- *`@param   image_name  the name of the image to get from the database
+ * @param   image_name  the name of the image to get from the database
  * @returns             the image with the specified name
 */
 SDL_Texture* GetImage(std::string image_name);

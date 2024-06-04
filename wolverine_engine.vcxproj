@@ -71,12 +71,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(ProjectDir)src/ThirdParty/SDL2/;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)ThirdParty\SDL2\lib\;$(ProjectDir)ThirdParty\SDL2_image\lib\;$(ProjectDir)ThirdParty\SDL2_mixer\lib\;$(ProjectDir)ThirdParty\SDL2_ttf\lib\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)src/ThirdParty/SDL2/;$(ProjectDir)src/ThirdParty/SDL2_ttf/;$(ProjectDir)src/ThirdParty/SDL2_mixer/;$(ProjectDir)src/ThirdParty/SDL2_image/;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)src/ThirdParty\SDL2\lib\;$(ProjectDir)src/ThirdParty\SDL2_image\lib\;$(ProjectDir)src/ThirdParty\SDL2_mixer\lib\;$(ProjectDir)src/ThirdParty\SDL2_ttf\lib\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(ProjectDir)src/ThirdParty/SDL2/;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)ThirdParty\SDL2\lib\;$(ProjectDir)ThirdParty\SDL2_image\lib\;$(ProjectDir)ThirdParty\SDL2_mixer\lib\;$(ProjectDir)ThirdParty\SDL2_ttf\lib\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)src/ThirdParty/SDL2/;$(ProjectDir)src/ThirdParty/SDL2_ttf/;$(ProjectDir)src/ThirdParty/SDL2_mixer/;$(ProjectDir)src/ThirdParty/SDL2_image/;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)src/ThirdParty\SDL2\lib\;$(ProjectDir)src/ThirdParty\SDL2_image\lib\;$(ProjectDir)src/ThirdParty\SDL2_mixer\lib\;$(ProjectDir)src/ThirdParty\SDL2_ttf\lib\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -110,15 +110,16 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>%(ProjectDir);%(ProjcetDir)src/ThirdParty/lua-5.4.6;%(ProjectDir)src/ThirdParty/sol2-3.3.0;%(ProjcetDIr)src/ThirdParty/box2d-2.4.1/box2d;%(ProjcetDIr)src/ThirdParty/box2d-2.4.1/src;%(ProjcetDIr)src/ThirdParty/box2d-2.4.1;%(ProjcetDIr)src/ThirdParty/SDL2_ttf/lib;%(ProjcetDIr)src/ThirdParty/SDL2_ttf;%(ProjcetDIr)src/ThirdParty/SDL2_mixer/lib;%(ProjcetDIr)src/ThirdParty/SDL2_mixer;%(ProjcetDIr)src/ThirdParty/SDL2_image/lib;%(ProjcetDIr)src/ThirdParty/SDL2_image;%(ProjcetDIr)src/ThirdParty/SDL2/lib;%(ProjcetDIr)src/ThirdParty/SDL2;%(ProjcetDir)src/ThirdParty/rapidjson-1.1.0/include;%(ProjcetDir)src/ThirdParty/glm</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(ProjcetDir)src/FirstParty;%(ProjectDir);%(ProjcetDir)src/ThirdParty/lua-5.4.6;%(ProjectDir)src/ThirdParty/sol2-3.3.0;%(ProjcetDIr)src/ThirdParty/box2d-2.4.1/box2d;%(ProjcetDIr)src/ThirdParty/box2d-2.4.1/src;%(ProjcetDIr)src/ThirdParty/box2d-2.4.1;%(ProjcetDIr)src/ThirdParty/SDL2_ttf/lib;%(ProjcetDIr)src/ThirdParty/SDL2_ttf;%(ProjcetDIr)src/ThirdParty/SDL2_mixer/lib;%(ProjcetDIr)src/ThirdParty/SDL2_mixer;%(ProjcetDIr)src/ThirdParty/SDL2_image/lib;%(ProjcetDIr)src/ThirdParty/SDL2_image;%(ProjcetDIr)src/ThirdParty/SDL2/lib;%(ProjcetDIr)src/ThirdParty/SDL2;%(ProjcetDir)src/ThirdParty/rapidjson-1.1.0/include/rapidjson;%(ProjcetDir)src/ThirdParty/glm;%(ProjcetDir)src/ThirdParty/glm/glm</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>SDL2.lib;SDL2_image.lib;SDL2_mixer.lib;SDL2_ttf.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>copy dlls\* $(OutDir)</Command>
@@ -130,9 +131,9 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>%(ProjectDir);%(ProjcetDir)src/ThirdParty/lua-5.4.6;%(ProjectDir)src/ThirdParty/sol2-3.3.0;%(ProjcetDIr)src/ThirdParty/box2d-2.4.1/box2d;%(ProjcetDIr)src/ThirdParty/box2d-2.4.1/src;%(ProjcetDIr)src/ThirdParty/box2d-2.4.1;%(ProjcetDIr)src/ThirdParty/SDL2_ttf/lib;%(ProjcetDIr)src/ThirdParty/SDL2_ttf;%(ProjcetDIr)src/ThirdParty/SDL2_mixer/lib;%(ProjcetDIr)src/ThirdParty/SDL2_mixer;%(ProjcetDIr)src/ThirdParty/SDL2_image/lib;%(ProjcetDIr)src/ThirdParty/SDL2_image;%(ProjcetDIr)src/ThirdParty/SDL2/lib;%(ProjcetDIr)src/ThirdParty/SDL2;%(ProjcetDir)src/ThirdParty/rapidjson-1.1.0/include;%(ProjcetDir)src/ThirdParty/glm</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(ProjcetDir)src/FirstParty;%(ProjectDir);%(ProjcetDir)src/ThirdParty/lua-5.4.6;%(ProjectDir)src/ThirdParty/sol2-3.3.0;%(ProjcetDIr)src/ThirdParty/box2d-2.4.1/box2d;%(ProjcetDIr)src/ThirdParty/box2d-2.4.1/src;%(ProjcetDIr)src/ThirdParty/box2d-2.4.1;%(ProjcetDIr)src/ThirdParty/SDL2_ttf/lib;%(ProjcetDIr)src/ThirdParty/SDL2_ttf;%(ProjcetDIr)src/ThirdParty/SDL2_mixer/lib;%(ProjcetDIr)src/ThirdParty/SDL2_mixer;%(ProjcetDIr)src/ThirdParty/SDL2_image/lib;%(ProjcetDIr)src/ThirdParty/SDL2_image;%(ProjcetDIr)src/ThirdParty/SDL2/lib;%(ProjcetDIr)src/ThirdParty/SDL2;%(ProjcetDir)src/ThirdParty/rapidjson-1.1.0/include/rapidjson;%(ProjcetDir)src/ThirdParty/glm;%(ProjcetDir)src/ThirdParty/glm/glm</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
     </ClCompile>
@@ -141,13 +142,20 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>SDL2.lib;SDL2_image.lib;SDL2_mixer.lib;SDL2_ttf.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>copy dlls\* $(OutDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\FirstParty\src\ActorManager.cpp" />
+    <ClCompile Include="src\FirstParty\src\Databases.cpp" />
+    <ClCompile Include="src\FirstParty\src\Engine.cpp" />
+    <ClCompile Include="src\FirstParty\src\InputManager.cpp" />
     <ClCompile Include="src\FirstParty\src\main.cpp" />
+    <ClCompile Include="src\FirstParty\src\Renderer.cpp" />
+    <ClCompile Include="src\FirstParty\src\SceneManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="src\ThirdParty\SDL2\lib\SDL2.lib" />
@@ -155,6 +163,37 @@
     <Library Include="src\ThirdParty\SDL2_image\lib\SDL2_image.lib" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\FirstParty\ActorManager.h" />
+    <ClInclude Include="src\FirstParty\AudioDB.h" />
+    <ClInclude Include="src\FirstParty\Engine.h" />
+    <ClInclude Include="src\FirstParty\EngineUtils.h" />
+    <ClInclude Include="src\FirstParty\ImageDB.h" />
+    <ClInclude Include="src\FirstParty\InputManager.h" />
+    <ClInclude Include="src\FirstParty\KeycodeDB.h" />
+    <ClInclude Include="src\FirstParty\Renderer.h" />
+    <ClInclude Include="src\FirstParty\RenderRequests.h" />
+    <ClInclude Include="src\FirstParty\SceneManager.h" />
+    <ClInclude Include="src\FirstParty\TemplateDB.h" />
+    <ClInclude Include="src\FirstParty\TextDB.h" />
+    <ClInclude Include="src\ThirdParty\rapidjson-1.1.0\include\rapidjson\allocators.h" />
+    <ClInclude Include="src\ThirdParty\rapidjson-1.1.0\include\rapidjson\document.h" />
+    <ClInclude Include="src\ThirdParty\rapidjson-1.1.0\include\rapidjson\encodedstream.h" />
+    <ClInclude Include="src\ThirdParty\rapidjson-1.1.0\include\rapidjson\encodings.h" />
+    <ClInclude Include="src\ThirdParty\rapidjson-1.1.0\include\rapidjson\filereadstream.h" />
+    <ClInclude Include="src\ThirdParty\rapidjson-1.1.0\include\rapidjson\filewritestream.h" />
+    <ClInclude Include="src\ThirdParty\rapidjson-1.1.0\include\rapidjson\fwd.h" />
+    <ClInclude Include="src\ThirdParty\rapidjson-1.1.0\include\rapidjson\istreamwrapper.h" />
+    <ClInclude Include="src\ThirdParty\rapidjson-1.1.0\include\rapidjson\memorybuffer.h" />
+    <ClInclude Include="src\ThirdParty\rapidjson-1.1.0\include\rapidjson\memorystream.h" />
+    <ClInclude Include="src\ThirdParty\rapidjson-1.1.0\include\rapidjson\ostreamwrapper.h" />
+    <ClInclude Include="src\ThirdParty\rapidjson-1.1.0\include\rapidjson\pointer.h" />
+    <ClInclude Include="src\ThirdParty\rapidjson-1.1.0\include\rapidjson\prettywriter.h" />
+    <ClInclude Include="src\ThirdParty\rapidjson-1.1.0\include\rapidjson\rapidjson.h" />
+    <ClInclude Include="src\ThirdParty\rapidjson-1.1.0\include\rapidjson\reader.h" />
+    <ClInclude Include="src\ThirdParty\rapidjson-1.1.0\include\rapidjson\schema.h" />
+    <ClInclude Include="src\ThirdParty\rapidjson-1.1.0\include\rapidjson\stream.h" />
+    <ClInclude Include="src\ThirdParty\rapidjson-1.1.0\include\rapidjson\stringbuffer.h" />
+    <ClInclude Include="src\ThirdParty\rapidjson-1.1.0\include\rapidjson\writer.h" />
     <ClInclude Include="src\ThirdParty\SDL2\begin_code.h" />
     <ClInclude Include="src\ThirdParty\SDL2\close_code.h" />
     <ClInclude Include="src\ThirdParty\SDL2\SDL.h" />
@@ -234,6 +273,13 @@
     <ClInclude Include="src\ThirdParty\SDL2\SDL_video.h" />
     <ClInclude Include="src\ThirdParty\SDL2\SDL_vulkan.h" />
     <ClInclude Include="src\ThirdParty\SDL2_image\SDL_image.h" />
+    <ClInclude Include="src\ThirdParty\SDL2_mixer\SDL_mixer.h" />
+    <ClInclude Include="src\ThirdParty\SDL2_ttf\SDL_ttf.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\game.config" />
+    <None Include="resources\rendering.config" />
+    <None Include="resources\scenes\basic.scene" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
