@@ -14,6 +14,7 @@
 #include <unordered_map>
 
 #include "TemplateDB.h"
+#include "Component.h"
 
 using namespace std;
 
