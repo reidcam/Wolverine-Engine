@@ -53,21 +53,24 @@ void Initialize()
     IMG_Init(IMG_INIT_PNG);
     TTF_Init();
     
-    if( CheckConfigFiles() != 0 ) {
-        // error with config files
-    }
-
-    RendererData::Init(EngineData::game_title);
     ComponentManager::init();
     
-    // Load Assets
-    LoadImages();
-    LoadSounds();
-    LoadFonts();
+    // Load Resources needed for scene initialization
+    // Do this here because the initial scene is loaded in CheckConfigFiles.
     LoadTemplates();
     LoadComponentTypes();
     
-    Scene::LoadScene("test");
+    if( CheckConfigFiles() != 0 ) {
+        // error with config files
+    }
+    
+    RendererData::Init(EngineData::game_title);
+    
+    // Load Assets
+    // Do this here because the renderer needs to be initialized before these assets can be loaded.
+    LoadImages();
+    LoadSounds();
+    LoadFonts();
 } // Initialize()
 
 //-------------------------------------------------------
