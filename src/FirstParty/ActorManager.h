@@ -135,13 +135,14 @@ public:
     static int LoadActorWithJSON(const rapidjson::Value& actor_data);
     
     /**
-     * Loads the data from JSON into an existing lua table
+     * Loads the data from JSON into an existing lua value
      * DO NOT USE: This function is for use inside of the scene and actor managers only.
      *
-     * @param   out_table    the lua table that will store the given data
-     * @param   data               the JSON that will be processed into the table
+     * @param   value                           the lua value that will store the given data
+     * @param   data                             the JSON that will be processed into the table
+     * @param   type                             the intended type of the lua value
     */
-    static void LoadJSONIntoLuaTable(sol::table& out_table, const rapidjson::Value& data);
+    static void JsonToLuaObject(sol::lua_value& value, const rapidjson::Value& data, sol::type type);
     
     /**
      * Destroys an actor

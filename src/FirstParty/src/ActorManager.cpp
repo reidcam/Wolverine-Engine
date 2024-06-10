@@ -234,7 +234,17 @@ int Actors::LoadActorWithJSON(const rapidjson::Value& actor_data)
             // Preform required overrides on component properties
             // Sets component properties to specified values
             const rapidjson::Value& component_properties = itr->value;
-            LoadJSONIntoLuaTable(new_component, component_properties);
+            for (rapidjson::Value::ConstMemberIterator itr2 = component_properties.MemberBegin(); itr2 != component_properties.MemberEnd(); itr2++)
+            {
+                std::string property_name = itr2->name.GetString();
+                sol::type property_type = new_component[property_name].get_type();
+                
+                sol::lua_value property = "";
+                
+                JsonToLuaObject(property, itr2->value, property_type);
+                
+                new_component[property_name] = property;
+            }
 
             //-------------------------------------------------------
             // Injects the new component with a reference to its actor
@@ -257,38 +267,50 @@ int Actors::LoadActorWithJSON(const rapidjson::Value& actor_data)
 }
 
 /**
- * Loads the data from JSON into an existing lua table
+ * Loads the data from JSON into an existing lua value
  * DO NOT USE: This function is for use inside of the scene and actor managers only.
  *
- * @param   out_table    the lua table that will store the given data
- * @param   data               the JSON that will be processed into the table
+ * @param   value                           the lua value that will store the given data
+ * @param   data                             the JSON that will be processed into the table
+ * @param   type                             the intended type of the lua value
 */
-void Actors::LoadJSONIntoLuaTable(sol::table& out_table, const rapidjson::Value& data)
+void Actors::JsonToLuaObject(sol::lua_value& value, const rapidjson::Value& data, sol::type type)
 {
-    for (rapidjson::Value::ConstMemberIterator itr = data.MemberBegin(); itr != data.MemberEnd(); itr++)
+    // Adds the property to the component
+    if (type == sol::type::string) { value = data.GetString(); }
+    else if (type == sol::type::boolean) { value = data.GetBool(); }
+    else if (type == sol::type::number)
     {
-        std::string property_name = itr->name.GetString();
-        sol::object property = out_table[itr->name.GetString()];
-        sol::type property_type = property.get_type();
+        if (data.IsDouble()) { value = data.GetDouble(); }
+        else { value = data.GetInt(); }
+    }
+    else if (type == sol::type::table)
+    {
+        sol::table _table = ComponentManager::GetLuaState()->create_table();
+        _table[0] = sol::object(*ComponentManager::GetLuaState());
         
-        // Adds the property to the component
-        if (property_type == sol::type::string) { out_table[property_name] = itr->value.GetString(); }
-        else if (property_type == sol::type::boolean) { out_table[property_name] = itr->value.GetBool(); }
-        else if (property_type == sol::type::number)
+        // Add all of the values in the data to our new table.
+        int i = 1;
+        for (rapidjson::Value::ConstMemberIterator itr = data.MemberBegin(); itr != data.MemberEnd(); itr++)
         {
-            if (itr->value.IsDouble()) { out_table[property_name] = itr->value.GetDouble(); }
-            else { out_table[property_name] = itr->value.GetInt(); }
-        }
-        else if (property_type == sol::type::table)
-        {
-            sol::table new_table = ComponentManager::GetLuaState()->create_table();
-            const rapidjson::Value& table_data = itr->value;
+            const rapidjson::Value& _data = itr->value;
             
-            // Iterate through the whole table until we fill each spot
-            LoadJSONIntoLuaTable(new_table, table_data);
+            sol::lua_value _value = "";
             
-            out_table[property_name] = new_table;
+            // Determine the type of value that is being added to the table
+            sol::type _type = sol::type::none;
+            if (itr->value.IsString()) { _type = sol::type::string; }
+            else if (itr->value.IsBool()) { _type = sol::type::boolean; }
+            else if (itr->value.IsInt() || itr->value.IsDouble()) { _type = sol::type::number; }
+            else if (itr->value.IsObject()) { _type = sol::type::table; }
+            
+            JsonToLuaObject(_value, _data, _type);
+            
+            // Add the value to the new table
+            _table[i] = _value;
+            i++;
         }
+        value = _table;
     }
 }
 
