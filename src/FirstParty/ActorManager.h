@@ -14,8 +14,16 @@
 #include <unordered_map>
 
 #include "TemplateDB.h"
+#include "ComponentManager.h"
 
 using namespace std;
+
+// This is a dummy class to be exposed to Lua so that developers can program in an object-oriented way.
+class Actor
+{
+public:
+    int ID = 0;
+};
 
 class Actors
 {
@@ -36,6 +44,18 @@ private:
     static std::vector<std::string> names;
     static std::vector<int> IDs;
     static std::vector<bool> actor_enabled;
+    
+    // The components of all the loaded actors
+    // Layer 1: the index of the actor
+    // Layer 2: the index of the component on the actor
+    inline static std::vector< std::vector< std::shared_ptr<sol::table>>> components;
+    
+    // All components that need to be added to an actor this frame
+    inline static std::vector<std::shared_ptr<sol::table>> components_to_add;
+    //static std::vector<std::string> componentsToRemove;
+    
+    // The components across all actors with lifecycle functions
+    inline static std::vector<std::shared_ptr<sol::table>> components_to_update;
     
 public:
     //-------------------------------------------------------
@@ -113,6 +133,15 @@ public:
      * @return             returns the id of the newly created actor
     */
     static int LoadActorWithJSON(const rapidjson::Value& actor_data);
+    
+    /**
+     * Loads the data from JSON into an existing lua table
+     * DO NOT USE: This function is for use inside of the scene and actor managers only.
+     *
+     * @param   out_table    the lua table that will store the given data
+     * @param   data               the JSON that will be processed into the table
+    */
+    static void LoadJSONIntoLuaTable(sol::table& out_table, const rapidjson::Value& data);
     
     /**
      * Destroys an actor

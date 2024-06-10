@@ -195,11 +195,101 @@ int Actors::LoadActorWithJSON(const rapidjson::Value& actor_data)
         actor_enabled.push_back(true);
     }
     
+    //-------------------------------------------------------
+    // Components
+    if (actor_data.HasMember("components"))
+    {
+        const rapidjson::Value& actor_components = actor_data["components"];
+        
+        // Iterate over each component
+        for (rapidjson::Value::ConstMemberIterator itr = actor_components.MemberBegin(); itr != actor_components.MemberEnd(); itr++)
+        {
+            // Creates and gets a reference to a new table on the Lua stack
+            sol::table new_component = ComponentManager::GetLuaState()->create_table();
+            
+            // The key of this component
+            std::string key = itr->name.GetString();
+            
+            // Establishes inheritance between the new component and its type if specified
+            if (itr->value.HasMember("type"))
+            {
+                std::string type = itr->value["type"].GetString();
+                ComponentManager::EstablishInheritance(new_component, *GetComponentType(type));
+                
+                // Allows the component to know its own type
+                new_component["type"] = type;
+                // Gives the component its key
+                new_component["key"] = key;
+                // Sets the component to be enabled by default
+                new_component["enabled"] = true;
+            }
+            // If the type for this component is not specified anywhere, throw an error
+            else
+            {
+                std::cout << "error: component type unspecified for " << key << " on " << names[names.size() - 1];
+                exit(0);
+            }
+            
+            //-------------------------------------------------------
+            // Preform required overrides on component properties
+            // Sets component properties to specified values
+            const rapidjson::Value& component_properties = itr->value;
+            LoadJSONIntoLuaTable(new_component, component_properties);
+
+            //-------------------------------------------------------
+            // Injects the new component with a reference to its actor
+            Actor* _a = new Actor();
+            _a->ID = num_total_actors;
+            new_component["actor"] = _a;
+        
+            new_component["OnStart"](new_component);
+            
+            // Add the new component to the "components_to_add" vector
+            components_to_add.push_back(std::make_shared<sol::table>(new_component));
+        }
+    }
+    
     // Update the number of loaded actors.
     num_loaded_actors++;
     num_total_actors++;
     
     return num_total_actors - 1;
+}
+
+/**
+ * Loads the data from JSON into an existing lua table
+ * DO NOT USE: This function is for use inside of the scene and actor managers only.
+ *
+ * @param   out_table    the lua table that will store the given data
+ * @param   data               the JSON that will be processed into the table
+*/
+void Actors::LoadJSONIntoLuaTable(sol::table& out_table, const rapidjson::Value& data)
+{
+    for (rapidjson::Value::ConstMemberIterator itr = data.MemberBegin(); itr != data.MemberEnd(); itr++)
+    {
+        std::string property_name = itr->name.GetString();
+        sol::object property = out_table[itr->name.GetString()];
+        sol::type property_type = property.get_type();
+        
+        // Adds the property to the component
+        if (property_type == sol::type::string) { out_table[property_name] = itr->value.GetString(); }
+        else if (property_type == sol::type::boolean) { out_table[property_name] = itr->value.GetBool(); }
+        else if (property_type == sol::type::number)
+        {
+            if (itr->value.IsDouble()) { out_table[property_name] = itr->value.GetDouble(); }
+            else { out_table[property_name] = itr->value.GetInt(); }
+        }
+        else if (property_type == sol::type::table)
+        {
+            sol::table new_table = ComponentManager::GetLuaState()->create_table();
+            const rapidjson::Value& table_data = itr->value;
+            
+            // Iterate through the whole table until we fill each spot
+            LoadJSONIntoLuaTable(new_table, table_data);
+            
+            out_table[property_name] = new_table;
+        }
+    }
 }
 
 /**

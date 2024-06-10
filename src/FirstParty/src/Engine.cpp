@@ -58,7 +58,6 @@ void Initialize()
     // Load Resources needed for scene initialization
     // Do this here because the initial scene is loaded in CheckConfigFiles.
     LoadTemplates();
-    LoadComponentTypes();
     
     if( CheckConfigFiles() != 0 ) {
         // error with config files
