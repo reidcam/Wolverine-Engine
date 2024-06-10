@@ -66,35 +66,87 @@ void Actors::Start(int actor_id)
 }
 
 /**
- * Processes all components added to the actor on this frame
- *
- * @param   actor_id the id of the actor that this function is acting on
+ * Processes all components added to all actors on the previous frame
 */
-void Actors::ProcessAddedComponents(int actor_id)
+void Actors::ProcessAddedComponents()
 {
-    int actor_index = GetIndex(actor_id);
+    // Stores the components that didn't get processed this frame, so we can re-add
+    // them to "components_to_init" when we've finished processing the others
+    std::vector<std::shared_ptr<sol::table>> not_processed;
     
-    // Skip this function if the actor isn't enabled
-    if (!actor_enabled[actor_index])
+    for (auto& component : components_to_init)
     {
-        return;
+        int actor_index = GetIndex((*component)["actor"]["ID"]);
+        
+        // Skip this component if the actor or component aren't enabled
+        if (!actor_enabled[actor_index] || (*component)["enabled"] == false)
+        {
+            not_processed.push_back(component);
+            continue;
+        }
+        
+        // Add to the appropriate lifecycle functions list so that they will start being called by the engine.
+        sol::function OnUpdate = (*component)["OnUpdate"];
+        if (OnUpdate.valid())
+            components_to_update.push_back(component);
+        
+        // Call "OnStart" if it exists for this component
+        try
+        {
+            // OnStart is called for each component the frame they are loaded into the game
+            sol::function OnStart = (*component)["OnStart"];
+            if (OnStart.valid())
+            {
+                OnStart(*component);
+            }
+        }
+        catch(const std::exception& e)
+        {
+            std::string errorMessage = e.what();
+#ifdef _WIN32
+            std::replace(errorMessage.begin(), errorMessage.end(), '\\', '/');
+#endif
+            std::cout << "\033[31m" << names[actor_index] << " : " << errorMessage << "\033[0m" << std::endl;
+        }
     }
-    // TODO: Call "OnStart" for every component on this actor that has it.
+    
+    // Remove all the processed components from the list
+    components_to_init.clear();
+    components_to_init = not_processed;
 }
 
 /**
- * Calls "OnUpdate" for every component on this actor that has it
- *
- * @param   actor_id the id of the actor that this function is acting on
+ * Calls "OnUpdate" for every component that has it
 */
-void Actors::Update(int actor_id)
+void Actors::Update()
 {
-    int actor_index = GetIndex(actor_id);
-    
-    // Skip this function if the actor isn't enabled
-    if (!actor_enabled[actor_index])
+    for (auto& component : components_to_update)
     {
-        return;
+        int actor_index = GetIndex((*component)["actor"]["ID"]);
+        
+        // Skip this component if the actor or component aren't enabled
+        if (!actor_enabled[actor_index] || (*component)["enabled"] == false)
+        {
+            continue;
+        }
+        
+        // Call "OnUpdate"
+        try
+        {
+            sol::function OnUpdate = (*component)["OnUpdate"];
+            if (OnUpdate.valid())
+            {
+                OnUpdate(*component);
+            }
+        }
+        catch(const std::exception& e)
+        {
+            std::string errorMessage = e.what();
+#ifdef _WIN32
+            std::replace(errorMessage.begin(), errorMessage.end(), '\\', '/');
+#endif
+            std::cout << "\033[31m" << names[actor_index] << " : " << errorMessage << "\033[0m" << std::endl;
+        }
     }
     
     //std::cout << GetID(actor_id) << std::endl;
@@ -172,7 +224,8 @@ int Actors::LoadActorWithJSON(const rapidjson::Value& actor_data)
 {
     // Gives actor their ID
     IDs.push_back(num_total_actors);
-    id_to_index[num_total_actors] = (int)IDs.size() - 1;
+    int index = (int)IDs.size() - 1;
+    id_to_index[num_total_actors] = index;
     
     // Assigns the values to the new actor
     if (actor_data.HasMember("name"))
@@ -197,6 +250,9 @@ int Actors::LoadActorWithJSON(const rapidjson::Value& actor_data)
     
     //-------------------------------------------------------
     // Components
+    
+    // Stores all of the created components
+    std::vector<std::shared_ptr<sol::table>> new_components_list;
     if (actor_data.HasMember("components"))
     {
         const rapidjson::Value& actor_components = actor_data["components"];
@@ -251,13 +307,17 @@ int Actors::LoadActorWithJSON(const rapidjson::Value& actor_data)
             Actor* _a = new Actor();
             _a->ID = num_total_actors;
             new_component["actor"] = _a;
-        
-            new_component["OnStart"](new_component);
             
-            // Add the new component to the "components_to_add" vector
-            components_to_add.push_back(std::make_shared<sol::table>(new_component));
+//            // Sets the component to uninitialized, it will become initialized after onstart has been called.
+//            new_component["IsComponentInitialized"] = false;
+            
+            // Add the new component to the "components_to_init" and "components" vectors
+            std::shared_ptr<sol::table> ptr = std::make_shared<sol::table>(new_component);
+            components_to_init.push_back(ptr);
+            new_components_list.push_back(ptr);
         }
     }
+    components.push_back(new_components_list);
     
     // Update the number of loaded actors.
     num_loaded_actors++;

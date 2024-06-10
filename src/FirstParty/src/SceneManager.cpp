@@ -44,17 +44,11 @@ void Scene::UpdateActors()
     }
     new_actors.clear();
     
-    // Process all of the components added to actors this frame
-    for (auto actor : actors)
-    {
-        Actors::ProcessAddedComponents(actor);
-    }
+    // Process all of the components added to actors on the previous frame
+    Actors::ProcessAddedComponents();
     
     // Update all actors
-    for (auto actor : actors)
-    {
-        Actors::Update(actor);
-    }
+    Actors::Update();
     
     // Late update all actors
     for (auto actor : actors)

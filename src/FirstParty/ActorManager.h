@@ -50,8 +50,8 @@ private:
     // Layer 2: the index of the component on the actor
     inline static std::vector< std::vector< std::shared_ptr<sol::table>>> components;
     
-    // All components that need to be added to an actor this frame
-    inline static std::vector<std::shared_ptr<sol::table>> components_to_add;
+    // All components that need to be initialized this frame
+    inline static std::vector<std::shared_ptr<sol::table>> components_to_init;
     //static std::vector<std::string> componentsToRemove;
     
     // The components across all actors with lifecycle functions
@@ -75,18 +75,14 @@ public:
     static void Start(int actor_id);
 
     /**
-     * Processes all components added to the actor on this frame
-     *
-     * @param   actor_id the id of the actor that this function is acting on
+     * Processes all components added to the actor on the previous frame
     */
-    static void ProcessAddedComponents(int actor_id);
+    static void ProcessAddedComponents();
 
     /**
-     * Calls "OnUpdate" for every component on this actor that has it
-     *
-     * @param   actor_id the id of the actor that this function is acting on
+     * Calls "OnUpdate" for every component that has it
     */
-    static void Update(int actor_id);
+    static void Update();
 
     /**
      * Calls "OnLateUpdate" for every component on this actor that has it
