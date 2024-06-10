@@ -65,6 +65,7 @@ void Initialize()
     LoadSounds();
     LoadFonts();
     LoadTemplates();
+    LoadComponentTypes();
     
     Scene::LoadScene("test");
 } // Initialize()

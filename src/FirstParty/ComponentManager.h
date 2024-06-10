@@ -16,7 +16,7 @@
 class ComponentManager
 {
 private:
-    static inline sol::state* lua_state;
+    static inline sol::state* l_state;
 public:
     /**
      * Initializes the component manager
@@ -26,7 +26,7 @@ public:
     /**
      * Get the Lua state
     */
-    static inline sol::state* GetLuaState() {return lua_state;}
+    static inline sol::state* GetLuaState() {return l_state;}
 };
 
 #endif /* ComponentManager_h */

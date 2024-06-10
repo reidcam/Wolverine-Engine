@@ -23,7 +23,7 @@
 #include "AudioDB.h"
 #include "TextDB.h"
 #include "TemplateDB.h"
-#include "ComponentDB.h"
+#include "ComponentManager.h"
 
 #include "Engine.h"
 
@@ -32,7 +32,7 @@ std::unordered_map<std::string, SDL_Texture*> loaded_images; // All of the loade
 std::unordered_map<std::string, Mix_Chunk*> loaded_sounds; // All of the loaded sounds
 std::unordered_map<std::string, std::unordered_map<int, TTF_Font*>> loaded_fonts; // All of the loaded fonts
 std::unordered_map<std::string, rapidjson::Document*> loaded_templates; // All of the loaded templates
-std::unordered_map<std::string, std::shared_ptr<sol::table>> loaded_component_typs; // All of the loaded component types
+std::unordered_map<std::string, std::shared_ptr<sol::table>> loaded_component_types; // All of the loaded component types
 
 //-------------------------------------------------------
 // Image Database
@@ -223,6 +223,7 @@ rapidjson::Document* GetTemplate(std::string template_name)
 
 /**
  * Loads all of the components in the resources/component_types directory
+ *  NOTE: All scripts table names must be the EXACT SAME as the file name (minus the .lua of course)
 */
 void LoadComponentTypes()
 {
@@ -236,11 +237,30 @@ void LoadComponentTypes()
         {
             if (file.path() != path + "/.DS_Store")
             {
-                sol::table script;
-//                rapidjson::Document* template_document = new rapidjson::Document;
-//                EngineUtils::ReadJsonFile(file.path().string(), *template_document);
-//                
-//                loaded_templates[file.path().filename().stem().stem().string()] = template_document;
+                std::string type_name = file.path().stem().string();
+
+                sol::load_result script = ComponentManager::GetLuaState()->load_file(file.path().string().c_str());
+                if (script.valid())
+                {
+                    // Load the script into the lua state
+                    script();
+                    
+                    // Attaches the script to a lua table for easier member access
+                    sol::table component_table = (*ComponentManager::GetLuaState())[type_name.c_str()];
+                    
+                    // Load the component type into our database
+                    loaded_component_types.insert(
+                          {
+                              type_name,
+                              std::make_shared<sol::table>(component_table)
+                          }
+                    );
+                }
+                else
+                {
+                    std::cout << "problem with lua file " << type_name;
+                    exit(0);
+                }
             }
         }
     }
@@ -252,4 +272,13 @@ void LoadComponentTypes()
  *`@param   component_name  the name of the component type to get from the database
  * @returns                 the component type with the specified name
 */
-std::shared_ptr<sol::table> GetComponentType(std::string component_name);
+std::shared_ptr<sol::table> GetComponentType(std::string component_name)
+{
+    if (loaded_component_types.find(component_name) == loaded_component_types.end())
+    {
+        std::cout << "error: missing component " << component_name;
+        exit(0);
+    }
+    
+    return loaded_component_types[component_name];
+}
