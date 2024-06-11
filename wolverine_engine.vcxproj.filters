@@ -36,9 +36,6 @@
     <ClCompile Include="src\FirstParty\src\SceneManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\FirstParty\src\ComponentManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Library Include="src\ThirdParty\SDL2\lib\SDL2.lib" />

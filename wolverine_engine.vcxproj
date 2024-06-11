@@ -150,7 +150,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\FirstParty\src\ActorManager.cpp" />
-    <ClCompile Include="src\FirstParty\src\ComponentManager.cpp" />
     <ClCompile Include="src\FirstParty\src\Databases.cpp" />
     <ClCompile Include="src\FirstParty\src\Engine.cpp" />
     <ClCompile Include="src\FirstParty\src\InputManager.cpp" />
