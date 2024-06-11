@@ -41,27 +41,26 @@ Mix_Chunk* GetSound(const std::string& audio_name);
 static void AudioPlay(const int channel, const std::string& clip_name, const int num_loops);
 
 /*
-* Halts the audio on the specified channel.
-* A 'channel' of -1 will halt all channels
+* Halt playing of a particular channel, except for any playing music.
 * More Info: https://wiki.libsdl.org/SDL2_mixer/Mix_HaltChannel
-* 
-* @param	channel    the channel to halt the audio on
+*
+* @param	channel    channel to halt, or -1 to halt all channels
 */
 static void AudioHalt(const int channel);
 
 /*
-* Pause a particular channel.
+* Pause a particular channel. Any music is unaffected.
 * More Info: https://wiki.libsdl.org/SDL2_mixer/Mix_Pause
-* 
-* @param	channel    the channel to pause, or -1 to pause all channels
+*
+* @param	channel    the channel to pause, or -1 to pause all channels.
 */
 static void AudioPause(const int channel);
 
 /*
-* Resume a particular channel
+* Resume a particular channel. Any music is unaffected.
 * More Info: https://wiki.libsdl.org/SDL2_mixer/Mix_Resume
-* 
-* @param	channel    the channel to resume, or -1 to resume all paused channels
+*
+* @param	channel    the channel to resume, or -1 to resume all paused channels.
 */
 static void AudioResume(const int channel);
 
@@ -89,4 +88,14 @@ static void AudioCloseMixer();
 */
 static void AudioDeinitMixer();
 
+/*
+* Set the master volume for all channels.
+* More Info: https://wiki.libsdl.org/SDL2_mixer/Mix_MasterVolume
+* 
+* @param	volume    the new volume, between 0 and MIX_MAX_VOLUME (128), or -1 to query.
+* 
+* @returns	Returns the previous volume. If the specified volume is -1,
+			this returns the current volume.
+*/
+static void AudioSetMasterVolume(const int volume);
 #endif /* AudioDB_h */
