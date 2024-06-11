@@ -36,6 +36,9 @@
     <ClCompile Include="src\FirstParty\src\SceneManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\FirstParty\src\ComponentManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Library Include="src\ThirdParty\SDL2\lib\SDL2.lib" />
@@ -379,9 +382,16 @@
     <ClInclude Include="src\ThirdParty\SDL2_ttf\SDL_ttf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\FirstParty\ComponentManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FirstParty\ComponentDB.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\game.config" />
     <None Include="resources\rendering.config" />
+    <None Include="resources\scenes\basic.scene" />
   </ItemGroup>
 </Project>

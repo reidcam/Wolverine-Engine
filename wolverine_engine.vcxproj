@@ -150,6 +150,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\FirstParty\src\ActorManager.cpp" />
+    <ClCompile Include="src\FirstParty\src\ComponentManager.cpp" />
     <ClCompile Include="src\FirstParty\src\Databases.cpp" />
     <ClCompile Include="src\FirstParty\src\Engine.cpp" />
     <ClCompile Include="src\FirstParty\src\InputManager.cpp" />
@@ -165,6 +166,8 @@
   <ItemGroup>
     <ClInclude Include="src\FirstParty\ActorManager.h" />
     <ClInclude Include="src\FirstParty\AudioDB.h" />
+    <ClInclude Include="src\FirstParty\ComponentDB.h" />
+    <ClInclude Include="src\FirstParty\ComponentManager.h" />
     <ClInclude Include="src\FirstParty\Engine.h" />
     <ClInclude Include="src\FirstParty\EngineUtils.h" />
     <ClInclude Include="src\FirstParty\ImageDB.h" />
