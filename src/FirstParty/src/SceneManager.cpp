@@ -37,9 +37,6 @@ void Scene::UpdateActors()
     for (auto actor : new_actors)
     {
         Actors::Start(actor);
-        
-        // TODO: Initialize all components added to new actors at runtime.
-        
         actors.push_back(actor);
     }
     new_actors.clear();
@@ -51,12 +48,7 @@ void Scene::UpdateActors()
     Actors::Update();
     
     // Late update all actors
-    for (auto actor : actors)
-    {
-        Actors::LateUpdate(actor);
-        
-        // TODO: Initialize all components added to new actors at runtime.
-    }
+    Actors::LateUpdate();
     
     // Processes all of the components removed from actors this frame
     for (auto actor : actors)

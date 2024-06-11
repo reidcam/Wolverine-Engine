@@ -56,6 +56,7 @@ private:
     
     // The components across all actors with lifecycle functions
     inline static std::vector<std::shared_ptr<sol::table>> components_to_update;
+    inline static std::vector<std::shared_ptr<sol::table>> components_to_update_late;
     
 public:
     //-------------------------------------------------------
@@ -85,11 +86,9 @@ public:
     static void Update();
 
     /**
-     * Calls "OnLateUpdate" for every component on this actor that has it
-     *
-     * @param   actor_id the id of the actor that this function is acting on
+     * Calls "OnLateUpdate" for every component that has it
     */
-    static void LateUpdate(int actor_id);
+    static void LateUpdate();
 
     /**
      * Processes all components removed from the actor on this frame

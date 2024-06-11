@@ -87,8 +87,9 @@ void Actors::ProcessAddedComponents()
         
         // Add to the appropriate lifecycle functions list so that they will start being called by the engine.
         sol::function OnUpdate = (*component)["OnUpdate"];
-        if (OnUpdate.valid())
-            components_to_update.push_back(component);
+        if (OnUpdate.valid()) { components_to_update.push_back(component); }
+        sol::function OnLateUpdate = (*component)["OnLateUpdate"];
+        if (OnLateUpdate.valid()) { components_to_update_late.push_back(component); }
         
         // Call "OnStart" if it exists for this component
         try
@@ -148,26 +149,41 @@ void Actors::Update()
             std::cout << "\033[31m" << names[actor_index] << " : " << errorMessage << "\033[0m" << std::endl;
         }
     }
-    
-    //std::cout << GetID(actor_id) << std::endl;
-    // TODO: Call "OnUpdate" for every component on this actor that has it.
 }
 
 /**
- * Calls "OnLateUpdate" for every component on this actor that has it
- *
- * @param   actor_id the id of the actor that this function is acting on
+ * Calls "OnLateUpdate" for every component that has it
 */
-void Actors::LateUpdate(int actor_id)
+void Actors::LateUpdate()
 {
-    int actor_index = GetIndex(actor_id);
-    
-    // Skip this function if the actor isn't enabled
-    if (!actor_enabled[actor_index])
+    for (auto& component : components_to_update_late)
     {
-        return;
+        int actor_index = GetIndex((*component)["actor"]["ID"]);
+        
+        // Skip this component if the actor or component aren't enabled
+        if (!actor_enabled[actor_index] || (*component)["enabled"] == false)
+        {
+            continue;
+        }
+        
+        // Call "OnLateUpdate"
+        try
+        {
+            sol::function OnLateUpdate = (*component)["OnLateUpdate"];
+            if (OnLateUpdate.valid())
+            {
+                OnLateUpdate(*component);
+            }
+        }
+        catch(const std::exception& e)
+        {
+            std::string errorMessage = e.what();
+#ifdef _WIN32
+            std::replace(errorMessage.begin(), errorMessage.end(), '\\', '/');
+#endif
+            std::cout << "\033[31m" << names[actor_index] << " : " << errorMessage << "\033[0m" << std::endl;
+        }
     }
-    // TODO: Call "OnLateUpdate" for every component on this actor that has it.
 }
 
 /**
