@@ -25,6 +25,6 @@ void LoadSounds();
  *`@param   audio_name  the name of the audio clip to get from the database
  * @returns             the audio clip with the specified name
 */
-Mix_Chunk* GetSound(std::string audio_name);
+Mix_Chunk* GetSound(const std::string& audio_name);
 
 #endif /* AudioDB_h */
