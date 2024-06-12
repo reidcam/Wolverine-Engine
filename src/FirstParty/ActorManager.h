@@ -14,8 +14,16 @@
 #include <unordered_map>
 
 #include "TemplateDB.h"
+#include "ComponentManager.h"
 
 using namespace std;
+
+// This is a dummy class to be exposed to Lua so that developers can program in an object-oriented way.
+class Actor
+{
+public:
+    int ID = 0;
+};
 
 class Actors
 {
@@ -37,6 +45,19 @@ private:
     static std::vector<int> IDs;
     static std::vector<bool> actor_enabled;
     
+    // The components of all the loaded actors
+    // Layer 1: the index of the actor
+    // Layer 2: the index of the component on the actor
+    inline static std::vector< std::vector< std::shared_ptr<sol::table>>> components;
+    
+    // All components that need to be initialized this frame
+    inline static std::vector<std::shared_ptr<sol::table>> components_to_init;
+    //static std::vector<std::string> componentsToRemove;
+    
+    // The components across all actors with lifecycle functions
+    inline static std::vector<std::shared_ptr<sol::table>> components_to_update;
+    inline static std::vector<std::shared_ptr<sol::table>> components_to_update_late;
+    
 public:
     //-------------------------------------------------------
     // Lifecycle Functions
@@ -55,25 +76,19 @@ public:
     static void Start(int actor_id);
 
     /**
-     * Processes all components added to the actor on this frame
-     *
-     * @param   actor_id the id of the actor that this function is acting on
+     * Processes all components added to the actor on the previous frame
     */
-    static void ProcessAddedComponents(int actor_id);
+    static void ProcessAddedComponents();
 
     /**
-     * Calls "OnUpdate" for every component on this actor that has it
-     *
-     * @param   actor_id the id of the actor that this function is acting on
+     * Calls "OnUpdate" for every component that has it
     */
-    static void Update(int actor_id);
+    static void Update();
 
     /**
-     * Calls "OnLateUpdate" for every component on this actor that has it
-     *
-     * @param   actor_id the id of the actor that this function is acting on
+     * Calls "OnLateUpdate" for every component that has it
     */
-    static void LateUpdate(int actor_id);
+    static void LateUpdate();
 
     /**
      * Processes all components removed from the actor on this frame
@@ -113,6 +128,16 @@ public:
      * @return             returns the id of the newly created actor
     */
     static int LoadActorWithJSON(const rapidjson::Value& actor_data);
+    
+    /**
+     * Loads the data from JSON into an existing lua value
+     * DO NOT USE: This function is for use inside of the scene and actor managers only.
+     *
+     * @param   value                           the lua value that will store the given data
+     * @param   data                             the JSON that will be processed into the table
+     * @param   type                             the intended type of the lua value
+    */
+    static void JsonToLuaObject(sol::lua_value& value, const rapidjson::Value& data, sol::type type);
     
     /**
      * Destroys an actor

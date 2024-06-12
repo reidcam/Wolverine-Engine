@@ -27,7 +27,7 @@ Initializes the renderer
 */
 void RendererData::Init(const std::string& title)
 {
-    SDL_Window* window = SDL_CreateWindow("test", window_position.x, window_position.y, window_size.x, window_size.y, SDL_WINDOW_SHOWN);
+    SDL_Window* window = SDL_CreateWindow(title.c_str(), window_position.x, window_position.y, window_size.x, window_size.y, SDL_WINDOW_SHOWN);
     SetWindow(window);
     SDL_Renderer* renderer = SDL_CreateRenderer(RendererData::window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
     SetRenderer(renderer);

@@ -66,56 +66,124 @@ void Actors::Start(int actor_id)
 }
 
 /**
- * Processes all components added to the actor on this frame
- *
- * @param   actor_id the id of the actor that this function is acting on
+ * Processes all components added to all actors on the previous frame
 */
-void Actors::ProcessAddedComponents(int actor_id)
+void Actors::ProcessAddedComponents()
 {
-    int actor_index = GetIndex(actor_id);
+    // Stores the components that didn't get processed this frame, so we can re-add
+    // them to "components_to_init" when we've finished processing the others
+    std::vector<std::shared_ptr<sol::table>> not_processed;
     
-    // Skip this function if the actor isn't enabled
-    if (!actor_enabled[actor_index])
+    for (auto& component : components_to_init)
     {
-        return;
+        int actor_index = GetIndex((*component)["actor"]["ID"]);
+        
+        // Skip this component if the actor or component aren't enabled
+        if (!actor_enabled[actor_index] || (*component)["enabled"] == false)
+        {
+            not_processed.push_back(component);
+            continue;
+        }
+        
+        // Add to the appropriate lifecycle functions list so that they will start being called by the engine.
+        sol::function OnUpdate = (*component)["OnUpdate"];
+        if (OnUpdate.valid()) { components_to_update.push_back(component); }
+        sol::function OnLateUpdate = (*component)["OnLateUpdate"];
+        if (OnLateUpdate.valid()) { components_to_update_late.push_back(component); }
+        
+        // Call "OnStart" if it exists for this component
+        try
+        {
+            // OnStart is called for each component the frame they are loaded into the game
+            sol::function OnStart = (*component)["OnStart"];
+            if (OnStart.valid())
+            {
+                OnStart(*component);
+            }
+        }
+        catch(const std::exception& e)
+        {
+            std::string errorMessage = e.what();
+#ifdef _WIN32
+            std::replace(errorMessage.begin(), errorMessage.end(), '\\', '/');
+#endif
+            std::cout << "\033[31m" << names[actor_index] << " : " << errorMessage << "\033[0m" << std::endl;
+        }
     }
-    // TODO: Call "OnStart" for every component on this actor that has it.
+    
+    // Remove all the processed components from the list
+    components_to_init.clear();
+    components_to_init = not_processed;
 }
 
 /**
- * Calls "OnUpdate" for every component on this actor that has it
- *
- * @param   actor_id the id of the actor that this function is acting on
+ * Calls "OnUpdate" for every component that has it
 */
-void Actors::Update(int actor_id)
+void Actors::Update()
 {
-    int actor_index = GetIndex(actor_id);
-    
-    // Skip this function if the actor isn't enabled
-    if (!actor_enabled[actor_index])
+    for (auto& component : components_to_update)
     {
-        return;
+        int actor_index = GetIndex((*component)["actor"]["ID"]);
+        
+        // Skip this component if the actor or component aren't enabled
+        if (!actor_enabled[actor_index] || (*component)["enabled"] == false)
+        {
+            continue;
+        }
+        
+        // Call "OnUpdate"
+        try
+        {
+            sol::function OnUpdate = (*component)["OnUpdate"];
+            if (OnUpdate.valid())
+            {
+                OnUpdate(*component);
+            }
+        }
+        catch(const std::exception& e)
+        {
+            std::string errorMessage = e.what();
+#ifdef _WIN32
+            std::replace(errorMessage.begin(), errorMessage.end(), '\\', '/');
+#endif
+            std::cout << "\033[31m" << names[actor_index] << " : " << errorMessage << "\033[0m" << std::endl;
+        }
     }
-    
-    //std::cout << GetID(actor_id) << std::endl;
-    // TODO: Call "OnUpdate" for every component on this actor that has it.
 }
 
 /**
- * Calls "OnLateUpdate" for every component on this actor that has it
- *
- * @param   actor_id the id of the actor that this function is acting on
+ * Calls "OnLateUpdate" for every component that has it
 */
-void Actors::LateUpdate(int actor_id)
+void Actors::LateUpdate()
 {
-    int actor_index = GetIndex(actor_id);
-    
-    // Skip this function if the actor isn't enabled
-    if (!actor_enabled[actor_index])
+    for (auto& component : components_to_update_late)
     {
-        return;
+        int actor_index = GetIndex((*component)["actor"]["ID"]);
+        
+        // Skip this component if the actor or component aren't enabled
+        if (!actor_enabled[actor_index] || (*component)["enabled"] == false)
+        {
+            continue;
+        }
+        
+        // Call "OnLateUpdate"
+        try
+        {
+            sol::function OnLateUpdate = (*component)["OnLateUpdate"];
+            if (OnLateUpdate.valid())
+            {
+                OnLateUpdate(*component);
+            }
+        }
+        catch(const std::exception& e)
+        {
+            std::string errorMessage = e.what();
+#ifdef _WIN32
+            std::replace(errorMessage.begin(), errorMessage.end(), '\\', '/');
+#endif
+            std::cout << "\033[31m" << names[actor_index] << " : " << errorMessage << "\033[0m" << std::endl;
+        }
     }
-    // TODO: Call "OnLateUpdate" for every component on this actor that has it.
 }
 
 /**
@@ -172,7 +240,8 @@ int Actors::LoadActorWithJSON(const rapidjson::Value& actor_data)
 {
     // Gives actor their ID
     IDs.push_back(num_total_actors);
-    id_to_index[num_total_actors] = (int)IDs.size() - 1;
+    int index = (int)IDs.size() - 1;
+    id_to_index[num_total_actors] = index;
     
     // Assigns the values to the new actor
     if (actor_data.HasMember("name"))
@@ -195,11 +264,130 @@ int Actors::LoadActorWithJSON(const rapidjson::Value& actor_data)
         actor_enabled.push_back(true);
     }
     
+    //-------------------------------------------------------
+    // Components
+    
+    // Stores all of the created components
+    std::vector<std::shared_ptr<sol::table>> new_components_list;
+    if (actor_data.HasMember("components"))
+    {
+        const rapidjson::Value& actor_components = actor_data["components"];
+        
+        // Iterate over each component
+        for (rapidjson::Value::ConstMemberIterator itr = actor_components.MemberBegin(); itr != actor_components.MemberEnd(); itr++)
+        {
+            // Creates and gets a reference to a new table on the Lua stack
+            sol::table new_component = ComponentManager::GetLuaState()->create_table();
+            
+            // The key of this component
+            std::string key = itr->name.GetString();
+            
+            // Establishes inheritance between the new component and its type if specified
+            if (itr->value.HasMember("type"))
+            {
+                std::string type = itr->value["type"].GetString();
+                ComponentManager::EstablishInheritance(new_component, *GetComponentType(type));
+                
+                // Allows the component to know its own type
+                new_component["type"] = type;
+                // Gives the component its key
+                new_component["key"] = key;
+                // Sets the component to be enabled by default
+                new_component["enabled"] = true;
+            }
+            // If the type for this component is not specified anywhere, throw an error
+            else
+            {
+                std::cout << "error: component type unspecified for " << key << " on " << names[names.size() - 1];
+                exit(0);
+            }
+            
+            //-------------------------------------------------------
+            // Preform required overrides on component properties
+            // Sets component properties to specified values
+            const rapidjson::Value& component_properties = itr->value;
+            for (rapidjson::Value::ConstMemberIterator itr2 = component_properties.MemberBegin(); itr2 != component_properties.MemberEnd(); itr2++)
+            {
+                std::string property_name = itr2->name.GetString();
+                sol::type property_type = new_component[property_name].get_type();
+                
+                sol::lua_value property = "";
+                
+                JsonToLuaObject(property, itr2->value, property_type);
+                
+                new_component[property_name] = property;
+            }
+
+            //-------------------------------------------------------
+            // Injects the new component with a reference to its actor
+            Actor* _a = new Actor();
+            _a->ID = num_total_actors;
+            new_component["actor"] = _a;
+            
+//            // Sets the component to uninitialized, it will become initialized after onstart has been called.
+//            new_component["IsComponentInitialized"] = false;
+            
+            // Add the new component to the "components_to_init" and "components" vectors
+            std::shared_ptr<sol::table> ptr = std::make_shared<sol::table>(new_component);
+            components_to_init.push_back(ptr);
+            new_components_list.push_back(ptr);
+        }
+    }
+    components.push_back(new_components_list);
+    
     // Update the number of loaded actors.
     num_loaded_actors++;
     num_total_actors++;
     
     return num_total_actors - 1;
+}
+
+/**
+ * Loads the data from JSON into an existing lua value
+ * DO NOT USE: This function is for use inside of the scene and actor managers only.
+ *
+ * @param   value                           the lua value that will store the given data
+ * @param   data                             the JSON that will be processed into the table
+ * @param   type                             the intended type of the lua value
+*/
+void Actors::JsonToLuaObject(sol::lua_value& value, const rapidjson::Value& data, sol::type type)
+{
+    // Adds the property to the component
+    if (type == sol::type::string) { value = data.GetString(); }
+    else if (type == sol::type::boolean) { value = data.GetBool(); }
+    else if (type == sol::type::number)
+    {
+        if (data.IsDouble()) { value = data.GetDouble(); }
+        else { value = data.GetInt(); }
+    }
+    else if (type == sol::type::table)
+    {
+        sol::table _table = ComponentManager::GetLuaState()->create_table();
+        _table[0] = sol::object(*ComponentManager::GetLuaState());
+        
+        // Add all of the values in the data to our new table.
+        int i = 1;
+        for (rapidjson::Value::ConstMemberIterator itr = data.MemberBegin(); itr != data.MemberEnd(); itr++)
+        {
+            const rapidjson::Value& _data = itr->value;
+            
+            sol::lua_value _value = "";
+            
+            // Determine the type of value that is being added to the table
+            sol::type _type = sol::type::none;
+            if (itr->value.IsString()) { _type = sol::type::string; }
+            else if (itr->value.IsBool()) { _type = sol::type::boolean; }
+            else if (itr->value.IsInt() || itr->value.IsDouble()) { _type = sol::type::number; }
+            else if (itr->value.IsObject()) { _type = sol::type::table; }
+            
+            JsonToLuaObject(_value, _data, _type);
+            
+            // Add the value to the new table
+            _table[i] = _value;
+            i++;
+        }
+        value = _table;
+    }
 }
 
 /**

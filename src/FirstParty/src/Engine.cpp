@@ -15,6 +15,7 @@
 #include "TextDB.h"
 #include "TemplateDB.h"
 #include "SceneManager.h"
+#include "ComponentManager.h"
 
 #include "Engine.h"
 #include "EngineUtils.h"
@@ -52,19 +53,23 @@ void Initialize()
     IMG_Init(IMG_INIT_PNG);
     TTF_Init();
     
+    ComponentManager::init();
+    
+    // Load Resources needed for scene initialization
+    // Do this here because the initial scene is loaded in CheckConfigFiles.
+    LoadTemplates();
+    
     if( CheckConfigFiles() != 0 ) {
         // error with config files
     }
-
+    
     RendererData::Init(EngineData::game_title);
     
     // Load Assets
+    // Do this here because the renderer needs to be initialized before these assets can be loaded.
     LoadImages();
     LoadSounds();
     LoadFonts();
-    LoadTemplates();
-    
-    Scene::LoadScene("test");
 } // Initialize()
 
 //-------------------------------------------------------
