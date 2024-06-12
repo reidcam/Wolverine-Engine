@@ -35,7 +35,7 @@ void ComponentManager::ExposeCPP()
     // "Actor" class
     sol::usertype<Actor> actor_type = l_state->new_usertype<Actor>("Actor");
     actor_type["ID"] = &Actor::ID;
-    actor_type.set("GetName", Actors::GetName);
+    actor_type["GetName"] = Actors::GetName;
 }
 
 /**
