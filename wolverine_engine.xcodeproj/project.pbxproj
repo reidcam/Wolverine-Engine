@@ -91,7 +91,7 @@
 		8974C61E2BFBA2A700DCA906 /* b2_rope.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8974C61D2BFBA2A700DCA906 /* b2_rope.cpp */; };
 		8974C6232BFBA4C900DCA906 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8974C6222BFBA4C900DCA906 /* main.cpp */; };
 		89772B252C0F6C8B00D49A00 /* Renderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 89772B242C0F6C8B00D49A00 /* Renderer.cpp */; };
-		89772B2D2C1B8C8000D49A00 /* AudioManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 89772B2C2C1B8C8000D49A00 /* AudioManager.cpp */; };
+		89772B2B2C172DF800D49A00 /* ComponentManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 89772B2A2C172DF800D49A00 /* ComponentManager.cpp */; };
 		89D484962BFBB0DB00E27B91 /* Engine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 89D484952BFBB0DB00E27B91 /* Engine.cpp */; };
 		89D484A32BFD0C9A00E27B91 /* Databases.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 89D484A22BFD0C9A00E27B91 /* Databases.cpp */; };
 		89D484A72BFE7A5A00E27B91 /* ActorManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 89D484A62BFE7A5A00E27B91 /* ActorManager.cpp */; };
@@ -196,7 +196,7 @@
 		8974C61D2BFBA2A700DCA906 /* b2_rope.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = b2_rope.cpp; path = "src/ThirdParty/box2d-2.4.1/src/rope/b2_rope.cpp"; sourceTree = "<group>"; };
 		8974C6222BFBA4C900DCA906 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = src/FirstParty/src/main.cpp; sourceTree = "<group>"; };
 		89772B242C0F6C8B00D49A00 /* Renderer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Renderer.cpp; path = src/FirstParty/src/Renderer.cpp; sourceTree = "<group>"; };
-		89772B2C2C1B8C8000D49A00 /* AudioManager.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = AudioManager.cpp; path = src/FirstParty/src/AudioManager.cpp; sourceTree = "<group>"; };
+		89772B2A2C172DF800D49A00 /* ComponentManager.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = ComponentManager.cpp; path = src/FirstParty/src/ComponentManager.cpp; sourceTree = "<group>"; };
 		89D484952BFBB0DB00E27B91 /* Engine.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Engine.cpp; path = src/FirstParty/src/Engine.cpp; sourceTree = "<group>"; };
 		89D484972BFBB37700E27B91 /* FirstParty */ = {isa = PBXFileReference; lastKnownFileType = folder; name = FirstParty; path = src/FirstParty; sourceTree = "<group>"; };
 		89D484A22BFD0C9A00E27B91 /* Databases.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Databases.cpp; path = src/FirstParty/src/Databases.cpp; sourceTree = "<group>"; };
@@ -377,7 +377,7 @@
 		89D484942BFBB09C00E27B91 /* src */ = {
 			isa = PBXGroup;
 			children = (
-				89772B2C2C1B8C8000D49A00 /* AudioManager.cpp */,
+				89772B2A2C172DF800D49A00 /* ComponentManager.cpp */,
 				89772B242C0F6C8B00D49A00 /* Renderer.cpp */,
 				890816CD2BFE99E20057ED15 /* SceneManager.cpp */,
 				89D484A62BFE7A5A00E27B91 /* ActorManager.cpp */,
@@ -444,7 +444,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				89772B2D2C1B8C8000D49A00 /* AudioManager.cpp in Sources */,
+				89772B2B2C172DF800D49A00 /* ComponentManager.cpp in Sources */,
 				89772B252C0F6C8B00D49A00 /* Renderer.cpp in Sources */,
 				89D484A32BFD0C9A00E27B91 /* Databases.cpp in Sources */,
 				89D484962BFBB0DB00E27B91 /* Engine.cpp in Sources */,
