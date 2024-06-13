@@ -25,7 +25,7 @@
 * @param	clip_name	the name of the audio file to play
 * @param	num_loops	the number of times to loop the clip
 */
-static void AudioPlay(const int channel, const std::string& clip_name, const int num_loops);
+void AudioPlay(const int channel, const std::string& clip_name, const int num_loops);
 
 /*
 * Halt playing of a particular channel, except for any playing music.
@@ -33,7 +33,7 @@ static void AudioPlay(const int channel, const std::string& clip_name, const int
 *
 * @param	channel    channel to halt, or -1 to halt all channels
 */
-static void AudioHalt(const int channel);
+void AudioHalt(const int channel);
 
 /*
 * Pause a particular channel. Any music is unaffected.
@@ -41,7 +41,7 @@ static void AudioHalt(const int channel);
 *
 * @param	channel    the channel to pause, or -1 to pause all channels.
 */
-static void AudioPause(const int channel);
+void AudioPause(const int channel);
 
 /*
 * Resume a particular channel. Any music is unaffected.
@@ -49,7 +49,7 @@ static void AudioPause(const int channel);
 *
 * @param	channel    the channel to resume, or -1 to resume all paused channels.
 */
-static void AudioResume(const int channel);
+void AudioResume(const int channel);
 
 /*
 * Sets the volume for a specific channel
@@ -61,19 +61,19 @@ static void AudioResume(const int channel);
 * @returns	Returns the previous volume. If the specified volume is -1, this returns
 			the current volume. If channel is -1, this returns the average of all channels.
 */
-static int AudioSetVolume(const int channel, const int volume);
+int AudioSetVolume(const int channel, const int volume);
 
 /*
 * Close the mixer, halting all playing audio.
 * More Info: https://wiki.libsdl.org/SDL2_mixer/Mix_CloseAudio
 */
-static void AudioCloseMixer();
+void AudioCloseMixer();
 
 /*
 * Deinitialize SDL_mixer.
 * More Info: https://wiki.libsdl.org/SDL2_mixer/Mix_Quit
 */
-static void AudioDeinitMixer();
+void AudioDeinitMixer();
 
 /*
 * Set the master volume for all channels.
@@ -84,5 +84,5 @@ static void AudioDeinitMixer();
 * @returns	Returns the previous volume. If the specified volume is -1,
 			this returns the current volume.
 */
-static void AudioSetMasterVolume(const int volume);
+void AudioSetMasterVolume(const int volume);
 #endif /* AudioManager_h */

@@ -20,7 +20,7 @@
 * @param	clip_name	the name of the audio file to play
 * @param	num_loops	the number of times to loop the clip
 */
-static void AudioPlay(const int channel, const std::string& clip_name, const int num_loops)
+void AudioPlay(const int channel, const std::string& clip_name, const int num_loops)
 {
     Mix_Chunk* mix_chunk = GetSound(clip_name);
     if (Mix_PlayChannel(channel, mix_chunk, num_loops) == -1) {
@@ -34,7 +34,7 @@ static void AudioPlay(const int channel, const std::string& clip_name, const int
 *
 * @param	channel    channel to halt, or -1 to halt all channels
 */
-static void AudioHalt(const int channel)
+void AudioHalt(const int channel)
 {
     if (Mix_HaltChannel(channel) == -1) {
         std::cout << Mix_GetError();
@@ -47,7 +47,7 @@ static void AudioHalt(const int channel)
 *
 * @param	channel    the channel to pause, or -1 to pause all channels.
 */
-static void AudioPause(const int channel)
+void AudioPause(const int channel)
 {
     Mix_Pause(channel);
 } // AudioPause()
@@ -58,7 +58,7 @@ static void AudioPause(const int channel)
 *
 * @param	channel    the channel to resume, or -1 to resume all paused channels.
 */
-static void AudioResume(const int channel)
+void AudioResume(const int channel)
 {
     Mix_Resume(channel);
 } // AudioResume()
@@ -73,7 +73,7 @@ static void AudioResume(const int channel)
 * @returns	Returns the previous volume. If the specified volume is -1, this returns
             the current volume. If channel is -1, this returns the average of all channels.
 */
-static int AudioSetVolume(const int channel, const int volume)
+int AudioSetVolume(const int channel, const int volume)
 {
     int previous_volume = Mix_Volume(channel, volume);
     return previous_volume;
@@ -83,7 +83,7 @@ static int AudioSetVolume(const int channel, const int volume)
 * Close the mixer, halting all playing audio.
 * More Info: https://wiki.libsdl.org/SDL2_mixer/Mix_CloseAudio
 */
-static void AudioCloseMixer()
+void AudioCloseMixer()
 {
     Mix_CloseAudio();
 } // AudioCLoseMixer()
@@ -92,7 +92,7 @@ static void AudioCloseMixer()
 * Deinitialize SDL_mixer.
 * More Info: https://wiki.libsdl.org/SDL2_mixer/Mix_Quit
 */
-static void AudioDeinitMixer()
+void AudioDeinitMixer()
 {
     Mix_Quit();
 } // AudioDeinitMixer
@@ -106,7 +106,7 @@ static void AudioDeinitMixer()
 * @returns	Returns the previous volume. If the specified volume is -1,
             this returns the current volume.
 */
-static void AudioSetMasterVolume(const int volume)
+void AudioSetMasterVolume(const int volume)
 {
     Mix_MasterVolume(volume);
 } // AudioSetMasterVolume()
