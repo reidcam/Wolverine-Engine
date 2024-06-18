@@ -151,12 +151,45 @@
   <ItemGroup>
     <ClCompile Include="src\FirstParty\src\ActorManager.cpp" />
     <ClCompile Include="src\FirstParty\src\AudioManager.cpp" />
+    <ClCompile Include="src\FirstParty\src\ComponentManager.cpp" />
     <ClCompile Include="src\FirstParty\src\Databases.cpp" />
     <ClCompile Include="src\FirstParty\src\Engine.cpp" />
     <ClCompile Include="src\FirstParty\src\InputManager.cpp" />
     <ClCompile Include="src\FirstParty\src\main.cpp" />
     <ClCompile Include="src\FirstParty\src\Renderer.cpp" />
     <ClCompile Include="src\FirstParty\src\SceneManager.cpp" />
+    <ClCompile Include="src\ThirdParty\lua-5.4.6\lapi.c" />
+    <ClCompile Include="src\ThirdParty\lua-5.4.6\lauxlib.c" />
+    <ClCompile Include="src\ThirdParty\lua-5.4.6\lbaselib.c" />
+    <ClCompile Include="src\ThirdParty\lua-5.4.6\lcode.c" />
+    <ClCompile Include="src\ThirdParty\lua-5.4.6\lcorolib.c" />
+    <ClCompile Include="src\ThirdParty\lua-5.4.6\lctype.c" />
+    <ClCompile Include="src\ThirdParty\lua-5.4.6\ldblib.c" />
+    <ClCompile Include="src\ThirdParty\lua-5.4.6\ldebug.c" />
+    <ClCompile Include="src\ThirdParty\lua-5.4.6\ldo.c" />
+    <ClCompile Include="src\ThirdParty\lua-5.4.6\ldump.c" />
+    <ClCompile Include="src\ThirdParty\lua-5.4.6\lfunc.c" />
+    <ClCompile Include="src\ThirdParty\lua-5.4.6\lgc.c" />
+    <ClCompile Include="src\ThirdParty\lua-5.4.6\linit.c" />
+    <ClCompile Include="src\ThirdParty\lua-5.4.6\liolib.c" />
+    <ClCompile Include="src\ThirdParty\lua-5.4.6\llex.c" />
+    <ClCompile Include="src\ThirdParty\lua-5.4.6\lmathlib.c" />
+    <ClCompile Include="src\ThirdParty\lua-5.4.6\lmem.c" />
+    <ClCompile Include="src\ThirdParty\lua-5.4.6\loadlib.c" />
+    <ClCompile Include="src\ThirdParty\lua-5.4.6\lobject.c" />
+    <ClCompile Include="src\ThirdParty\lua-5.4.6\lopcodes.c" />
+    <ClCompile Include="src\ThirdParty\lua-5.4.6\loslib.c" />
+    <ClCompile Include="src\ThirdParty\lua-5.4.6\lparser.c" />
+    <ClCompile Include="src\ThirdParty\lua-5.4.6\lstate.c" />
+    <ClCompile Include="src\ThirdParty\lua-5.4.6\lstring.c" />
+    <ClCompile Include="src\ThirdParty\lua-5.4.6\lstrlib.c" />
+    <ClCompile Include="src\ThirdParty\lua-5.4.6\ltable.c" />
+    <ClCompile Include="src\ThirdParty\lua-5.4.6\ltablib.c" />
+    <ClCompile Include="src\ThirdParty\lua-5.4.6\ltm.c" />
+    <ClCompile Include="src\ThirdParty\lua-5.4.6\lundump.c" />
+    <ClCompile Include="src\ThirdParty\lua-5.4.6\lutf8lib.c" />
+    <ClCompile Include="src\ThirdParty\lua-5.4.6\lvm.c" />
+    <ClCompile Include="src\ThirdParty\lua-5.4.6\lzio.c" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="src\ThirdParty\SDL2\lib\SDL2.lib" />
