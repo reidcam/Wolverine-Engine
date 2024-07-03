@@ -50,6 +50,31 @@ void LuaAPI::ExposeLuaAPI()
 	sol::usertype<Actor> actor_type = LuaAPI::GetLuaState()->new_usertype<Actor>("Actor");
 	actor_type["ID"] = &Actor::ID;
 	actor_type["GetName"] = Actors::GetName;
+    actor_type["RemoveComponent"] = Actors::RemoveComponentFromActor;
+    actor_type["GetComponentByType"] = Actors::GetComponentByType;
+}
+
+
+void deny_write() { std::cout << "error: attempt to modify a dead lua table" << std::endl; }
+/*
+ * Deletes a table on the lua stack
+ *
+ * Note: does not actualy delete a table from the lua stack as only lua's garbage collection can do that.
+ * Instead, this function clears all data from the table and locks it in read-only. This is to make any lingering references to it
+ * in other scripts useless, and prevent zombie components from causing undefined behavior.
+ * DO NOT EXPOSE TO LUA, THIS IS AN ENGINE TOOL ONLY!
+*/
+void LuaAPI::DeleteLuaTable(std::shared_ptr<sol::table> table)
+{
+    (*table).clear();
+    
+    // Create the new read-only table
+    sol::table dead_table = LuaAPI::GetLuaState()->create_table();
+    dead_table[sol::meta_function::new_index] = deny_write;
+    dead_table[sol::meta_function::index] = sol::lua_nil;
+    
+    // Set it on the actual table
+    (*table)[sol::metatable_key] = dead_table;
 }
 
 /*

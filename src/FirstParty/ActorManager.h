@@ -158,13 +158,25 @@ public:
     */
     static void DestroyActor(int actor_id);
     
+    //-------------------------------------------------------
+    // Components.
+    
     /**
      * Removes a component from an actor and marks it for deletion
      *
      * @param   actor_id        the id of the actor that this function is acting on
      * @param   component      the component to be removed
     */
-    static void RemoveComponentFromActor(int actor_id, std::shared_ptr<sol::table> component);
+    static void RemoveComponentFromActor(int actor_id, sol::table component);
+    
+    /**
+     * Gets the first component on the given actor with the given type if it exists.
+     *
+     * @param   actor_id        the id of the actor that this function is acting on
+     * @param   type                 the type of component we're searching for
+     * @return              the first component on the given actor with the given type, if none are found returns null
+    */
+    static sol::table GetComponentByType(int actor_id, std::string type);
     
 }; // Actors
 

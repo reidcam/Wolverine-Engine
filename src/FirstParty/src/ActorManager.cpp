@@ -133,13 +133,13 @@ void Actors::Update()
     
     for (auto& component : components_to_update)
     {
-        int actor_index = GetIndex((*component)["actor"]["ID"]);
-        
         // If this component is dead, skip it
-        if ((*component)["REMOVED_FROM_ACTOR"] == true)
+        if ((*component).empty() || (*component)["REMOVED_FROM_ACTOR"] == true)
         {
             continue;
         }
+        
+        int actor_index = GetIndex((*component)["actor"]["ID"]);
         
         // The component is alive! add it to living components
         living_components.push_back(component);
@@ -182,13 +182,13 @@ void Actors::LateUpdate()
     
     for (auto& component : components_to_update_late)
     {
-        int actor_index = GetIndex((*component)["actor"]["ID"]);
-        
         // If this component is dead, skip it
-        if ((*component)["REMOVED_FROM_ACTOR"] == true)
+        if ((*component).empty() || (*component)["REMOVED_FROM_ACTOR"] == true)
         {
             continue;
         }
+        
+        int actor_index = GetIndex((*component)["actor"]["ID"]);
         
         // The component is alive! add it to living components
         living_components.push_back(component);
@@ -227,10 +227,9 @@ void Actors::LateUpdate()
 */
 void Actors::ProcessRemovedComponents()
 {
-    while (!components_to_delete.empty())
+    while (components_to_delete.size() > 0)
     {
         auto& component = components_to_delete.front();
-        components_to_delete.pop();
         
         int actor_index = GetIndex((*component)["actor"]["ID"]);
         bool enabled_actor = actor_enabled[actor_index];
@@ -261,15 +260,9 @@ void Actors::ProcessRemovedComponents()
         }
         
         // Deletes the component
-        // TODO: Remove component instance from the lua state somehow? Need to prevent access to dead components.
-        delete component.get();
+        LuaAPI::DeleteLuaTable(component);
+        components_to_delete.pop();
     }
-    
-//    (*component).as<sol::table>() = nullptr;
-
-    // TODO: Call "OnDestroy" for every component on this actor that has it.
-    // What if the dev calls destroy in OnDestroy? The components in the destroyed actor wouldn't be processed correctly
-    // Maybe call "OnDestroy" right when the component is destroyed?
 }
 
 //-------------------------------------------------------
@@ -476,7 +469,7 @@ void Actors::PrepareActorForDestruction(int actor_id)
     // Queues all of the components on the given actor for deletion
     for (auto& component : components[actor_index])
     {
-        RemoveComponentFromActor(actor_id, component);
+        RemoveComponentFromActor(actor_id, *component);
     }
 }
 
@@ -498,32 +491,6 @@ void Actors::DestroyActor(int actor_id)
 }
 
 /**
- * Removes a component from an actor and marks it for deletion
- *
- * @param   actor_id        the id of the actor that this function is acting on
- * @param   component      the component to be removed
-*/
-void Actors::RemoveComponentFromActor(int actor_id, std::shared_ptr<sol::table> component)
-{
-    int actor_index = GetIndex(actor_id);
-    
-    // Removes this component from the actor
-    int component_index = -1;
-    for (int i = 0; i < components[actor_index].size(); i++) // Find the index of this component
-    {
-        if (components[actor_index][i].get() == component.get())
-        {
-            component_index = i;
-            break;
-        }
-    }
-    if (component_index != -1) { components[actor_index].erase(components[actor_index].begin() + component_index); } // remove the component from the actor
-    
-    (*component)["REMOVED_FROM_ACTOR"] = true;
-    components_to_delete.push(component);
-}
-
-/**
  * Gets the vector index of the actor with the given ID
  *
  * @param   actor_id the id of the actor that this function is acting on
@@ -538,4 +505,61 @@ int Actors::GetIndex(int actor_id)
     
     //std::cout << "error: attempt to access a nonexistant actor with ID: " << actor_id << std::endl;
     return -1;
+}
+
+//-------------------------------------------------------
+// Components.
+
+/**
+ * Removes a component from an actor and marks it for deletion
+ *
+ * @param   actor_id        the id of the actor that this function is acting on
+ * @param   component      the component to be removed
+*/
+void Actors::RemoveComponentFromActor(int actor_id, sol::table component)
+{
+    if (!component.valid())
+    {
+        return;
+    }
+    
+    int actor_index = GetIndex(actor_id);
+    
+    // Removes this component from the actor
+    int component_index = -1;
+    for (int i = 0; i < components[actor_index].size(); i++) // Find the index of this component
+    {
+        if ((*components[actor_index][i]) == component)
+        {
+            (component)["REMOVED_FROM_ACTOR"] = true;
+            components_to_delete.push(std::make_shared<sol::table>(component));
+            component_index = i;
+            break;
+        }
+    }
+    if (component_index != -1) { components[actor_index].erase(components[actor_index].begin() + component_index); } // remove the component from the actor
+}
+
+/**
+ * Gets the first component on the given actor with the given type if it exists.
+ *
+ * @param   actor_id        the id of the actor that this function is acting on
+ * @param   type                 the type of component we're searching for
+ * @return              the first component on the given actor with the given type, if none are found returns null
+*/
+sol::table Actors::GetComponentByType(int actor_id, std::string type)
+{
+    int actor_index = GetIndex(actor_id);
+    
+    for (int i = 0; i < components[actor_index].size(); i++)
+    {
+        if ((*components[actor_index][i])["type"] == type)
+        {
+            return *components[actor_index][i];
+        }
+    }
+    
+    // Return null if the component cannot be found.
+    sol::table null;
+    return null;
 }
