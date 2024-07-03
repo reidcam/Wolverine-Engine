@@ -38,7 +38,15 @@ void LuaAPI::ExposeLuaAPI()
 	(*GetLuaState())["Input"]["GetButtonDown"] = &Input::GetMouseButtonDown;
 	(*GetLuaState())["Input"]["GetButtonUp"] = &Input::GetMouseButtonUp;
 
-	// "Actor" class
+	// Text Namespace
+	(*GetLuaState())["Text"] = GetLuaState()->create_table();
+
+	// Vec2 Class
+	sol::usertype<glm::vec2> vec2_type = LuaAPI::GetLuaState()->new_usertype<glm::vec2>("vec2");
+	vec2_type["x"] = &glm::vec2::x;
+	vec2_type["y"] = &glm::vec2::y;
+
+	// "Actor" Class
 	sol::usertype<Actor> actor_type = LuaAPI::GetLuaState()->new_usertype<Actor>("Actor");
 	actor_type["ID"] = &Actor::ID;
 	actor_type["GetName"] = Actors::GetName;
