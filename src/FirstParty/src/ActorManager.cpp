@@ -9,6 +9,7 @@
 #include <stdio.h>
 
 #include "ActorManager.h"
+#include "LuaAPI.h"
 
 int Actors::num_total_actors = 0; // The total number of actors created during runtime
 int Actors::num_loaded_actors = 0; // The number of actors currently loaded in the game
@@ -348,7 +349,7 @@ int Actors::LoadActorWithJSON(const rapidjson::Value& actor_data)
         for (rapidjson::Value::ConstMemberIterator itr = actor_components.MemberBegin(); itr != actor_components.MemberEnd(); itr++)
         {
             // Creates and gets a reference to a new table on the Lua stack
-            sol::table new_component = ComponentManager::GetLuaState()->create_table();
+            sol::table new_component = LuaAPI::GetLuaState()->create_table();
             
             // The key of this component
             std::string key = itr->name.GetString();
@@ -433,8 +434,8 @@ void Actors::JsonToLuaObject(sol::lua_value& value, const rapidjson::Value& data
     }
     else if (type == sol::type::table)
     {
-        sol::table _table = ComponentManager::GetLuaState()->create_table();
-        _table[0] = sol::object(*ComponentManager::GetLuaState());
+        sol::table _table = LuaAPI::GetLuaState()->create_table();
+        _table[0] = sol::object(*LuaAPI::GetLuaState());
         
         // Add all of the values in the data to our new table.
         int i = 1;

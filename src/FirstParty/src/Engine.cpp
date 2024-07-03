@@ -53,7 +53,9 @@ void Initialize()
     IMG_Init(IMG_INIT_PNG);
     TTF_Init();
     
-    ComponentManager::init();
+    LuaAPI::InitLuaState();
+    LuaAPI::ExposeLuaAPI();
+    LoadComponentTypes();
     
     // Load Resources needed for scene initialization
     // Do this here because the initial scene is loaded in CheckConfigFiles.
@@ -156,6 +158,8 @@ bool CheckGameConfig()
 */
 int GameLoop()
 {
+    LuaAPI::IncrementFrameCounter();
+
     if (EngineData::quit)
     {
         return 1;
