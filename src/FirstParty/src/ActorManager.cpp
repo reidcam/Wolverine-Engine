@@ -79,6 +79,12 @@ void Actors::ProcessAddedComponents()
     {
         int actor_index = GetIndex((*component)["actor"]["ID"]);
         
+        // If this component has been removed, skip it
+        if ((*component)["REMOVED_FROM_ACTOR"] == true)
+        {
+            continue;
+        }
+        
         // Skip this component if the actor or component aren't enabled
         if (!actor_enabled[actor_index] || (*component)["enabled"] == false)
         {
@@ -122,10 +128,21 @@ void Actors::ProcessAddedComponents()
 */
 void Actors::Update()
 {
+    std::vector<std::shared_ptr<sol::table>> living_components; // The "Update" list without any of the dead components
+    
     for (auto& component : components_to_update)
     {
         int actor_index = GetIndex((*component)["actor"]["ID"]);
         
+        // If this component is dead, skip it
+        if ((*component)["REMOVED_FROM_ACTOR"] == true)
+        {
+            continue;
+        }
+        
+        // The component is alive! add it to living components
+        living_components.push_back(component);
+    
         // Skip this component if the actor or component aren't enabled
         if (!actor_enabled[actor_index] || (*component)["enabled"] == false)
         {
@@ -150,6 +167,9 @@ void Actors::Update()
             std::cout << "\033[31m" << names[actor_index] << " : " << errorMessage << "\033[0m" << std::endl;
         }
     }
+    
+    components_to_update.clear();
+    components_to_update = living_components;
 }
 
 /**
@@ -157,9 +177,20 @@ void Actors::Update()
 */
 void Actors::LateUpdate()
 {
+    std::vector<std::shared_ptr<sol::table>> living_components; // The "LateUpdate" list without any of the dead components
+    
     for (auto& component : components_to_update_late)
     {
         int actor_index = GetIndex((*component)["actor"]["ID"]);
+        
+        // If this component is dead, skip it
+        if ((*component)["REMOVED_FROM_ACTOR"] == true)
+        {
+            continue;
+        }
+        
+        // The component is alive! add it to living components
+        living_components.push_back(component);
         
         // Skip this component if the actor or component aren't enabled
         if (!actor_enabled[actor_index] || (*component)["enabled"] == false)
@@ -185,6 +216,9 @@ void Actors::LateUpdate()
             std::cout << "\033[31m" << names[actor_index] << " : " << errorMessage << "\033[0m" << std::endl;
         }
     }
+    
+    components_to_update_late.clear();
+    components_to_update_late = living_components;
 }
 
 /**
@@ -441,7 +475,7 @@ void Actors::PrepareActorForDestruction(int actor_id)
     // Queues all of the components on the given actor for deletion
     for (auto& component : components[actor_index])
     {
-        components_to_delete.push(component);
+        RemoveComponentFromActor(actor_id, component);
     }
 }
 
@@ -460,6 +494,32 @@ void Actors::DestroyActor(int actor_id)
     actor_enabled[actor_index] = false;
     id_to_index.erase(actor_id);
     num_loaded_actors--;
+}
+
+/**
+ * Removes a component from an actor and marks it for deletion
+ *
+ * @param   actor_id        the id of the actor that this function is acting on
+ * @param   component      the component to be removed
+*/
+void Actors::RemoveComponentFromActor(int actor_id, std::shared_ptr<sol::table> component)
+{
+    int actor_index = GetIndex(actor_id);
+    
+    // Removes this component from the actor
+    int component_index = -1;
+    for (int i = 0; i < components[actor_index].size(); i++) // Find the index of this component
+    {
+        if (components[actor_index][i].get() == component.get())
+        {
+            component_index = i;
+            break;
+        }
+    }
+    if (component_index != -1) { components[actor_index].erase(components[actor_index].begin() + component_index); } // remove the component from the actor
+    
+    (*component)["REMOVED_FROM_ACTOR"] = true;
+    components_to_delete.push(component);
 }
 
 /**

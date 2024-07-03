@@ -158,6 +158,14 @@ public:
     */
     static void DestroyActor(int actor_id);
     
+    /**
+     * Removes a component from an actor and marks it for deletion
+     *
+     * @param   actor_id        the id of the actor that this function is acting on
+     * @param   component      the component to be removed
+    */
+    static void RemoveComponentFromActor(int actor_id, std::shared_ptr<sol::table> component);
+    
 }; // Actors
 
 #endif /* ActorManager_h */
