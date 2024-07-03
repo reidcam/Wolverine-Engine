@@ -51,43 +51,43 @@ void Scene::UpdateActors()
     Actors::LateUpdate();
     
     // Processes all of the components removed from actors this frame
-    for (auto actor : actors)
-    {
-        Actors::ProcessRemovedComponents(actor);
-    }
+    Actors::ProcessRemovedComponents();
     
     // Destroys all of the dead actors
     // TODO: Take another look at how to remove dead actors from a scene, this feels VERY slow
     for (auto actor : dead_actors)
     {
-        int index_to_remove = -1;
-        // Find the index of the actor within 'actors' and delete it
-        for (int i = 0; i < actors.size(); i++)
-        {
-            if (actor == actors[i])
-            {
-                index_to_remove = i;
-                break;
-            }
-        }
+        // Destroy all of the actors that have been prepped for destruction.
+        Actors::DestroyActor(actor);
         
-        // Erase the dead actor
-        if (index_to_remove != -1) { actors.erase(actors.begin() + index_to_remove); }
-        else
-        {
-            // If the actor isn't in 'actors' check 'new_actors'
-            // Find the index of the actor within 'new_actors' and delete it
-            for (int i = 0; i < new_actors.size(); i++)
-            {
-                if (actor == new_actors[i])
-                {
-                    index_to_remove = i;
-                    break;
-                }
-            }
-            
-            if (index_to_remove != -1) { new_actors.erase(new_actors.begin() + index_to_remove); }
-        }
+//        int index_to_remove = -1;
+//        // Find the index of the actor within 'actors' and delete it
+//        for (int i = 0; i < actors.size(); i++)
+//        {
+//            if (actor == actors[i])
+//            {
+//                index_to_remove = i;
+//                break;
+//            }
+//        }
+//        
+//        // Erase the dead actor
+//        if (index_to_remove != -1) { actors.erase(actors.begin() + index_to_remove); }
+//        else
+//        {
+//            // If the actor isn't in 'actors' check 'new_actors'
+//            // Find the index of the actor within 'new_actors' and delete it
+//            for (int i = 0; i < new_actors.size(); i++)
+//            {
+//                if (actor == new_actors[i])
+//                {
+//                    index_to_remove = i;
+//                    break;
+//                }
+//            }
+//            
+//            if (index_to_remove != -1) { new_actors.erase(new_actors.begin() + index_to_remove); }
+//        }
     }
     dead_actors.clear();
 }
@@ -183,7 +183,7 @@ void Scene::Destroy(int actor_id)
 {
     dead_actors.push_back(actor_id);
     
-    Actors::DestroyActor(actor_id);
+    Actors::PrepareActorForDestruction(actor_id);
 }
 
 //-------------------------------------------------------
@@ -232,5 +232,6 @@ std::vector<int> Scene::FindAllActorsWithName(std::string actor_name)
 */
 int Scene::FindActorByID(int ID)
 {
+    
     return 0;
 }

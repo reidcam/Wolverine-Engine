@@ -39,6 +39,7 @@ void Actors::Cleanup()
             IDs.erase(IDs.begin() + i);
             names.erase(names.begin() + i);
             actor_enabled.erase(actor_enabled.begin() + i);
+            components.erase(components.begin() + i);
         }
         else
         {
@@ -78,6 +79,12 @@ void Actors::ProcessAddedComponents()
     for (auto& component : components_to_init)
     {
         int actor_index = GetIndex((*component)["actor"]["ID"]);
+        
+        // If this component has been removed, skip it
+        if ((*component)["REMOVED_FROM_ACTOR"] == true)
+        {
+            continue;
+        }
         
         // Skip this component if the actor or component aren't enabled
         if (!actor_enabled[actor_index] || (*component)["enabled"] == false)
@@ -122,10 +129,21 @@ void Actors::ProcessAddedComponents()
 */
 void Actors::Update()
 {
+    std::vector<std::shared_ptr<sol::table>> living_components; // The "Update" list without any of the dead components
+    
     for (auto& component : components_to_update)
     {
+        // If this component is dead, skip it
+        if ((*component).empty() || (*component)["REMOVED_FROM_ACTOR"] == true)
+        {
+            continue;
+        }
+        
         int actor_index = GetIndex((*component)["actor"]["ID"]);
         
+        // The component is alive! add it to living components
+        living_components.push_back(component);
+    
         // Skip this component if the actor or component aren't enabled
         if (!actor_enabled[actor_index] || (*component)["enabled"] == false)
         {
@@ -150,6 +168,9 @@ void Actors::Update()
             std::cout << "\033[31m" << names[actor_index] << " : " << errorMessage << "\033[0m" << std::endl;
         }
     }
+    
+    components_to_update.clear();
+    components_to_update = living_components;
 }
 
 /**
@@ -157,9 +178,20 @@ void Actors::Update()
 */
 void Actors::LateUpdate()
 {
+    std::vector<std::shared_ptr<sol::table>> living_components; // The "LateUpdate" list without any of the dead components
+    
     for (auto& component : components_to_update_late)
     {
+        // If this component is dead, skip it
+        if ((*component).empty() || (*component)["REMOVED_FROM_ACTOR"] == true)
+        {
+            continue;
+        }
+        
         int actor_index = GetIndex((*component)["actor"]["ID"]);
+        
+        // The component is alive! add it to living components
+        living_components.push_back(component);
         
         // Skip this component if the actor or component aren't enabled
         if (!actor_enabled[actor_index] || (*component)["enabled"] == false)
@@ -185,20 +217,52 @@ void Actors::LateUpdate()
             std::cout << "\033[31m" << names[actor_index] << " : " << errorMessage << "\033[0m" << std::endl;
         }
     }
+    
+    components_to_update_late.clear();
+    components_to_update_late = living_components;
 }
 
 /**
- * Processes all components removed from the actor on this frame
- *
- * @param   actor_id the id of the actor that this function is acting on
+ * Processes all components removed from actors on this frame
 */
-void Actors::ProcessRemovedComponents(int actor_id)
+void Actors::ProcessRemovedComponents()
 {
-    int actor_index = GetIndex(actor_id);
-
-    // TODO: Call "OnDestroy" for every component on this actor that has it.
-    // What if the dev calls destroy in OnDestroy? The components in the destroyed actor wouldn't be processed correctly
-    // Maybe call "OnDestroy" right when the component is destroyed?
+    while (components_to_delete.size() > 0)
+    {
+        auto& component = components_to_delete.front();
+        
+        int actor_index = GetIndex((*component)["actor"]["ID"]);
+        bool enabled_actor = actor_enabled[actor_index];
+        bool enabled_component = (*component)["enabled"];
+        
+        // Skip caling "OnDestroy" on this component if the actor or component aren't enabled
+        if (!enabled_actor || !enabled_component)
+        {
+            continue;
+        }
+        
+        // Call "OnDestroy" if this component has it.
+        try
+        {
+            sol::function OnDestroy = (*component)["OnDestroy"];
+            if (OnDestroy.valid())
+            {
+                OnDestroy(*component);
+            }
+        }
+        catch(const std::exception& e)
+        {
+            std::string errorMessage = e.what();
+#ifdef _WIN32
+            std::replace(errorMessage.begin(), errorMessage.end(), '\\', '/');
+#endif
+            std::cout << "\033[31m" << names[actor_index] << " : " << errorMessage << "\033[0m" << std::endl;
+        }
+        
+        // Deletes the component
+        LuaAPI::DeleteLuaTable(component);
+        components_to_delete.pop();
+    }
 }
 
 //-------------------------------------------------------
@@ -392,9 +456,27 @@ void Actors::JsonToLuaObject(sol::lua_value& value, const rapidjson::Value& data
 }
 
 /**
- * Destroys an actor
+ * Prepares an actor for destruction later this frame
  * DO NOT USE: This function is for use inside of the scene and actor managers only.
- * In order to destroy an actor please use the "'destroy' function instead
+ * In order to destroy an actor please use the "'destroy' function instead. This ensures that actors are properly prepared for destruction.
+ *
+ * @param   actor_id        the id of the actor that this function is acting on
+*/
+void Actors::PrepareActorForDestruction(int actor_id)
+{
+    int actor_index = GetIndex(actor_id);
+    
+    // Queues all of the components on the given actor for deletion
+    for (auto& component : components[actor_index])
+    {
+        RemoveComponentFromActor(actor_id, *component);
+    }
+}
+
+/**
+ * Destroys all actors queued up for destruction
+ * DO NOT USE: This function is for use inside of the scene and actor managers only.
+ * In order to destroy an actor please use the "'destroy' function instead. This ensures that actors are properly prepared for destruction.
  *
  * @param   actor_id        the id of the actor that this function is acting on
 */
@@ -423,4 +505,61 @@ int Actors::GetIndex(int actor_id)
     
     //std::cout << "error: attempt to access a nonexistant actor with ID: " << actor_id << std::endl;
     return -1;
+}
+
+//-------------------------------------------------------
+// Components.
+
+/**
+ * Removes a component from an actor and marks it for deletion
+ *
+ * @param   actor_id        the id of the actor that this function is acting on
+ * @param   component      the component to be removed
+*/
+void Actors::RemoveComponentFromActor(int actor_id, sol::table component)
+{
+    if (!component.valid())
+    {
+        return;
+    }
+    
+    int actor_index = GetIndex(actor_id);
+    
+    // Removes this component from the actor
+    int component_index = -1;
+    for (int i = 0; i < components[actor_index].size(); i++) // Find the index of this component
+    {
+        if ((*components[actor_index][i]) == component)
+        {
+            (component)["REMOVED_FROM_ACTOR"] = true;
+            components_to_delete.push(std::make_shared<sol::table>(component));
+            component_index = i;
+            break;
+        }
+    }
+    if (component_index != -1) { components[actor_index].erase(components[actor_index].begin() + component_index); } // remove the component from the actor
+}
+
+/**
+ * Gets the first component on the given actor with the given type if it exists.
+ *
+ * @param   actor_id        the id of the actor that this function is acting on
+ * @param   type                 the type of component we're searching for
+ * @return              the first component on the given actor with the given type, if none are found returns null
+*/
+sol::table Actors::GetComponentByType(int actor_id, std::string type)
+{
+    int actor_index = GetIndex(actor_id);
+    
+    for (int i = 0; i < components[actor_index].size(); i++)
+    {
+        if ((*components[actor_index][i])["type"] == type)
+        {
+            return *components[actor_index][i];
+        }
+    }
+    
+    // Return null if the component cannot be found.
+    sol::table null;
+    return null;
 }
