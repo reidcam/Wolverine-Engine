@@ -23,7 +23,7 @@
 #include "AudioDB.h"
 #include "TextDB.h"
 #include "TemplateDB.h"
-#include "ComponentManager.h"
+#include "LuaAPI.h"
 
 #include "Engine.h"
 
@@ -239,14 +239,14 @@ void LoadComponentTypes()
             {
                 std::string type_name = file.path().stem().string();
 
-                sol::load_result script = ComponentManager::GetLuaState()->load_file(file.path().string().c_str());
+                sol::load_result script = LuaAPI::GetLuaState()->load_file(file.path().string().c_str());
                 if (script.valid())
                 {
                     // Load the script into the lua state
                     script();
                     
                     // Attaches the script to a lua table for easier member access
-                    sol::table component_table = (*ComponentManager::GetLuaState())[type_name.c_str()];
+                    sol::table component_table = (*LuaAPI::GetLuaState())[type_name.c_str()];
                     
                     // Load the component type into our database
                     loaded_component_types.insert(

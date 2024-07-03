@@ -276,6 +276,9 @@
     <ClCompile Include="src\ThirdParty\box2d-2.4.1\src\rope\b2_rope.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\FirstParty\src\LuaAPI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Library Include="src\ThirdParty\SDL2\lib\SDL2.lib" />
@@ -662,6 +665,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\box2d.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FirstParty\LuaAPI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -155,6 +155,7 @@
     <ClCompile Include="src\FirstParty\src\Databases.cpp" />
     <ClCompile Include="src\FirstParty\src\Engine.cpp" />
     <ClCompile Include="src\FirstParty\src\InputManager.cpp" />
+    <ClCompile Include="src\FirstParty\src\LuaAPI.cpp" />
     <ClCompile Include="src\FirstParty\src\main.cpp" />
     <ClCompile Include="src\FirstParty\src\Renderer.cpp" />
     <ClCompile Include="src\FirstParty\src\Rigidbody.cpp" />
@@ -253,6 +254,7 @@
     <ClInclude Include="src\FirstParty\ImageDB.h" />
     <ClInclude Include="src\FirstParty\InputManager.h" />
     <ClInclude Include="src\FirstParty\KeycodeDB.h" />
+    <ClInclude Include="src\FirstParty\LuaAPI.h" />
     <ClInclude Include="src\FirstParty\PhysicsWorld.h" />
     <ClInclude Include="src\FirstParty\Renderer.h" />
     <ClInclude Include="src\FirstParty\RenderRequests.h" />

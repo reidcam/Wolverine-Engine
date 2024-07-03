@@ -10,33 +10,7 @@
 
 #include "ComponentManager.h"
 #include "ActorManager.h"
-
-/**
- * Initializes the component manager
-*/
-void ComponentManager::init()
-{
-    // Initialize the state
-    l_state = new sol::state();
-    l_state->open_libraries(sol::lib::base, sol::lib::package, sol::lib::table);
-    
-    // Initialize the C++ classes and functions to get exposed to Lua
-    ExposeCPP();
-    
-    // Load all of the component types
-    LoadComponentTypes();
-}
-
-/**
- * Exposes C++ classes and functions to lua so that they can be used.
- */
-void ComponentManager::ExposeCPP()
-{
-    // "Actor" class
-    sol::usertype<Actor> actor_type = l_state->new_usertype<Actor>("Actor");
-    actor_type["ID"] = &Actor::ID;
-    actor_type["GetName"] = Actors::GetName;
-}
+#include "LuaAPI.h"
 
 /**
  * Establishes inheritance between two tables by setting one to be the metatable of the other
@@ -47,7 +21,7 @@ void ComponentManager::ExposeCPP()
 void ComponentManager::EstablishInheritance(sol::table& instance_table, sol::table& parent_table)
 {
     /* We must create a metatable to establish inheritance in Lua */
-    sol::table new_metatable = l_state->create_table();
+    sol::table new_metatable = LuaAPI::GetLuaState()->create_table();
     new_metatable["__index"] = parent_table;
     
     /* We must use the raw lua C-API (lua stack) to preform a "setmetatable" operation */
