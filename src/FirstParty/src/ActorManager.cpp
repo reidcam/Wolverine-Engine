@@ -38,6 +38,7 @@ void Actors::Cleanup()
             IDs.erase(IDs.begin() + i);
             names.erase(names.begin() + i);
             actor_enabled.erase(actor_enabled.begin() + i);
+            components.erase(components.begin() + i);
         }
         else
         {
@@ -187,13 +188,49 @@ void Actors::LateUpdate()
 }
 
 /**
- * Processes all components removed from the actor on this frame
- *
- * @param   actor_id the id of the actor that this function is acting on
+ * Processes all components removed from actors on this frame
 */
-void Actors::ProcessRemovedComponents(int actor_id)
+void Actors::ProcessRemovedComponents()
 {
-    int actor_index = GetIndex(actor_id);
+    while (!components_to_delete.empty())
+    {
+        auto& component = components_to_delete.front();
+        components_to_delete.pop();
+        
+        int actor_index = GetIndex((*component)["actor"]["ID"]);
+        bool enabled_actor = actor_enabled[actor_index];
+        bool enabled_component = (*component)["enabled"];
+        
+        // Skip caling "OnDestroy" on this component if the actor or component aren't enabled
+        if (!enabled_actor || !enabled_component)
+        {
+            continue;
+        }
+        
+        // Call "OnDestroy" if this component has it.
+        try
+        {
+            sol::function OnDestroy = (*component)["OnDestroy"];
+            if (OnDestroy.valid())
+            {
+                OnDestroy(*component);
+            }
+        }
+        catch(const std::exception& e)
+        {
+            std::string errorMessage = e.what();
+#ifdef _WIN32
+            std::replace(errorMessage.begin(), errorMessage.end(), '\\', '/');
+#endif
+            std::cout << "\033[31m" << names[actor_index] << " : " << errorMessage << "\033[0m" << std::endl;
+        }
+        
+        // Deletes the component
+        // TODO: Remove component instance from the lua state somehow? Need to prevent access to dead components.
+        delete component.get();
+    }
+    
+//    (*component).as<sol::table>() = nullptr;
 
     // TODO: Call "OnDestroy" for every component on this actor that has it.
     // What if the dev calls destroy in OnDestroy? The components in the destroyed actor wouldn't be processed correctly
@@ -391,9 +428,27 @@ void Actors::JsonToLuaObject(sol::lua_value& value, const rapidjson::Value& data
 }
 
 /**
- * Destroys an actor
+ * Prepares an actor for destruction later this frame
  * DO NOT USE: This function is for use inside of the scene and actor managers only.
- * In order to destroy an actor please use the "'destroy' function instead
+ * In order to destroy an actor please use the "'destroy' function instead. This ensures that actors are properly prepared for destruction.
+ *
+ * @param   actor_id        the id of the actor that this function is acting on
+*/
+void Actors::PrepareActorForDestruction(int actor_id)
+{
+    int actor_index = GetIndex(actor_id);
+    
+    // Queues all of the components on the given actor for deletion
+    for (auto& component : components[actor_index])
+    {
+        components_to_delete.push(component);
+    }
+}
+
+/**
+ * Destroys all actors queued up for destruction
+ * DO NOT USE: This function is for use inside of the scene and actor managers only.
+ * In order to destroy an actor please use the "'destroy' function instead. This ensures that actors are properly prepared for destruction.
  *
  * @param   actor_id        the id of the actor that this function is acting on
 */

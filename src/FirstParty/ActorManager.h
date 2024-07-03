@@ -12,6 +12,7 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include <queue>
 
 #include "TemplateDB.h"
 #include "ComponentManager.h"
@@ -52,7 +53,9 @@ private:
     
     // All components that need to be initialized this frame
     inline static std::vector<std::shared_ptr<sol::table>> components_to_init;
-    //static std::vector<std::string> componentsToRemove;
+    
+    // All components that need to be deleted this frame
+    inline static std::queue<std::shared_ptr<sol::table>> components_to_delete;
     
     // The components across all actors with lifecycle functions
     inline static std::vector<std::shared_ptr<sol::table>> components_to_update;
@@ -91,11 +94,9 @@ public:
     static void LateUpdate();
 
     /**
-     * Processes all components removed from the actor on this frame
-     *
-     * @param   actor_id the id of the actor that this function is acting on
+     * Processes all components removed from actors on this frame
     */
-    static void ProcessRemovedComponents(int actor_id);
+    static void ProcessRemovedComponents();
 
     //-------------------------------------------------------
     // Getters/Setters
@@ -140,13 +141,23 @@ public:
     static void JsonToLuaObject(sol::lua_value& value, const rapidjson::Value& data, sol::type type);
     
     /**
+     * Prepares an actor for destruction later this frame
+     * DO NOT USE: This function is for use inside of the scene and actor managers only.
+     * In order to destroy an actor please use the "'destroy' function instead. This ensures that actors are properly prepared for destruction.
+     *
+     * @param   actor_id        the id of the actor that this function is acting on
+    */
+    static void PrepareActorForDestruction(int actor_id);
+    
+    /**
      * Destroys an actor
      * DO NOT USE: This function is for use inside of the scene and actor managers only.
-     * In order to destroy an actor please use the "'destroy' function instead
+     * In order to destroy an actor please use the "'destroy' function instead. This ensures that actors are properly prepared for destruction.
      *
      * @param   actor_id        the id of the actor that this function is acting on
     */
     static void DestroyActor(int actor_id);
+    
 }; // Actors
 
 #endif /* ActorManager_h */
