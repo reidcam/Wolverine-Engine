@@ -14,19 +14,19 @@
 // Image Render Request
 // default values are commented next to their respective data structure
 
-std::vector<std::string> image_render_request_image_name; // ""
-std::vector<float> image_render_request_x; // 0.0f
-std::vector<float> image_render_request_y; // 0.0f
-std::vector<int> image_render_request_rotation_degrees; // 0
-std::vector<float> image_render_request_scale_x; // 1.0f
-std::vector<float> image_render_request_scale_y; // 1.0f
-std::vector<float> image_render_request_pivot_x; // 0.5f
-std::vector<float> image_render_request_pivot_y; // 0.5f
-std::vector<int> image_render_request_r; // 255
-std::vector<int> image_render_request_g; // 255
-std::vector<int> image_render_request_b; // 255
-std::vector<int> image_render_request_a; // 255
-std::vector<int> image_render_request_sorting_order; // 0
+//std::vector<std::string> image_render_request_image_name; // ""
+//std::vector<float> image_render_request_x; // 0.0f
+//std::vector<float> image_render_request_y; // 0.0f
+//std::vector<int> image_render_request_rotation_degrees; // 0
+//std::vector<float> image_render_request_scale_x; // 1.0f
+//std::vector<float> image_render_request_scale_y; // 1.0f
+//std::vector<float> image_render_request_pivot_x; // 0.5f
+//std::vector<float> image_render_request_pivot_y; // 0.5f
+//std::vector<int> image_render_request_r; // 255
+//std::vector<int> image_render_request_g; // 255
+//std::vector<int> image_render_request_b; // 255
+//std::vector<int> image_render_request_a; // 255
+//std::vector<int> image_render_request_sorting_order; // 0
 
 struct ImageDrawRequest {
 	std::string image_name = "";
@@ -47,15 +47,15 @@ struct ImageDrawRequest {
 // Text Render Request
 // default values are commented next to their respective data structure
 
-std::vector<std::string> text_render_request_text; // ""
-std::vector<std::string> text_render_request_font; // ""
-std::vector<int> text_render_request_r; // 0
-std::vector<int> text_render_request_g; // 0
-std::vector<int> text_render_request_b; // 0
-std::vector<int> text_render_request_a; // 0
-std::vector<int> text_render_request_size; // 0
-std::vector<int> text_render_request_x; // 0
-std::vector<int> text_render_request_y; // 0
+//std::vector<std::string> text_render_request_text; // ""
+//std::vector<std::string> text_render_request_font; // ""
+//std::vector<int> text_render_request_r; // 0
+//std::vector<int> text_render_request_g; // 0
+//std::vector<int> text_render_request_b; // 0
+//std::vector<int> text_render_request_a; // 0
+//std::vector<int> text_render_request_size; // 0
+//std::vector<int> text_render_request_x; // 0
+//std::vector<int> text_render_request_y; // 0
 
 struct TextRenderRequest {
 	std::string text = "";
@@ -72,14 +72,14 @@ struct TextRenderRequest {
 // UI Render Request
 // default values are commented next to their respective data structure
 
-std::vector<std::string> ui_render_request_image_name; // ""
-std::vector<int> ui_render_request_x; // 0
-std::vector<int> ui_render_request_y; // 0
-std::vector<int> ui_render_request_r; // 255
-std::vector<int> ui_render_request_g; // 255
-std::vector<int> ui_render_request_b; // 255
-std::vector<int> ui_render_request_a; // 255
-std::vector<int> ui_render_request_sorting_order; // 0
+//std::vector<std::string> ui_render_request_image_name; // ""
+//std::vector<int> ui_render_request_x; // 0
+//std::vector<int> ui_render_request_y; // 0
+//std::vector<int> ui_render_request_r; // 255
+//std::vector<int> ui_render_request_g; // 255
+//std::vector<int> ui_render_request_b; // 255
+//std::vector<int> ui_render_request_a; // 255
+//std::vector<int> ui_render_request_sorting_order; // 0
 
 struct UIRenderRequest {
 	std::string image_name = "";
@@ -95,12 +95,12 @@ struct UIRenderRequest {
 // Pixel Render Request
 // default values are commented next to their respective data structure
 
-std::vector<int> pixel_render_request_x; // 0
-std::vector<int> pixel_render_request_y; // 0
-std::vector<int> pixel_render_request_r; // 255
-std::vector<int> pixel_render_request_g; // 255
-std::vector<int> pixel_render_request_b; // 255
-std::vector<int> pixel_render_request_a; // 255
+//std::vector<int> pixel_render_request_x; // 0
+//std::vector<int> pixel_render_request_y; // 0
+//std::vector<int> pixel_render_request_r; // 255
+//std::vector<int> pixel_render_request_g; // 255
+//std::vector<int> pixel_render_request_b; // 255
+//std::vector<int> pixel_render_request_a; // 255
 
 struct PixelDrawRequest
 {
