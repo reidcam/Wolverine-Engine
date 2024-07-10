@@ -18,11 +18,10 @@ private:
     static std::string current_scene_name; // The name of this scene
     static int current_scene_lifetime; // The number of frames this scene has been active for
     
-    static std::string new_scene_path; // The name of the new scene we're loading into
-    
     static std::vector<int> actors; // A list of active actors indexes
     static std::vector<int> dead_actors; // A list of actors that need to be deleted this frame
 public:
+    static std::string new_scene_name; // The name of the new scene we're loading into
     static bool load_new_scene; // True if we want to load a new scene at the end of this frame
     //-------------------------------------------------------
     // Lifecycle Functions
