@@ -11,9 +11,14 @@
 #include <thread>
 
 #include "sol/sol.hpp"
+#include "box2d/box2d.h"
 
 #include "ActorManager.h"
 #include "InputManager.h"
+#include "Renderer.h"
+#include "RenderRequests.h"
+#include "AudioManager.h"
+#include "SceneManager.h"
 
 class LuaAPI
 {
