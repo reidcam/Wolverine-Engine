@@ -19,6 +19,7 @@
 #include "RenderRequests.h"
 #include "AudioManager.h"
 #include "SceneManager.h"
+#include "Rigidbody.h"
 
 class LuaAPI
 {

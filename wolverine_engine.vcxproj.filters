@@ -670,6 +670,345 @@
     <ClInclude Include="src\FirstParty\LuaAPI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_math.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\call.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\sol.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\stack.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\stack_check.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\stack_check_get.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\stack_check_get_qualified.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\stack_check_get_unqualified.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\stack_check_qualified.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\stack_check_unqualified.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\stack_core.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\stack_field.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\stack_get.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\stack_get_qualified.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\stack_get_unqualified.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\stack_guard.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\stack_iterator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\stack_pop.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\stack_probe.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\stack_proxy.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\stack_proxy_base.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\stack_push.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\stack_reference.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\state.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\state_handling.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\state_view.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\string_view.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\table.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\table_core.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\table_iterator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\table_proxy.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\thread.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\tie.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\traits.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\trampoline.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\tuple.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\types.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\unicode.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\unique_usertype_traits.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\unsafe_function.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\unsafe_function_result.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\userdata.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\usertype.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\usertype_container.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\usertype_container_launch.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\usertype_core.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\usertype_proxy.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\usertype_storage.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\usertype_traits.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\variadic_args.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\variadic_results.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\version.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\wrapper.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\resolve.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\compatibility.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\config.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\coroutine.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\debug.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\demangle.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\deprecate.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\dump_handler.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\ebco.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\environment.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\epilogue.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\error.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\error_handler.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\forward.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\forward_detail.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\function.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\function_result.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\function_types.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\function_types_core.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\function_types_overloaded.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\function_types_stateful.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\function_types_stateless.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\function_types_templated.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\in_place.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\inheritance.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\load_result.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\lua_table.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\lua_value.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\make_reference.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\metatable.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\object.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\object_base.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\optional.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\optional_implementation.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\overload.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\packaged_coroutine.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\pairs_iterator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\pointer_like.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\policies.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\prologue.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\property.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\protect.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\protected_function.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\protected_function_result.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\protected_handler.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\proxy_base.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\raii.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\reference.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\as_args.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\as_returns.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\assert.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\base_traits.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\bind_traits.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\bytecode.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\compatibility\compat-5.3.c.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\compatibility\compat-5.3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\compatibility\compat-5.4.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\compatibility\lua_version.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\detail\build_version.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\stack\detail\pairs.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\game.config" />

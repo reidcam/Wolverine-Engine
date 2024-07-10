@@ -40,6 +40,7 @@ void LuaAPI::ExposeLuaAPI()
 
 	// Text Namespace
 	(*GetLuaState())["Text"] = GetLuaState()->create_table();
+	(*GetLuaState())["Text"]["Draw"] = &RendererData::DrawText;
     
     // Scene Namespace
     (*GetLuaState())["Scene"] = GetLuaState()->create_table();
@@ -48,7 +49,6 @@ void LuaAPI::ExposeLuaAPI()
     (*GetLuaState())["Scene"]["FindActorByID"] = &Scene::FindActorByID;
     (*GetLuaState())["Scene"]["FindActorWithName"] = &Scene::FindActorWithName;
     (*GetLuaState())["Scene"]["FindAllActorsWithName"] = &Scene::FindAllActorsWithName;
-	(*GetLuaState())["Text"]["Draw"] = &RendererData::DrawText;
 
 	// Audio Namespace
 	(*GetLuaState())["Audio"] = GetLuaState()->create_table();
@@ -76,12 +76,6 @@ void LuaAPI::ExposeLuaAPI()
 	(*GetLuaState())["Camera"]["SetZoom"] = &RendererData::SetCameraZoom;
 	(*GetLuaState())["Camera"]["GetZoom"] = &RendererData::GetCameraZoom;
 
-	// Scene Namespace
-	(*GetLuaState())["Scene"] = GetLuaState()->create_table();
-	(*GetLuaState())["Scene"]["Load"] = &Scene::LoadScene;
-	(*GetLuaState())["Scene"]["GetCurrent"] = &Scene::GetSceneName;
-	// (*GetLuaState())["Scene"]["DontDestroy"] NEEDS TO BE IMPLEMENTED
-
 	// Collision Namespace
 	(*GetLuaState())["Collision"] = GetLuaState()->create_table();
 	//(*GetLuaState())["Collision"]["other"] NEEDS TO BE IMPLEMENTED
@@ -92,30 +86,30 @@ void LuaAPI::ExposeLuaAPI()
 	// Vec2 Namespace
 	(*GetLuaState())["vec2"] = GetLuaState()->create_table();
 	(*GetLuaState())["vec2"]["Distance"] = &b2Distance;
-	(*GetLuaState())["vec2"]["Dot"] = static_cast<float (*)(const b2Vec2&, const b2Vec2&)>(&b2Dot);
+	//(*GetLuaState())["vec2"]["Dot"] = static_cast<float (*)(const b2Vec2&, const b2Vec2&)>(&b2Dot);
 
 	// Vec2 Class
-	//sol::usertype<glm::vec2> vec2_type = LuaAPI::GetLuaState()->new_usertype<glm::vec2>("vec2",
-	LuaAPI::GetLuaState()->new_usertype<glm::vec2>("vec2",
-		sol::constructors<glm::vec2(float, float)>(),
+	//sol::usertype<glm::vec2> vec2_type = LuaAPI::GetLuaState()->new_usertype<glm::vec2>("vec2");
+	LuaAPI::GetLuaState()->new_usertype<b2Vec2>("vec2",
+		sol::constructors<b2Vec2(float, float)>(),
 
-		"x", &glm::vec2::x,
-		"y", &glm::vec2::y,
+		"x", &b2Vec2::x,
+		"y", & b2Vec2::y,
 		"Normalize", &b2Vec2::Normalize,
 		"Length", &b2Vec2::Length,
 
 		// overload the add operator
 		sol::meta_function::addition, sol::overload(
-			sol::resolve<glm::vec2(const glm::vec2&)>(glm::operator+)),
+			sol::resolve<b2Vec2(const b2Vec2&)>(&b2Vec2::operator_add)),
 
 		// overload the subtract operator
 		sol::meta_function::subtraction, sol::overload(
-			sol::resolve<glm::vec2(const glm::vec2&)>(glm::operator-)),
+			sol::resolve<b2Vec2(const b2Vec2&)>(&b2Vec2::operator_sub)),
 
 		// overload the multiply operator
 		sol::meta_function::multiplication, sol::overload(
-			sol::resolve<glm::vec2(const glm::vec2&, float)>(glm::operator*),
-			sol::resolve<glm::vec2(float, const glm::vec2&)>(glm::operator*)
+			sol::resolve<b2Vec2(const b2Vec2&, float)>(&b2Vec2::operator_mul2),
+			sol::resolve<b2Vec2(float, const b2Vec2&)>(&b2Vec2::operator_mul)
 		)
 	);
 
@@ -125,7 +119,7 @@ void LuaAPI::ExposeLuaAPI()
 	//vec2_type["Length"] = &b2Vec2::Length;
 	
 	// Rigidbody Class
-	LuaAPI::GetLuaState()->new_usertype<glm::vec2>("vec2",
+	LuaAPI::GetLuaState()->new_usertype<Rigidbody>("Rigidbody",
 		"enabled", &Rigidbody::enabled,
 		"key", &Rigidbody::key,
 		"type", &Rigidbody::type,

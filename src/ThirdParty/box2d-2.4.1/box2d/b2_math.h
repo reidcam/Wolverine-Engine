@@ -135,9 +135,14 @@ struct B2_API b2Vec2
 		return b2Vec2(x - other.x, y - other.y);
 	}
 
-	b2Vec2 operator_mul(const float multiplier)
+	b2Vec2 operator_mul(const float multiplier, const b2Vec2& v)
 	{
-		return b2Vec2(x * multiplier, y * multiplier);
+		return b2Vec2(v.x * multiplier, v.y * multiplier);
+	}
+
+	b2Vec2 operator_mul2(const b2Vec2& v, const float multiplier)
+	{
+		return b2Vec2(v.x * multiplier, v.y * multiplier);
 	}
 
 	float x, y;

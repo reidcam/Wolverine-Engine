@@ -5,8 +5,8 @@
 //	Created by Cameron Reid on 7/2/24.
 //	Defines the rigidbody component
 
-#ifndef Renderer_h
-#define Renderer_h
+#ifndef RIGIDBODY_H
+#define RIGIDBODY_H
 
 #include <string>
 
@@ -14,7 +14,7 @@
 #include "box2d/box2d.h"
 #include "PhysicsWorld.h"
 
-struct Actor; // forward declation
+class Actor; // forward declation
 
 class Rigidbody
 {
