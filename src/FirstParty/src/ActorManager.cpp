@@ -461,7 +461,8 @@ void Actors::PrepareActorForDestruction(int actor_id)
     if (actor_index == -1) {return;}
     
     // Queues all of the components on the given actor for deletion
-    for (auto& component : components[actor_index])
+    std::vector<std::shared_ptr<sol::table>> components_to_remove = components[actor_index];
+    for (auto& component : components_to_remove)
     {
         RemoveComponentFromActor(actor_id, *component);
     }

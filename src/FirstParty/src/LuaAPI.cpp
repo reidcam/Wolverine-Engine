@@ -44,11 +44,14 @@ void LuaAPI::ExposeLuaAPI()
     
     // Scene Namespace
     (*GetLuaState())["Scene"] = GetLuaState()->create_table();
+    // TODO: Move thse functions to the actor static class when its created
     (*GetLuaState())["Scene"]["Instantiate"] = &Scene::Instantiate;
     (*GetLuaState())["Scene"]["Destroy"] = &Scene::Destroy;
+    
     (*GetLuaState())["Scene"]["FindActorByID"] = &Scene::FindActorByID;
     (*GetLuaState())["Scene"]["FindActorWithName"] = &Scene::FindActorWithName;
     (*GetLuaState())["Scene"]["FindAllActorsWithName"] = &Scene::FindAllActorsWithName;
+    (*GetLuaState())["Scene"]["Load"] = &Scene::ChangeScene;
 
 	// Audio Namespace
 	(*GetLuaState())["Audio"] = GetLuaState()->create_table();

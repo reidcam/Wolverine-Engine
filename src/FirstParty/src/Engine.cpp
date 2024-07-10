@@ -14,6 +14,7 @@
 #include "AudioDB.h"
 #include "TextDB.h"
 #include "TemplateDB.h"
+#include "SceneDB.h"
 #include "SceneManager.h"
 #include "ComponentManager.h"
 
@@ -56,6 +57,7 @@ void Initialize()
     LuaAPI::InitLuaState();
     LuaAPI::ExposeLuaAPI();
     LoadComponentTypes();
+    LoadScenePaths();
     
     // Load Resources needed for scene initialization
     // Do this here because the initial scene is loaded in CheckConfigFiles.
@@ -109,7 +111,8 @@ bool CheckGameConfig()
     }
     if(game_config.HasMember("initial_scene")){
         std::string initial_scene = game_config["initial_scene"].GetString();
-        Scene::LoadScene(initial_scene);
+        Scene::new_scene_name = initial_scene;
+        Scene::LoadNewScene();
     }
     else {
         std::cout << "error: initial scene unspecified";
@@ -178,6 +181,9 @@ int GameLoop()
     SDL_RenderClear(RendererData::GetRenderer()); // clear the renderer with the render clear color
     
     Scene::UpdateActors();
+    
+    // Load the new scene if asked for
+    if (Scene::load_new_scene) {Scene::LoadNewScene();}
     
     // RENDER STUFF HERE
     
