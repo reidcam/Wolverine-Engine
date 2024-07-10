@@ -14,6 +14,7 @@
 
 #include "ActorManager.h"
 #include "InputManager.h"
+#include "SceneManager.h"
 
 class LuaAPI
 {

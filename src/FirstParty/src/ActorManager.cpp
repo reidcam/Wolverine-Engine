@@ -55,19 +55,6 @@ void Actors::Cleanup()
 }
 
 /**
- * Initializes the actor at the given index
- * Called the frame an actor is loaded
- *
- * @param   actor_id the id of the actor that this function is acting on
-*/
-void Actors::Start(int actor_id)
-{
-    int actor_index = GetIndex(actor_id);
-    
-    // TODO: ???
-}
-
-/**
  * Processes all components added to all actors on the previous frame
 */
 void Actors::ProcessAddedComponents()
@@ -276,7 +263,10 @@ void Actors::ProcessRemovedComponents()
 */
 std::string Actors::GetName(int actor_id)
 {
-    return names[GetIndex(actor_id)];
+    int actor_index = GetIndex(actor_id);
+    if (actor_index == -1) {return "";}
+    
+    return names[actor_index];
 }
 
 /**
@@ -287,7 +277,10 @@ std::string Actors::GetName(int actor_id)
 */
 int Actors::GetID(int actor_id)
 {
-    return IDs[GetIndex(actor_id)];
+    int actor_index = GetIndex(actor_id);
+    if (actor_index == -1) {return -1;}
+    
+    return IDs[actor_index];
 }
 
 //-------------------------------------------------------
@@ -465,6 +458,7 @@ void Actors::JsonToLuaObject(sol::lua_value& value, const rapidjson::Value& data
 void Actors::PrepareActorForDestruction(int actor_id)
 {
     int actor_index = GetIndex(actor_id);
+    if (actor_index == -1) {return;}
     
     // Queues all of the components on the given actor for deletion
     for (auto& component : components[actor_index])
@@ -483,6 +477,7 @@ void Actors::PrepareActorForDestruction(int actor_id)
 void Actors::DestroyActor(int actor_id)
 {
     int actor_index = GetIndex(actor_id);
+    if (actor_index == -1) {return;}
     
     IDs[actor_index] = -1;
     actor_enabled[actor_index] = false;
@@ -524,6 +519,7 @@ void Actors::RemoveComponentFromActor(int actor_id, sol::table component)
     }
     
     int actor_index = GetIndex(actor_id);
+    if (actor_index == -1) {return;}
     
     // Removes this component from the actor
     int component_index = -1;
@@ -549,7 +545,10 @@ void Actors::RemoveComponentFromActor(int actor_id, sol::table component)
 */
 sol::table Actors::GetComponentByType(int actor_id, std::string type)
 {
+    sol::table null;
+    
     int actor_index = GetIndex(actor_id);
+    if (actor_index == -1) {return null;}
     
     for (int i = 0; i < components[actor_index].size(); i++)
     {
@@ -560,6 +559,5 @@ sol::table Actors::GetComponentByType(int actor_id, std::string type)
     }
     
     // Return null if the component cannot be found.
-    sol::table null;
     return null;
 }

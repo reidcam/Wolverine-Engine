@@ -23,7 +23,7 @@ using namespace std;
 class Actor
 {
 public:
-    int ID = 0;
+    int ID = -1;
 };
 
 class Actors
@@ -69,14 +69,6 @@ public:
      * Cleans all of the dead actors out from the vectors
     */
     static void Cleanup();
-    
-    /**
-     * Initializes the given actor
-     * Called the frame an actor is loaded
-     *
-     * @param   actor_id the id of the actor that this function is acting on
-    */
-    static void Start(int actor_id);
 
     /**
      * Processes all components added to the actor on the previous frame

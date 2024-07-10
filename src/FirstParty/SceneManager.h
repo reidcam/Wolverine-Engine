@@ -18,7 +18,6 @@ private:
     static int current_scene_lifetime; // The number of frames this scene has been active for
     
     static std::vector<int> actors; // A list of active actors indexes
-    static std::vector<int> new_actors; // A list of actors that need to be initialized this frame
     static std::vector<int> dead_actors; // A list of actors that need to be deleted this frame
 public:
     //-------------------------------------------------------
@@ -50,9 +49,9 @@ public:
     /**
      * destroys an actor and then removes it from the scene
      *
-     * @param   actor_id    the id of the actor to be destroyed
+     * @param   actor    the actor to be destroyed
     */
-    static void Destroy(int actor_id);
+    static void Destroy(Actor actor);
     
     //-------------------------------------------------------
     // Getters/Setters
@@ -69,9 +68,9 @@ public:
      * If multiple actors have this name this returns the one that was loaded first
      *
      * @param   actor_name  the name of the actor that this function is trying to find
-     * @returns             the index of the found actor
+     * @returns            the found actor
     */
-    static int FindActorWithName(std::string actor_name);
+    static Actor FindActorWithName(std::string actor_name);
     
     /**
      * Finds all actors in the current scene that have the provided name
@@ -79,15 +78,15 @@ public:
      * @param   actor_name  the name of the actors that this function is trying to find
      * @returns             a list of indexes that represent actors with the given name
     */
-    static std::vector<int> FindAllActorsWithName(std::string actor_name);
+    static sol::table FindAllActorsWithName(std::string actor_name);
     
     /**
      * Finds an actor with the given ID
      *
      * @param   ID                     the ID of the actor that this function is trying to find
-     * @returns             the index of the found actor
+     * @returns             the found actor
     */
-    static int FindActorByID(int ID);
+    static Actor FindActorByID(int ID);
 }; // Scene
 
 #endif /* SceneManager_h */

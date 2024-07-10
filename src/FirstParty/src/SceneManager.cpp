@@ -10,11 +10,12 @@
 
 #include "SceneManager.h"
 
+#include "LuaAPI.h"
+
 std::string Scene::current_scene_name = ""; // The name of this scene
 int Scene::current_scene_lifetime = 0; // The number of frames this scene has been active for
 
 std::vector<int> Scene::actors; // A list of active actors indexes
-std::vector<int> Scene::new_actors; // A list of actors that need to be initialized this frame
 std::vector<int> Scene::dead_actors; // A list of actors that need to be deleted this frame
 
 //-------------------------------------------------------
@@ -32,14 +33,6 @@ void Scene::UpdateActors()
     {
         Actors::Cleanup();
     }
-    
-    // Add all of the new actors to this scene
-    for (auto actor : new_actors)
-    {
-        Actors::Start(actor);
-        actors.push_back(actor);
-    }
-    new_actors.clear();
     
     // Process all of the components added to actors on the previous frame
     Actors::ProcessAddedComponents();
@@ -60,34 +53,18 @@ void Scene::UpdateActors()
         // Destroy all of the actors that have been prepped for destruction.
         Actors::DestroyActor(actor);
         
-//        int index_to_remove = -1;
-//        // Find the index of the actor within 'actors' and delete it
-//        for (int i = 0; i < actors.size(); i++)
-//        {
-//            if (actor == actors[i])
-//            {
-//                index_to_remove = i;
-//                break;
-//            }
-//        }
-//        
-//        // Erase the dead actor
-//        if (index_to_remove != -1) { actors.erase(actors.begin() + index_to_remove); }
-//        else
-//        {
-//            // If the actor isn't in 'actors' check 'new_actors'
-//            // Find the index of the actor within 'new_actors' and delete it
-//            for (int i = 0; i < new_actors.size(); i++)
-//            {
-//                if (actor == new_actors[i])
-//                {
-//                    index_to_remove = i;
-//                    break;
-//                }
-//            }
-//            
-//            if (index_to_remove != -1) { new_actors.erase(new_actors.begin() + index_to_remove); }
-//        }
+        int index_to_remove = -1;
+        // Find the index of the actor within 'actors' and delete it
+        for (int i = 0; i < actors.size(); i++)
+        {
+            if (actor == actors[i])
+            {
+                index_to_remove = i;
+                break;
+            }
+        }
+        // Erase the dead actor
+        if (index_to_remove != -1) { actors.erase(actors.begin() + index_to_remove); }
     }
     dead_actors.clear();
 }
@@ -143,11 +120,11 @@ void Scene::LoadScene(std::string scene_name)
 //                            combined_actor.Accept(writer);
 //                            std::cout << buffer.GetString() << std::endl;
                             
-                            new_actors.push_back(Actors::LoadActorWithJSON(combined_actor));
+                            actors.push_back(Actors::LoadActorWithJSON(combined_actor));
                         }
                         else
                         {
-                            new_actors.push_back(Actors::LoadActorWithJSON(member));
+                            actors.push_back(Actors::LoadActorWithJSON(member));
                         }
                     }
                 }
@@ -169,7 +146,7 @@ int Scene::Instantiate(std::string actor_template_name)
     // Creates the actor
     int new_actor_id = Actors::LoadActorWithJSON(*GetTemplate(actor_template_name));
     // Adds the actor to the scene
-    new_actors.push_back(new_actor_id);
+    actors.push_back(new_actor_id);
     
     return new_actor_id;
 }
@@ -177,13 +154,13 @@ int Scene::Instantiate(std::string actor_template_name)
 /**
  * destroys an actor and then removes it from the scene
  *
- * @param   actor_id    the id of the actor to be destroyed
+ * @param   actor    the actor to be destroyed
 */
-void Scene::Destroy(int actor_id)
+void Scene::Destroy(Actor actor)
 {
-    dead_actors.push_back(actor_id);
+    dead_actors.push_back(actor.ID);
     
-    Actors::PrepareActorForDestruction(actor_id);
+    Actors::PrepareActorForDestruction(actor.ID);
 }
 
 //-------------------------------------------------------
@@ -204,12 +181,25 @@ std::string Scene::GetSceneName()
  * If multiple actors have this name this returns the one that was loaded first
  *
  * @param   actor_name  the name of the actor that this function is trying to find
- * @returns             the index of the found actor
+ * @returns            the found actor
 */
-int Scene::FindActorWithName(std::string actor_name)
+Actor Scene::FindActorWithName(std::string actor_name)
 {
-    // TODO: This function
-    return 0;
+    // Create a new actor that will be assigned with the value of our actor with the given name if one is found
+    Actor found_actor;
+    found_actor.ID = -1;
+    
+    // Find the actor
+    for (auto& actor_id : actors)
+    {
+        if (Actors::GetName(actor_id) == actor_name)
+        {
+            found_actor.ID = actor_id;
+            return found_actor;
+        }
+    }
+    
+    return found_actor;
 }
 
 /**
@@ -218,20 +208,40 @@ int Scene::FindActorWithName(std::string actor_name)
  * @param   actor_name  the name of the actors that this function is trying to find
  * @returns             a list of indexes that represent actors with the given name
 */
-std::vector<int> Scene::FindAllActorsWithName(std::string actor_name)
+sol::table Scene::FindAllActorsWithName(std::string actor_name)
 {
-    // TODO: This function
-    return vector<int>(0);
+    // Create a new empty lua table to fill with our actors, and make it 1 indexed so it can be looped through in lua
+    sol::table actors_with_name = LuaAPI::GetLuaState()->create_table();
+    actors_with_name[0] = sol::object(*LuaAPI::GetLuaState());
+    
+    // Fill the table
+    // Keys must be increasing integers so the table is ipairs compatable
+    int i = 1;
+    for (auto& actor_id : actors)
+    {
+        if (Actors::GetName(actor_id) == actor_name)
+        {
+            // Add our actor with the given name to the list
+            Actor found_actor;
+            found_actor.ID = actor_id;
+            actors_with_name[i] = found_actor;
+            i++;
+        }
+    }
+    
+    return actors_with_name;
 }
 
 /**
  * Finds an actor with the given ID
  *
  * @param   ID                     the ID of the actor that this function is trying to find
- * @returns             the index of the found actor
+ * @returns             the found actor
 */
-int Scene::FindActorByID(int ID)
+Actor Scene::FindActorByID(int ID)
 {
+    Actor found_actor;
+    found_actor.ID = ID;
     
-    return 0;
+    return found_actor;
 }

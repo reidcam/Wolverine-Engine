@@ -40,6 +40,14 @@ void LuaAPI::ExposeLuaAPI()
 
 	// Text Namespace
 	(*GetLuaState())["Text"] = GetLuaState()->create_table();
+    
+    // Scene Namespace
+    (*GetLuaState())["Scene"] = GetLuaState()->create_table();
+    (*GetLuaState())["Scene"]["Instantiate"] = &Scene::Instantiate;
+    (*GetLuaState())["Scene"]["Destroy"] = &Scene::Destroy;
+    (*GetLuaState())["Scene"]["FindActorByID"] = &Scene::FindActorByID;
+    (*GetLuaState())["Scene"]["FindActorWithName"] = &Scene::FindActorWithName;
+    (*GetLuaState())["Scene"]["FindAllActorsWithName"] = &Scene::FindAllActorsWithName;
 
 	// Vec2 Class
 	sol::usertype<glm::vec2> vec2_type = LuaAPI::GetLuaState()->new_usertype<glm::vec2>("vec2");
@@ -49,9 +57,9 @@ void LuaAPI::ExposeLuaAPI()
 	// "Actor" Class
 	sol::usertype<Actor> actor_type = LuaAPI::GetLuaState()->new_usertype<Actor>("Actor");
 	actor_type["ID"] = &Actor::ID;
-	actor_type["GetName"] = Actors::GetName;
-    actor_type["RemoveComponent"] = Actors::RemoveComponentFromActor;
-    actor_type["GetComponentByType"] = Actors::GetComponentByType;
+	actor_type["GetName"] = &Actors::GetName;
+    actor_type["RemoveComponent"] = &Actors::RemoveComponentFromActor;
+    actor_type["GetComponentByType"] = &Actors::GetComponentByType;
 }
 
 
