@@ -48,11 +48,125 @@ void LuaAPI::ExposeLuaAPI()
     (*GetLuaState())["Scene"]["FindActorByID"] = &Scene::FindActorByID;
     (*GetLuaState())["Scene"]["FindActorWithName"] = &Scene::FindActorWithName;
     (*GetLuaState())["Scene"]["FindAllActorsWithName"] = &Scene::FindAllActorsWithName;
+	(*GetLuaState())["Text"]["Draw"] = &RendererData::DrawText;
+
+	// Audio Namespace
+	(*GetLuaState())["Audio"] = GetLuaState()->create_table();
+	(*GetLuaState())["Audio"]["Play"] = &AudioManager::AudioPlay;
+	(*GetLuaState())["Audio"]["Halt"] = &AudioManager::AudioHalt;
+	(*GetLuaState())["Audio"]["SetVolume"] = &AudioManager::AudioSetVolume;
+	(*GetLuaState())["Audio"]["SetMasterVolume"] = &AudioManager::AudioSetMasterVolume;
+	(*GetLuaState())["Audio"]["Resume"] = &AudioManager::AudioResume;
+	(*GetLuaState())["Audio"]["CloseMixer"] = &AudioManager::AudioCloseMixer;
+	(*GetLuaState())["Audio"]["DeinitMixer"] = &AudioManager::AudioDeinitMixer;
+	(*GetLuaState())["Audio"]["Pause"] = &AudioManager::AudioPause;
+
+	// Image Namespace
+	(*GetLuaState())["Image"] = GetLuaState()->create_table();
+	(*GetLuaState())["Image"]["Draw"] = &RendererData::DrawImage;
+	(*GetLuaState())["Image"]["DrawEx"] = &RendererData::DrawImageEx;
+	(*GetLuaState())["Image"]["DrawPixel"] = &RendererData::DrawPixel;
+	(*GetLuaState())["Image"]["DrawUI"] = &RendererData::DrawUI;
+	(*GetLuaState())["Image"]["DrawUIEx"] = &RendererData::DrawUIEx;
+
+	// Camera Namespace
+	(*GetLuaState())["Camera"] = GetLuaState()->create_table();
+	(*GetLuaState())["Camera"]["SetPosition"] = &RendererData::SetCameraPosition;
+	(*GetLuaState())["Camera"]["GetPosition"] = &RendererData::GetCameraPosition;
+	(*GetLuaState())["Camera"]["SetZoom"] = &RendererData::SetCameraZoom;
+	(*GetLuaState())["Camera"]["GetZoom"] = &RendererData::GetCameraZoom;
+
+	// Scene Namespace
+	(*GetLuaState())["Scene"] = GetLuaState()->create_table();
+	(*GetLuaState())["Scene"]["Load"] = &Scene::LoadScene;
+	(*GetLuaState())["Scene"]["GetCurrent"] = &Scene::GetSceneName;
+	// (*GetLuaState())["Scene"]["DontDestroy"] NEEDS TO BE IMPLEMENTED
+
+	// Collision Namespace
+	(*GetLuaState())["Collision"] = GetLuaState()->create_table();
+	//(*GetLuaState())["Collision"]["other"] NEEDS TO BE IMPLEMENTED
+	//(*GetLuaState())["Collision"]["point"] NEEDS TO BE IMPLEMENTED
+	//(*GetLuaState())["Collision"]["relative_velocity"] NEEDS TO BE IMPLEMENTED
+	//(*GetLuaState())["Collision"]["normal"] NEEDS TO BE IMPLEMENTED
+
+	// Vec2 Namespace
+	(*GetLuaState())["vec2"] = GetLuaState()->create_table();
+	(*GetLuaState())["vec2"]["Distance"] = &b2Distance;
+	(*GetLuaState())["vec2"]["Dot"] = static_cast<float (*)(const b2Vec2&, const b2Vec2&)>(&b2Dot);
 
 	// Vec2 Class
-	sol::usertype<glm::vec2> vec2_type = LuaAPI::GetLuaState()->new_usertype<glm::vec2>("vec2");
-	vec2_type["x"] = &glm::vec2::x;
-	vec2_type["y"] = &glm::vec2::y;
+	//sol::usertype<glm::vec2> vec2_type = LuaAPI::GetLuaState()->new_usertype<glm::vec2>("vec2",
+	LuaAPI::GetLuaState()->new_usertype<glm::vec2>("vec2",
+		sol::constructors<glm::vec2(float, float)>(),
+
+		"x", &glm::vec2::x,
+		"y", &glm::vec2::y,
+		"Normalize", &b2Vec2::Normalize,
+		"Length", &b2Vec2::Length,
+
+		// overload the add operator
+		sol::meta_function::addition, sol::overload(
+			sol::resolve<glm::vec2(const glm::vec2&)>(glm::operator+)),
+
+		// overload the subtract operator
+		sol::meta_function::subtraction, sol::overload(
+			sol::resolve<glm::vec2(const glm::vec2&)>(glm::operator-)),
+
+		// overload the multiply operator
+		sol::meta_function::multiplication, sol::overload(
+			sol::resolve<glm::vec2(const glm::vec2&, float)>(glm::operator*),
+			sol::resolve<glm::vec2(float, const glm::vec2&)>(glm::operator*)
+		)
+	);
+
+	//vec2_type["x"] = &glm::vec2::x;
+	//vec2_type["y"] = &glm::vec2::y;
+	//vec2_type["Normalize"] = &b2Vec2::Normalize;
+	//vec2_type["Length"] = &b2Vec2::Length;
+	
+	// Rigidbody Class
+	LuaAPI::GetLuaState()->new_usertype<glm::vec2>("vec2",
+		"enabled", &Rigidbody::enabled,
+		"key", &Rigidbody::key,
+		"type", &Rigidbody::type,
+		"actor", &Rigidbody::actor,
+		"x", &Rigidbody::x,
+		"y", &Rigidbody::y,
+		"body_type", &Rigidbody::body_type,
+		"precise", &Rigidbody::precise,
+		"gravity_scale", &Rigidbody::gravity_scale,
+		"density", &Rigidbody::density,
+		"angular_friction", &Rigidbody::angular_friction,
+		"rotation", &Rigidbody::rotation,
+		"has_collider", &Rigidbody::has_collider,
+		"has_trigger", &Rigidbody::has_trigger,
+		"collider_type", &Rigidbody::collider_type,
+		"trigger_type", &Rigidbody::trigger_type,
+		"collider_width", &Rigidbody::collider_width,
+		"collider_height", &Rigidbody::collider_height,
+		"collider_radius", &Rigidbody::collider_radius,
+		"trigger_width", &Rigidbody::trigger_width,
+		"trigger_height", &Rigidbody::trigger_height,
+		"trigger_radius", &Rigidbody::trigger_radius,
+		"friction", &Rigidbody::friction,
+		"bounciness", &Rigidbody::bounciness,
+		"GetPosition", &Rigidbody::GetPosition,
+		"GetRotation", &Rigidbody::GetRotation,
+		"OnStart", &Rigidbody::OnStart,
+		"AddForce", &Rigidbody::AddForce,
+		"SetVelocity", &Rigidbody::SetVelocity,
+		"SetPosition", &Rigidbody::SetPosition,
+		"SetRotation", &Rigidbody::SetRotation,
+		"SetAngularVelocity", &Rigidbody::SetAngularVelocity,
+		"SetGravityScale", &Rigidbody::SetGravityScale,
+		"SetUpDirection", &Rigidbody::SetUpDirection,
+		"SetRightDirection", &Rigidbody::SetRightDirection,
+		"GetVelocity", &Rigidbody::GetVelocity,
+		"GetAngularVelocity", &Rigidbody::GetAngularVelocity,
+		"GetGravityScale", &Rigidbody::GetGravityScale,
+		"GetUpDirection", &Rigidbody::GetUpDirection,
+		"GetRightDirection", &Rigidbody::GetRightDirection
+	);
 
 	// "Actor" Class
 	sol::usertype<Actor> actor_type = LuaAPI::GetLuaState()->new_usertype<Actor>("Actor");
