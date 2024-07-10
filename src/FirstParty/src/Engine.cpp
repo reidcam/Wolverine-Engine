@@ -14,6 +14,7 @@
 #include "AudioDB.h"
 #include "TextDB.h"
 #include "TemplateDB.h"
+#include "SceneDB.h"
 #include "SceneManager.h"
 #include "ComponentManager.h"
 
@@ -72,6 +73,7 @@ void Initialize()
     LoadImages();
     LoadSounds();
     LoadFonts();
+    LoadScenePaths();
 } // Initialize()
 
 //-------------------------------------------------------
@@ -178,6 +180,9 @@ int GameLoop()
     SDL_RenderClear(RendererData::GetRenderer()); // clear the renderer with the render clear color
     
     Scene::UpdateActors();
+    
+    // Load the new scene if asked for
+    if (Scene::load_new_scene) {Scene::LoadNewScene();}
     
     // RENDER STUFF HERE
     

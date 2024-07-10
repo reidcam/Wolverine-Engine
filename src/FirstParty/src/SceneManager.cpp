@@ -15,6 +15,9 @@
 std::string Scene::current_scene_name = ""; // The name of this scene
 int Scene::current_scene_lifetime = 0; // The number of frames this scene has been active for
 
+bool Scene::load_new_scene = false; // True if we want to load a new scene at the end of this frame
+std::string Scene::new_scene_path = ""; // The name of the new scene we're loading into
+
 std::vector<int> Scene::actors; // A list of active actors indexes
 std::vector<int> Scene::dead_actors; // A list of actors that need to be deleted this frame
 
@@ -73,12 +76,33 @@ void Scene::UpdateActors()
 // Loaders
 
 /**
- * Loads a new scene
+ * Loads a new scene with the given name.
  *
  * @param   scene_name  the name of the scene to be loaded
 */
-void Scene::LoadScene(std::string scene_name)
+void Scene::ChangeScene(std::string scene_name)
 {
+    // Crash the engine if the new scene doesn't exist
+    new_scene_path = GetScenePath(scene_name);
+    load_new_scene = true;
+    
+    // Prepare all of the actors in this scene for deletion
+    for (auto& actor_id : actors)
+    {
+        Actor to_destroy;
+        to_destroy.ID = actor_id;
+        
+        Destroy(to_destroy);
+    }
+}
+
+/**
+ * Loads the new scene
+ * NOTE: DO NOT EXPOSE TO LUA! This is called in GameLoop ONLY if ChangeScene was called this frame.
+*/
+void Scene::LoadNewScene()
+{
+    load_new_scene = false;
     // TODO: Scene path database so that this code doesn't have to search for the scene path every time.
     /* Load files from this path */
     const std::string path = "resources/scenes";
@@ -91,7 +115,7 @@ void Scene::LoadScene(std::string scene_name)
             // If this scene matches the name of the one to be loaded
             if (file.path().filename().stem().stem().string() == scene_name)
             {
-                current_scene_name = scene_name;
+                current_scene_name = new_scene_path.
                 current_scene_lifetime = 0;
                 
                 rapidjson::Document scene_document;

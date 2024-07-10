@@ -10,6 +10,7 @@
 #define SceneManager_h
 
 #include "ActorManager.h"
+#include "SceneDB.h"
 
 class Scene
 {
@@ -17,9 +18,12 @@ private:
     static std::string current_scene_name; // The name of this scene
     static int current_scene_lifetime; // The number of frames this scene has been active for
     
+    static std::string new_scene_path; // The name of the new scene we're loading into
+    
     static std::vector<int> actors; // A list of active actors indexes
     static std::vector<int> dead_actors; // A list of actors that need to be deleted this frame
 public:
+    static bool load_new_scene; // True if we want to load a new scene at the end of this frame
     //-------------------------------------------------------
     // Lifecycle Functions
     
@@ -32,11 +36,17 @@ public:
     // Loaders
     
     /**
-     * Loads a new scene
+     * Loads a new scene with the given name.
      *
      * @param   scene_name  the name of the scene to be loaded
     */
-    static void LoadScene(std::string scene_name);
+    static void ChangeScene(std::string scene_name);
+    
+    /**
+     * Loads the new scene
+     * NOTE: DO NOT EXPOSE TO LUA! This is called in GameLoop ONLY if ChangeScene was called this frame.
+    */
+    static void LoadNewScene();
     
     /**
      * Creates a new actor from a template and adds it to the current scene, then returns a reference to it
