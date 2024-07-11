@@ -23,6 +23,33 @@ public:
      *  @param parent_table        the table that is being inherited from (passed by reference)
      */
     static void EstablishInheritance(sol::table& instance_table, sol::table& parent_table);
+    
+    //-------------------------------------------------------
+    // Native Components
+    
+    /**
+     * Returns true if the given type is a C++ based component
+     *
+     *  @param type                          the type to confirm if its native or not
+     *  @returns               true if the given type is a native component, and false otherwise
+     */
+    static bool IsComponentTypeNative(std::string type);
+    
+    /**
+     * Creates and returns a new native component of the given type
+     *
+     *  @param component_type   the component type to create a new copy of
+     *  @returns               the table that contains our new native component
+     */
+    static sol::table NewNativeComponent(std::string component_type);
+    
+    /**
+     * Makes a new copy of the given native component and returns it
+     *
+     *  @param native_component   the component that is being compied
+     *  @returns                the table that contains our new native component
+     */
+    static sol::table CopyNativeComponent(std::shared_ptr<sol::table> native_component);
 };
 
 #endif /* ComponentManager_h */
