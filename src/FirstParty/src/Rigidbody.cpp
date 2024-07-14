@@ -91,6 +91,9 @@ void Rigidbody::OnStart()
 */
 void Rigidbody::OnDestroy()
 {
+    if (body == nullptr)
+        return;
+    
 	PhysicsWorld::world->DestroyBody(body);
 }
 

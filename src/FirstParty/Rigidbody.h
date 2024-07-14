@@ -50,6 +50,7 @@ public:
 	std::string type = "Rigidbody";
 	std::string key = "???";
 	Actor* actor = nullptr;
+    bool REMOVED_FROM_ACTOR = false;
 	bool enabled = true;
 
 	/*

@@ -127,6 +127,7 @@ void LuaAPI::ExposeLuaAPI()
 		"key", &Rigidbody::key,
 		"type", &Rigidbody::type,
 		"actor", &Rigidbody::actor,
+        "REMOVED_FROM_ACTOR", &Rigidbody::REMOVED_FROM_ACTOR,
 		"x", &Rigidbody::x,
 		"y", &Rigidbody::y,
 		"body_type", &Rigidbody::body_type,
@@ -150,6 +151,7 @@ void LuaAPI::ExposeLuaAPI()
 		"GetPosition", &Rigidbody::GetPosition,
 		"GetRotation", &Rigidbody::GetRotation,
 		"OnStart", &Rigidbody::OnStart,
+        "OnDestroy", &Rigidbody::OnDestroy,
 		"AddForce", &Rigidbody::AddForce,
 		"SetVelocity", &Rigidbody::SetVelocity,
 		"SetPosition", &Rigidbody::SetPosition,
@@ -185,15 +187,22 @@ void deny_write() { std::cout << "error: attempt to modify a dead lua table" << 
 */
 void LuaAPI::DeleteLuaTable(std::shared_ptr<sol::table> table)
 {
-    (*table).clear();
-    
-    // Create the new read-only table
-    sol::table dead_table = LuaAPI::GetLuaState()->create_table();
-    dead_table[sol::meta_function::new_index] = deny_write;
-    dead_table[sol::meta_function::index] = sol::lua_nil;
-    
-    // Set it on the actual table
-    (*table)[sol::metatable_key] = dead_table;
+    if (ComponentManager::IsComponentTypeNative((*table)["type"]))
+    {
+        // TODO: Find a way to delete native components without memory shenanigans
+    }
+    else
+    {
+        (*table).clear();
+        
+        // Create the new read-only table
+        sol::table dead_table = LuaAPI::GetLuaState()->create_table();
+        dead_table[sol::meta_function::new_index] = deny_write;
+        dead_table[sol::meta_function::index] = sol::lua_nil;
+        
+        // Set it on the actual table
+        (*table)[sol::metatable_key] = dead_table;
+    }
 }
 
 /*

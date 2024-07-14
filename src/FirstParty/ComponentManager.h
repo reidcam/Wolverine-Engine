@@ -42,14 +42,6 @@ public:
      *  @returns               the table that contains our new native component
      */
     static sol::table NewNativeComponent(std::string component_type);
-    
-    /**
-     * Makes a new copy of the given native component and returns it
-     *
-     *  @param native_component   the component that is being compied
-     *  @returns                the table that contains our new native component
-     */
-    static sol::table CopyNativeComponent(std::shared_ptr<sol::table> native_component);
 };
 
 #endif /* ComponentManager_h */

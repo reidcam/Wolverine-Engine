@@ -54,26 +54,16 @@ bool ComponentManager::IsComponentTypeNative(std::string type)
  */
 sol::table ComponentManager::NewNativeComponent(std::string component_type)
 {
-    sol::table new_component;
     
     if (component_type == "Rigidbody")
     {
         Rigidbody* rigidbody = new Rigidbody();
-        new_component = LuaAPI::GetLuaState()->create_table_with(rigidbody);
+        sol::object r = sol::make_object(*LuaAPI::GetLuaState(), rigidbody);
+        sol::table new_component = r;
+        
         return new_component;
     }
     
-    return new_component;
-}
-
-/**
- * Makes a new copy of the given native component and returns it
- *
- *  @param native_component   the component that is being compied
- *  @returns                the table that contains our new native component
- */
-sol::table ComponentManager::CopyNativeComponent(std::shared_ptr<sol::table> native_component)
-{
-    sol::table new_copy;
-    return new_copy;
+    sol::table null;
+    return null;
 }
