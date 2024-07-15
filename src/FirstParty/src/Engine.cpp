@@ -182,12 +182,14 @@ int GameLoop()
     
     Scene::UpdateActors();
     
-    // Load the new scene if asked for
-    if (Scene::load_new_scene) {Scene::LoadNewScene();}
-    
     // RENDER STUFF HERE
     
+    PhysicsWorld::AdvanceWorld();
+    
     SDL_RenderPresent(RendererData::GetRenderer()); // present the frame into the window
+    
+    // Load the new scene if asked for
+    if (Scene::load_new_scene) {Scene::LoadNewScene();}
     
     return 0;
 } // GameLoop()

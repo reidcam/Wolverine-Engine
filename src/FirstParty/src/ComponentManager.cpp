@@ -12,6 +12,12 @@
 #include "ActorManager.h"
 #include "LuaAPI.h"
 
+#include "Rigidbody.h"
+
+// Native component lists
+// Stores the pointers to all native components active in the game so they can be deleted when the time comes
+std::vector<Rigidbody*> rigidbodies;
+
 /**
  * Establishes inheritance between two tables by setting one to be the metatable of the other
  *
@@ -26,4 +32,41 @@ void ComponentManager::EstablishInheritance(sol::table& instance_table, sol::tab
     
     /* We must use the raw lua C-API (lua stack) to preform a "setmetatable" operation */
     instance_table[sol::metatable_key] = new_metatable;
+}
+
+//-------------------------------------------------------
+// Native Components
+
+/**
+ * Returns true if the given type is a C++ based component
+ *
+ *  @param type                          the type to confirm if its native or not
+ *  @returns               true if the given type is a native component, and false otherwise
+ */
+bool ComponentManager::IsComponentTypeNative(std::string type)
+{
+    if (type == "Rigidbody") {return true;}
+    
+    return false;
+}
+
+/**
+ * Creates and returns a new native component of the given type
+ *
+ *  @param component_type   the component type to create a new copy of
+ *  @returns               the table that contains our new native component
+ */
+sol::table ComponentManager::NewNativeComponent(std::string component_type)
+{
+    if (component_type == "Rigidbody")
+    {
+        Rigidbody rigidbody;
+        sol::object r = sol::make_object(*LuaAPI::GetLuaState(), rigidbody);
+        sol::table new_component = r;
+        
+        return new_component;
+    }
+    
+    sol::table null;
+    return null;
 }

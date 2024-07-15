@@ -344,7 +344,16 @@ int Actors::LoadActorWithJSON(const rapidjson::Value& actor_data)
             if (itr->value.HasMember("type"))
             {
                 std::string type = itr->value["type"].GetString();
-                ComponentManager::EstablishInheritance(new_component, *GetComponentType(type));
+                
+                // Establishes our new component according to its type
+                if (ComponentManager::IsComponentTypeNative(type))
+                {
+                    new_component = ComponentManager::NewNativeComponent(type);
+                }
+                else
+                {
+                    ComponentManager::EstablishInheritance(new_component, *GetComponentType(type));
+                }
                 
                 // Allows the component to know its own type
                 new_component["type"] = type;
@@ -381,9 +390,6 @@ int Actors::LoadActorWithJSON(const rapidjson::Value& actor_data)
             Actor* _a = new Actor();
             _a->ID = num_total_actors;
             new_component["actor"] = _a;
-            
-//            // Sets the component to uninitialized, it will become initialized after onstart has been called.
-//            new_component["IsComponentInitialized"] = false;
             
             // Add the new component to the "components_to_init" and "components" vectors
             std::shared_ptr<sol::table> ptr = std::make_shared<sol::table>(new_component);
@@ -526,7 +532,7 @@ void Actors::RemoveComponentFromActor(int actor_id, sol::table component)
     int component_index = -1;
     for (int i = 0; i < components[actor_index].size(); i++) // Find the index of this component
     {
-        if ((*components[actor_index][i]) == component)
+        if ((*components[actor_index][i]).pointer() == component.pointer())
         {
             (component)["REMOVED_FROM_ACTOR"] = true;
             components_to_delete.push(std::make_shared<sol::table>(component));
@@ -534,7 +540,9 @@ void Actors::RemoveComponentFromActor(int actor_id, sol::table component)
             break;
         }
     }
-    if (component_index != -1) { components[actor_index].erase(components[actor_index].begin() + component_index); } // remove the component from the actor
+    if (component_index != -1) {
+        components[actor_index].erase(components[actor_index].begin() + component_index);
+    } // remove the component from the actor
 }
 
 /**
