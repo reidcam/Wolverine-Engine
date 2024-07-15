@@ -19,7 +19,7 @@ class Actor; // forward declation
 class Rigidbody
 {
 public:
-	b2Body* body;
+	b2Body* body = nullptr;
 
 	// Rigidbody parameters
 	float x = 0.0f;

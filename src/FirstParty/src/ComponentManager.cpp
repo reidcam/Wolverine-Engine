@@ -14,6 +14,10 @@
 
 #include "Rigidbody.h"
 
+// Native component lists
+// Stores the pointers to all native components active in the game so they can be deleted when the time comes
+std::vector<Rigidbody*> rigidbodies;
+
 /**
  * Establishes inheritance between two tables by setting one to be the metatable of the other
  *
@@ -54,10 +58,9 @@ bool ComponentManager::IsComponentTypeNative(std::string type)
  */
 sol::table ComponentManager::NewNativeComponent(std::string component_type)
 {
-    
     if (component_type == "Rigidbody")
     {
-        Rigidbody* rigidbody = new Rigidbody();
+        Rigidbody rigidbody;
         sol::object r = sol::make_object(*LuaAPI::GetLuaState(), rigidbody);
         sol::table new_component = r;
         

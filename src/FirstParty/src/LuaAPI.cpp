@@ -189,7 +189,8 @@ void LuaAPI::DeleteLuaTable(std::shared_ptr<sol::table> table)
 {
     if (ComponentManager::IsComponentTypeNative((*table)["type"]))
     {
-        // TODO: Find a way to delete native components without memory shenanigans
+        // TODO: Find a way to delete native components FROM LUA STATE without memory shenanigans
+        // sol::objects cannot be cleared and locked the same way that tables can. So native components must be treated differently here
     }
     else
     {
