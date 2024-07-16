@@ -32,6 +32,10 @@ target_compile_features("${PROJECT_NAME}" PRIVATE cxx_std_20 c_std_17)
 # Add third party libraries
 add_subdirectory("src/ThirdParty/glm")
 add_subdirectory("src/ThirdParty/rapidjson-1.1.0")
+add_subdirectory("src/ThirdParty/SDL2-2.30.5")
+add_subdirectory("src/ThirdParty/SDL2_image-2.8.2")
+add_subdirectory("src/ThirdParty/SDL2_ttf-2.22.0")
+add_subdirectory("src/ThirdParty/SDL2_mixer-2.8.0")
 
 # Link everything together
 target_link_libraries("${PROJECT_NAME}"
@@ -39,4 +43,8 @@ target_link_libraries("${PROJECT_NAME}"
         "${PROJECT_NAME}_box2d"
         glm
         rapidjson-1.1.0
+        SDL2
+        SDL2_image
+        SDL2_ttf
+        SDL2_mixer
 )
