@@ -151,6 +151,7 @@
   <ItemGroup>
     <ClCompile Include="src\FirstParty\src\ActorManager.cpp" />
     <ClCompile Include="src\FirstParty\src\AudioManager.cpp" />
+    <ClCompile Include="src\FirstParty\src\CollisionDetector.cpp" />
     <ClCompile Include="src\FirstParty\src\ComponentManager.cpp" />
     <ClCompile Include="src\FirstParty\src\Databases.cpp" />
     <ClCompile Include="src\FirstParty\src\Engine.cpp" />
@@ -247,6 +248,8 @@
     <ClInclude Include="src\FirstParty\ActorManager.h" />
     <ClInclude Include="src\FirstParty\AudioDB.h" />
     <ClInclude Include="src\FirstParty\AudioManager.h" />
+    <ClInclude Include="src\FirstParty\Collision.h" />
+    <ClInclude Include="src\FirstParty\CollisionDetector.h" />
     <ClInclude Include="src\FirstParty\ComponentDB.h" />
     <ClInclude Include="src\FirstParty\ComponentManager.h" />
     <ClInclude Include="src\FirstParty\Engine.h" />
