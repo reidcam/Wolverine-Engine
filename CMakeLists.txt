@@ -19,14 +19,10 @@ add_library("${PROJECT_NAME}_lua" ${LUA_SRC})
 target_include_directories("${PROJECT_NAME}_lua" PUBLIC "src/ThirdParty/lua-5.4.6")
 
 # Add Sol includes (header only library)
-file(GLOB SOL_SRC "src/ThirdParty/sol2-3.3.0/sol/*.hpp")
-target_include_directories("${PROJECT_NAME}" PRIVATE "src/ThirdParty/sol2-3.3.0")
+target_include_directories("${PROJECT_NAME}" PUBLIC "src/ThirdParty/sol2-3.3.0")
 
-# Hard include for rapidJSON, in case their cmake misses anything (namely document.h)
-target_include_directories("${PROJECT_NAME}" PRIVATE "src/ThirdParty/rapidjson-1.1.0/include/rapidjson")
-
-# Hard include for glm, in case their cmake misses anything (namely glm.hpp)
-target_include_directories("${PROJECT_NAME}" PRIVATE "src/ThirdParty/glm/glm")
+# Add RapidJSON includes (header only library)
+target_include_directories("${PROJECT_NAME}" PUBLIC "src/ThirdParty/rapidjson-1.1.0/include/rapidjson")
 
 # Add box2d library
 file(GLOB BOX2D_SOURCES
@@ -52,7 +48,6 @@ target_compile_features("${PROJECT_NAME}_box2d" PRIVATE cxx_std_20 c_std_17)
 
 # Add third party libraries
 add_subdirectory("src/ThirdParty/glm")
-add_subdirectory("src/ThirdParty/rapidjson-1.1.0")
 add_subdirectory("src/ThirdParty/SDL2-2.30.5")
 add_subdirectory("src/ThirdParty/SDL2_image-2.8.2")
 add_subdirectory("src/ThirdParty/SDL2_ttf-2.22.0")
@@ -64,7 +59,6 @@ target_link_libraries("${PROJECT_NAME}"
         "${PROJECT_NAME}_box2d"
         "${PROJECT_NAME}_lua"
         glm
-        RapidJSON
         SDL2
         SDL2_image
         SDL2_ttf
