@@ -83,12 +83,11 @@ void Initialize()
  */
 int CheckConfigFiles()
 {
-    std::filesystem::path currentFile = __FILE__;
-    std::filesystem::path currentDirectory = currentFile.parent_path();
-    std::filesystem::path relativePath = currentDirectory / ".." / ".." / ".." / "resources";
-    std::filesystem::path absolutePath = std::filesystem::canonical(relativePath);
-
-    if( !EngineUtils::DirectoryExists(absolutePath.string())) {
+//    std::filesystem::path currentFile = __FILE__;
+//    std::filesystem::path currentDirectory = currentFile.parent_path();
+//    std::filesystem::path relativePath = currentDirectory / ".." / ".." / ".." / "resources";
+//    std::filesystem::path absolutePath = std::filesystem::canonical(relativePath);
+    if(!EngineUtils::DirectoryExists("resources/")) {
         std::cout << "error: resources/ missing";
         return 1;
     }
