@@ -1,3 +1,7 @@
+# cmake build system for wolverine engine
+# written by Jacob Robinson <mrjacob@umich.edu>
+# 7/16/2024
+
 cmake_minimum_required(VERSION 3.30)
 
 project("wolverine-engine-demo")
@@ -8,6 +12,21 @@ file(GLOB FIRST_PARTY "src/FirstParty/src/*.cpp" "src/FirstParty/*.h")
 # Add executable
 add_executable("${PROJECT_NAME}" ${FIRST_PARTY})
 target_include_directories("${PROJECT_NAME}" PRIVATE "src/FirstParty")
+
+# Add Lua library
+file(GLOB LUA_SRC "src/ThirdParty/lua-5.4.6/*.c")
+add_library("${PROJECT_NAME}_lua" ${LUA_SRC})
+target_include_directories("${PROJECT_NAME}_lua" PUBLIC "src/ThirdParty/lua-5.4.6")
+
+# Add Sol includes (header only library)
+file(GLOB SOL_SRC "src/ThirdParty/sol2-3.3.0/sol/*.hpp")
+target_include_directories("${PROJECT_NAME}" PRIVATE "src/ThirdParty/sol2-3.3.0")
+
+# Hard include for rapidJSON, in case their cmake misses anything (namely document.h)
+target_include_directories("${PROJECT_NAME}" PRIVATE "src/ThirdParty/rapidjson-1.1.0/include/rapidjson")
+
+# Hard include for glm, in case their cmake misses anything (namely glm.hpp)
+target_include_directories("${PROJECT_NAME}" PRIVATE "src/ThirdParty/glm/glm")
 
 # Add box2d library
 file(GLOB BOX2D_SOURCES
@@ -28,6 +47,8 @@ target_include_directories("${PROJECT_NAME}_box2d"
 
 # Sets the C++ version
 target_compile_features("${PROJECT_NAME}" PRIVATE cxx_std_20 c_std_17)
+target_compile_features("${PROJECT_NAME}_lua" PRIVATE cxx_std_20 c_std_17)
+target_compile_features("${PROJECT_NAME}_box2d" PRIVATE cxx_std_20 c_std_17)
 
 # Add third party libraries
 add_subdirectory("src/ThirdParty/glm")
@@ -41,8 +62,9 @@ add_subdirectory("src/ThirdParty/SDL2_mixer-2.8.0")
 target_link_libraries("${PROJECT_NAME}"
         PRIVATE
         "${PROJECT_NAME}_box2d"
+        "${PROJECT_NAME}_lua"
         glm
-        rapidjson-1.1.0
+        RapidJSON
         SDL2
         SDL2_image
         SDL2_ttf
