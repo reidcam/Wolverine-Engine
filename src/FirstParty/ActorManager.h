@@ -169,7 +169,33 @@ public:
      * @return              the first component on the given actor with the given type, if none are found returns null
     */
     static sol::table GetComponentByType(int actor_id, std::string type);
+
+    /*
+    * Gets the number of components that an actor has
+    * 
+    * @param     actor_id    the id of the actor that this function is acting on
+    * 
+    * @return    the number of components that the actor currently has
+    */
+    static int GetNumberOfComponents(int actor_id);
     
+    /*
+    * Gets a component by index
+    * 
+    * @param     actor_id           the id of the actor that this function is acting on
+    * @param     component_index    the index of the component
+    * @return    a sol table containing the component
+    */
+    static sol::table GetComponentByIndex(int actor_id, int component_index);
+
+    /*
+    * Gets where or not an actor is enabled
+    * 
+    * @param     actor_id    the id of the actor that this function is acting on
+    * @return    a bool for whether or not the actor is enabled
+    */
+    static bool GetActorEnabled(int actor_id);
+
 }; // Actors
 
 #endif /* ActorManager_h */

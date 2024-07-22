@@ -36,24 +36,27 @@ void CollisionDetector::BeginContact(b2Contact* contact)
 
 	collision.normal = world_manifold.normal;
 
-	collision.other = actor_b;
+	collision.other_actor_id = actor_b->ID;
+	collision.this_actor_id = actor_a->ID;
 
 	// determine if we have 2 triggers or 2 colliders
 	if (fixture_a->IsSensor() && fixture_b->IsSensor()) {
 		collision.point = b2Vec2(-999.0f, -999.0f); // not valid for trigger
 		collision.normal = b2Vec2(-999.0f, -999.0f); // not valid for trigger
-		actor_a->OnTriggerEnter(collision);
+		OnEnter::OnTriggerEnter(collision);
 
-		collision.other = actor_a;
+		collision.other_actor_id = actor_a->ID;
+		collision.this_actor_id = actor_b->ID;
 
-		actor_b->OnTriggerEnter(collision);
+		OnEnter::OnTriggerEnter(collision);
 	}
 	else if (!fixture_a->IsSensor() && !fixture_b->IsSensor()) {
-		actor_a->OnCollisionEnter(collision);
+		OnEnter::OnCollisionEnter(collision);
 
-		collision.other = actor_a;
+		collision.other_actor_id = actor_a->ID;
+		collision.this_actor_id = actor_b->ID;
 
-		actor_b->OnCollisionEnter(collision);
+		OnEnter::OnCollisionEnter(collision);
 	}
 }
 
@@ -83,22 +86,25 @@ void CollisionDetector::EndContact(b2Contact* contact)
 
 	collision.normal = b2Vec2(-999.0f, -999.0f); // not valid for exit
 
-	collision.other = actor_b;
+	collision.other_actor_id = actor_b->ID;
+	collision.this_actor_id = actor_a->ID;
 
 	// determine if we have 2 triggers or 2 colliders
 	if (fixture_a->IsSensor() && fixture_b->IsSensor()) {
-		actor_a->OnTriggerExit(collision);
+		OnEnter::OnTriggerExit(collision);
 
-		collision.other = actor_a;
+		collision.other_actor_id = actor_a->ID;
+		collision.this_actor_id = actor_b->ID;
 
-		actor_b->OnTriggerExit(collision);
+		OnEnter::OnTriggerExit(collision);
 	}
 	else if (!fixture_a->IsSensor() && !fixture_b->IsSensor()) {
-		actor_a->OnCollisionExit(collision);
+		OnEnter::OnCollisionExit(collision);
 
-		collision.other = actor_a;
+		collision.other_actor_id = actor_a->ID;
+		collision.this_actor_id = actor_b->ID;
 
-		actor_b->OnCollisionExit(collision);
+		OnEnter::OnCollisionExit(collision);
 	}
 }
 
@@ -109,27 +115,143 @@ void CollisionDetector::EndContact(b2Contact* contact)
 */
 void OnEnter::OnTriggerEnter(const Collision& collision)
 {
-	std::vector<std::pair<std::string, Component>> name_and_component;
+	size_t number_of_components = Actors::GetNumberOfComponents(collision.this_actor_id);
 
-	// find all components on the actor that have OnTriggerEnter functions
-	for (auto& component : components) {
-		if ((*component.second.componentRef)["OnTriggerEnter"].isFunction())
-			name_and_component.push_back(std::pair<std::string, Component>(component.first, component.second));
-	}
-
-	sort(name_and_component.begin(), name_and_component.end(), SortComponentsByKey());
-
-	// call all of the OnTriggerEnter functions in order by key
-	for (auto& component : name_and_component) {
+	for (size_t i = 0; i < number_of_components; i++) {
 		try {
-			luabridge::LuaRef enabled = (*component.second.componentRef)["enabled"];
+			sol::table component = Actors::GetComponentByIndex(collision.this_actor_id, i);
+			sol::function OnTriggerEnter = component["OnTriggerEnter"];
 
-			if (enabled.cast<bool>() == true) {
-				(*component.second.componentRef)["OnTriggerEnter"](*component.second.componentRef, collision);
+			// Skip this component if the actor or component aren't enabled
+			if (!Actors::GetActorEnabled(collision.this_actor_id) || (component)["enabled"] == false)
+			{
+				continue;
+			}
+
+			if (OnTriggerEnter.valid())
+			{
+				OnTriggerEnter(component, collision);
 			}
 		}
-		catch (const luabridge::LuaException& e) {
-			ReportError(actor_name, e);
+		catch (const sol::error& e) {
+			std::cerr << "Caught Lua runtime error: " << e.what() << std::endl;
+		}
+		catch (const std::exception& e) {
+			std::cerr << "Caught C++ exception: " << e.what() << std::endl;
+		}
+		catch (...) {
+			std::cerr << "Caught unknown exception." << std::endl;
+		}
+	}
+}
+
+/*
+* Called when contact ends between two triggers
+*
+* @parameters    collision    info about the collision
+*/
+void OnEnter::OnTriggerExit(const Collision& collision)
+{
+	size_t number_of_components = Actors::GetNumberOfComponents(collision.this_actor_id);
+
+	for (size_t i = 0; i < number_of_components; i++) {
+		try {
+			sol::table component = Actors::GetComponentByIndex(collision.this_actor_id, i);
+			sol::function OnTriggerExit = component["OnTriggerExit"];
+
+			// Skip this component if the actor or component aren't enabled
+			if (!Actors::GetActorEnabled(collision.this_actor_id) || (component)["enabled"] == false)
+			{
+				continue;
+			}
+
+			if (OnTriggerExit.valid())
+			{
+				OnTriggerExit(OnTriggerExit, collision);
+			}
+		}
+		catch (const sol::error& e) {
+			std::cerr << "Caught Lua runtime error: " << e.what() << std::endl;
+		}
+		catch (const std::exception& e) {
+			std::cerr << "Caught C++ exception: " << e.what() << std::endl;
+		}
+		catch (...) {
+			std::cerr << "Caught unknown exception." << std::endl;
+		}
+	}
+}
+
+/*
+* Called when contact begins between two rigidbodies
+*
+* @parameter    collision    info about the collision
+*/
+void OnEnter::OnCollisionEnter(const Collision& collision)
+{
+	size_t number_of_components = Actors::GetNumberOfComponents(collision.this_actor_id);
+
+	for (size_t i = 0; i < number_of_components; i++) {
+		try {
+			sol::table component = Actors::GetComponentByIndex(collision.this_actor_id, i);
+			sol::function OnCollisionEnter = component["OnCollisionEnter"];
+
+			// Skip this component if the actor or component aren't enabled
+			if (!Actors::GetActorEnabled(collision.this_actor_id) || (component)["enabled"] == false)
+			{
+				continue;
+			}
+
+			if (OnCollisionEnter.valid())
+			{
+				OnCollisionEnter(OnCollisionEnter, collision);
+			}
+		}
+		catch (const sol::error& e) {
+			std::cerr << "Caught Lua runtime error: " << e.what() << std::endl;
+		}
+		catch (const std::exception& e) {
+			std::cerr << "Caught C++ exception: " << e.what() << std::endl;
+		}
+		catch (...) {
+			std::cerr << "Caught unknown exception." << std::endl;
+		}
+	}
+}
+
+/*
+* Called when contact ends between two rigidbodies
+*
+* @parameter    collision    info about the collision
+*/
+void OnEnter::OnCollisionExit(const Collision& collision)
+{
+	size_t number_of_components = Actors::GetNumberOfComponents(collision.this_actor_id);
+
+	for (size_t i = 0; i < number_of_components; i++) {
+		try {
+			sol::table component = Actors::GetComponentByIndex(collision.this_actor_id, i);
+			sol::function OnCollisionExit = component["OnCollisionExit"];
+
+			// Skip this component if the actor or component aren't enabled
+			if (!Actors::GetActorEnabled(collision.this_actor_id) || (component)["enabled"] == false)
+			{
+				continue;
+			}
+
+			if (OnCollisionExit.valid())
+			{
+				OnCollisionExit(OnCollisionExit, collision);
+			}
+		}
+		catch (const sol::error& e) {
+			std::cerr << "Caught Lua runtime error: " << e.what() << std::endl;
+		}
+		catch (const std::exception& e) {
+			std::cerr << "Caught C++ exception: " << e.what() << std::endl;
+		}
+		catch (...) {
+			std::cerr << "Caught unknown exception." << std::endl;
 		}
 	}
 }

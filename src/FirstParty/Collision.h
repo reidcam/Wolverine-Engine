@@ -8,7 +8,8 @@ class Actor; // forward declaration
 class Collision
 {
 public:
-	Actor* other;
+	int other_actor_id;
+	int this_actor_id;
 	b2Vec2 point;
 	b2Vec2 relative_velocity;
 	b2Vec2 normal;

@@ -561,3 +561,38 @@ sol::table Actors::GetComponentByType(int actor_id, std::string type)
     // Return null if the component cannot be found.
     return null;
 }
+
+/*
+* Gets the number of components that an actor has
+*
+* @param     actor_id    the id of the actor that this function is acting on
+*
+* @return    the number of components that the actor currently has
+*/
+int Actors::GetNumberOfComponents(int actor_id)
+{
+    return components[GetIndex(actor_id)].size();
+}
+
+/*
+* Gets a component by index
+*
+* @param     actor_id           the id of the actor that this function is acting on
+* @param     component_index    the index of the component
+* @return    a sol table containing the component
+*/
+sol::table Actors::GetComponentByIndex(int actor_id, int component_index)
+{
+    return *components[GetIndex(actor_id)][component_index];
+}
+
+/*
+* Gets where or not an actor is enabled
+*
+* @param     actor_id    the id of the actor that this function is acting on
+* @return    a bool for whether or not the actor is enabled
+*/
+bool Actors::GetActorEnabled(int actor_id)
+{
+    return actor_enabled[GetIndex(actor_id)];
+}

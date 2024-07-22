@@ -34,11 +34,32 @@ class OnEnter
 {
 public:
 	/*
-	* Called when contact begins begins between two triggers
+	* Called when contact begins between two triggers
 	* 
 	* @parameters    collision    info about the collision
 	*/
 	static void OnTriggerEnter(const Collision& collision);
+
+	/*
+	* Called when contact ends between two triggers
+	* 
+	* @parameters    collision    info about the collision
+	*/
+	static void OnTriggerExit(const Collision& collision);
+
+	/*
+	* Called when contact begins between two rigidbodies
+	* 
+	* @parameter    collision    info about the collision
+	*/
+	static void OnCollisionEnter(const Collision& collision);
+
+	/*
+	* Called when contact ends between two rigidbodies
+	*
+	* @parameter    collision    info about the collision
+	*/
+	static void OnCollisionExit(const Collision& collision);
 
 	/*
 	* Catches and outputs lua errors from sol
@@ -47,5 +68,11 @@ public:
 	* @parameters    e           the sol error
 	*/
 	static void ReportError(const int actor_id, const sol::error& e);
+private:
+	struct SortComponentsByKey {
+		bool operator() (const std::pair<std::string, sol::table>& component_1, const std::pair<std::string, sol::table>& component_2) {
+			return component_1.first < component_2.first;
+		}
+	};
 };
 #endif
