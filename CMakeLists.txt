@@ -4,29 +4,42 @@
 
 cmake_minimum_required(VERSION 3.30)
 
-project("wolverine-engine-demo")
+project("wolverine-engine-demo" VERSION 1.0)
 
 # Some quick settings
 set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED="NO" CACHE INTERNAL "")
 set(BUILD_SHARED_LIBS OFF)
+set(CMAKE_JSON_SOURCE_FILE_EXTENSIONS json;JSON;config;template;scene)
 
 # GLOB all of our files
 file(GLOB FIRST_PARTY "src/FirstParty/src/*.cpp" "src/FirstParty/*.h")
 
 # Get all of our games resources
-# configs
-file(GLOB CONFIG_FILES "resources/*.config")
-# images
-file(GLOB_RECURSE IMAGE_FILES
-        "resources/images/*.png"
-        "resources/images/*.jpeg"
+file(GLOB IMAGE_FILES
+        "${CMAKE_SOURCE_DIR}/resources/images/*.png"
+        "${CMAKE_SOURCE_DIR}/resources/images/*.jpeg"
 )
+file(GLOB AUDIO_FILES 
+        "${CMAKE_SOURCE_DIR}/resources/audio/*.mp3"
+        "${CMAKE_SOURCE_DIR}/resources/audio/*.wav"
+)
+file(GLOB FONT_FILES "${CMAKE_SOURCE_DIR}/resources/fonts/*.ttf")
+file(GLOB CONFIG_FILES "${CMAKE_SOURCE_DIR}/resources/*.config")
+file(GLOB ACTOR_TEMPLATES "${CMAKE_SOURCE_DIR}/resources/actor_templates/*.template")
+file(GLOB COMPONENT_TYPES "${CMAKE_SOURCE_DIR}/resources/component_types/*.lua")
+file(GLOB SCENE_FILES "${CMAKE_SOURCE_DIR}/resources/scenes/*.scene")
 
 # Add executable
 add_executable("${PROJECT_NAME}" 
         ${FIRST_PARTY}
-        ${CONFIG_FILES}
+        # bundle resources
         ${IMAGE_FILES}
+        ${AUDIO_FILES}
+        ${FONT_FILES}
+        ${CONFIG_FILES}
+        ${ACTOR_TEMPLATES}
+        ${COMPONENT_TYPES}
+        ${SCENE_FILES}
 )
 target_include_directories("${PROJECT_NAME}" PRIVATE "src/FirstParty")
 
@@ -59,20 +72,49 @@ target_include_directories("${PROJECT_NAME}_box2d"
 )
 
 if(APPLE)
-        # # Add all of the game resources to the mac bundle
-        # foreach(FILE ${IMAGE_FILES})
-        #         file(RELATIVE_PATH NEW_FILE "resources/images" ${FILE})
-        #         get_filename_component(NEW_FILE_PATH ${NEW_FILE} DIRECTORY)
-        #         set_source_files_properties(${FILE} PROPERTIES
-        #                 MACOSX_PACKAGE_LOCATION "Resources/images/${NEW_FILE_PATH}"
-        #         )
-        # endforeach()
+        # Add all of the game resources to the mac bundle
+        foreach(FILE ${IMAGE_FILES})
+                set_source_files_properties(${FILE} PROPERTIES
+                        MACOSX_PACKAGE_LOCATION "Resources/images"
+                )
+        endforeach()
+        foreach(FILE ${AUDIO_FILES})
+                set_source_files_properties(${FILE} PROPERTIES
+                        MACOSX_PACKAGE_LOCATION "Resources/audio"
+                )
+        endforeach()
+        foreach(FILE ${FONT_FILES})
+                set_source_files_properties(${FILE} PROPERTIES
+                        MACOSX_PACKAGE_LOCATION "Resources/fonts"
+                )
+        endforeach()
+        foreach(FILE ${CONFIG_FILES})
+                set_source_files_properties(${FILE} PROPERTIES
+                        MACOSX_PACKAGE_LOCATION "Resources"
+                )
+        endforeach()
+        foreach(FILE ${ACTOR_TEMPLATES})
+                set_source_files_properties(${FILE} PROPERTIES
+                        MACOSX_PACKAGE_LOCATION "Resources/actor_templates"
+                )
+        endforeach()
+        foreach(FILE ${COMPONENT_TYPES})
+                set_source_files_properties(${FILE} PROPERTIES
+                        MACOSX_PACKAGE_LOCATION "Resources/component_types"
+                )
+        endforeach()
+        foreach(FILE ${SCENE_FILES})
+                set_source_files_properties(${FILE} PROPERTIES
+                        MACOSX_PACKAGE_LOCATION "Resources/scenes"
+                )
+        endforeach()
 
         # Make target a .app executable
         set_target_properties("${PROJECT_NAME}" PROPERTIES
-                MACOSX_BUNDLE true     
-                # Bundle resources
-                RESOURCE "${IMAGE_FILES}"   
+                MACOSX_BUNDLE true
+                MACOSX_BUNDLE_NAME "${PROJECT_NAME}"
+                MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
+                MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION}
         )
 endif()
 
