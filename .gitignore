@@ -1,4 +1,3 @@
-
 build
 **/resources
 **/frames
@@ -29,6 +28,7 @@ osx_build_derived_data
 **.wav
 **.mp3
 **.ogg
+**.raw
 **.mp4
 **.mov
 
@@ -472,3 +472,7 @@ xcuserdata/
 *.out
 *.app
 sdl_user_input.txt
+
+# Allow everything in third party
+!src/ThirdParty/SDL2_mixer-2.8.0/external/opus/silk/x86
+!src/ThirdParty/SDL2_ttf-2.22.0/external/freetype/builds/unix
