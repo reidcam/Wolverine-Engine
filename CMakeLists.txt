@@ -77,37 +77,37 @@ if(APPLE)
         # Add all of the game resources to the mac bundle
         foreach(FILE ${IMAGE_FILES})
                 set_source_files_properties(${FILE} PROPERTIES
-                        MACOSX_PACKAGE_LOCATION "Resources/images"
+                        MACOSX_PACKAGE_LOCATION "Resources/resources/images"
                 )
         endforeach()
         foreach(FILE ${AUDIO_FILES})
                 set_source_files_properties(${FILE} PROPERTIES
-                        MACOSX_PACKAGE_LOCATION "Resources/audio"
+                        MACOSX_PACKAGE_LOCATION "Resources/resources/audio"
                 )
         endforeach()
         foreach(FILE ${FONT_FILES})
                 set_source_files_properties(${FILE} PROPERTIES
-                        MACOSX_PACKAGE_LOCATION "Resources/fonts"
+                        MACOSX_PACKAGE_LOCATION "Resources/resources/fonts"
                 )
         endforeach()
         foreach(FILE ${CONFIG_FILES})
                 set_source_files_properties(${FILE} PROPERTIES
-                        MACOSX_PACKAGE_LOCATION "Resources"
+                        MACOSX_PACKAGE_LOCATION "Resources/resources"
                 )
         endforeach()
         foreach(FILE ${ACTOR_TEMPLATES})
                 set_source_files_properties(${FILE} PROPERTIES
-                        MACOSX_PACKAGE_LOCATION "Resources/actor_templates"
+                        MACOSX_PACKAGE_LOCATION "Resources/resources/actor_templates"
                 )
         endforeach()
         foreach(FILE ${COMPONENT_TYPES})
                 set_source_files_properties(${FILE} PROPERTIES
-                        MACOSX_PACKAGE_LOCATION "Resources/component_types"
+                        MACOSX_PACKAGE_LOCATION "Resources/resources/component_types"
                 )
         endforeach()
         foreach(FILE ${SCENE_FILES})
                 set_source_files_properties(${FILE} PROPERTIES
-                        MACOSX_PACKAGE_LOCATION "Resources/scenes"
+                        MACOSX_PACKAGE_LOCATION "Resources/resources/scenes"
                 )
         endforeach()
 

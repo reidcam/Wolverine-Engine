@@ -42,14 +42,14 @@ bool RendererData::LoadRenderingConfig()
 {
 	std::string file_path = "resources/rendering.config";
 
-	if (!EngineUtils::DirectoryExists(file_path)) {
+	if (!FileUtils::DirectoryExists(file_path)) {
 		std::cout << "error: resources/rendering.config missing";
 		return false;
 	}
 
 	// read in the document
 	rapidjson::Document doc;
-	EngineUtils::ReadJsonFile(file_path, doc);
+	EngineUtils::ReadJsonFile(FileUtils::GetPath(file_path), doc);
 
 	// parse the JSON
 	if (doc.HasMember("x_position")) {
