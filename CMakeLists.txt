@@ -6,11 +6,28 @@ cmake_minimum_required(VERSION 3.30)
 
 project("wolverine-engine-demo")
 
+# Some quick settings
+set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED="NO" CACHE INTERNAL "")
+set(BUILD_SHARED_LIBS OFF)
+
 # GLOB all of our files
 file(GLOB FIRST_PARTY "src/FirstParty/src/*.cpp" "src/FirstParty/*.h")
 
+# Get all of our games resources
+# configs
+file(GLOB CONFIG_FILES "resources/*.config")
+# images
+file(GLOB_RECURSE IMAGE_FILES
+        "resources/images/*.png"
+        "resources/images/*.jpeg"
+)
+
 # Add executable
-add_executable("${PROJECT_NAME}" ${FIRST_PARTY})
+add_executable("${PROJECT_NAME}" 
+        ${FIRST_PARTY}
+        ${CONFIG_FILES}
+        ${IMAGE_FILES}
+)
 target_include_directories("${PROJECT_NAME}" PRIVATE "src/FirstParty")
 
 # Add Lua library
@@ -41,6 +58,25 @@ target_include_directories("${PROJECT_NAME}_box2d"
         "src/ThirdParty/box2d-2.4.1/src/dynamics"
 )
 
+if(APPLE)
+        # # Add all of the game resources to the mac bundle
+        # foreach(FILE ${IMAGE_FILES})
+        #         file(RELATIVE_PATH NEW_FILE "resources/images" ${FILE})
+        #         get_filename_component(NEW_FILE_PATH ${NEW_FILE} DIRECTORY)
+        #         set_source_files_properties(${FILE} PROPERTIES
+        #                 MACOSX_PACKAGE_LOCATION "Resources/images/${NEW_FILE_PATH}"
+        #         )
+        # endforeach()
+
+        # Make target a .app executable
+        set_target_properties("${PROJECT_NAME}" PROPERTIES
+                MACOSX_BUNDLE true     
+                # Bundle resources
+                RESOURCE "${IMAGE_FILES}"   
+        )
+endif()
+
+
 # Sets the C++ version
 target_compile_features("${PROJECT_NAME}" PRIVATE cxx_std_20 c_std_17)
 target_compile_features("${PROJECT_NAME}_lua" PRIVATE cxx_std_20 c_std_17)
@@ -59,8 +95,8 @@ target_link_libraries("${PROJECT_NAME}"
         "${PROJECT_NAME}_box2d"
         "${PROJECT_NAME}_lua"
         glm
-        SDL2
-        SDL2_image
-        SDL2_ttf
-        SDL2_mixer
+        SDL2::SDL2-static
+        SDL2_image::SDL2_image-static
+        SDL2_ttf::SDL2_ttf-static
+        SDL2_mixer::SDL2_mixer-static
 )
