@@ -10,6 +10,8 @@ project("wolverine-engine-demo" VERSION 1.0)
 set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED="NO" CACHE INTERNAL "")
 set(BUILD_SHARED_LIBS OFF)
 set(CMAKE_JSON_SOURCE_FILE_EXTENSIONS json;JSON;config;template;scene)
+set(SDL2TTF_VENDORED TRUE)
+set(SDL2MIXER_VENDORED TRUE)
 
 # GLOB all of our files
 file(GLOB FIRST_PARTY "src/FirstParty/src/*.cpp" "src/FirstParty/*.h")
