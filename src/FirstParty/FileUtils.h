@@ -41,6 +41,9 @@ public:
         CFRelease(resources_url);
         working_directory = path;
 #endif
+#ifdef _WIN32
+            
+#endif
     }
     
     /**

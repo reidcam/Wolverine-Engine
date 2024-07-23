@@ -474,6 +474,5 @@ xcuserdata/
 sdl_user_input.txt
 
 # Allow everything in third party
-!src/ThirdParty/SDL2_mixer-2.8.0/external/opus/silk/x86
-!src/ThirdParty/SDL2_mixer-2.8.0/external/opus/silk/arm
-!src/ThirdParty/SDL2_ttf-2.22.0/external/freetype/builds/unix
+!src/ThirdParty/**
+**.DS_Store
