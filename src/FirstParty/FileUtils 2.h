@@ -40,7 +40,6 @@ public:
         }
         CFRelease(resources_url);
         working_directory = path;
-        std::cout << working_directory << std::endl;
 #endif
 #ifdef _WIN32
         std::filesystem::path current_file = __FILE__;
