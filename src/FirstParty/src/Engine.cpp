@@ -147,6 +147,10 @@ int GameLoop()
     Scene::UpdateActors();
     
     // RENDER STUFF HERE
+    RendererData::RenderAndClearAllImageRequests();
+    RendererData::RenderAndClearAllTextRequests();
+    RendererData::RenderAndClearAllPixels();
+    RendererData::RenderAndClearAllUI();
     
     PhysicsWorld::AdvanceWorld();
     

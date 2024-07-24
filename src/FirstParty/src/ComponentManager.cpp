@@ -13,10 +13,7 @@
 #include "LuaAPI.h"
 
 #include "Rigidbody.h"
-
-// Native component lists
-// Stores the pointers to all native components active in the game so they can be deleted when the time comes
-std::vector<Rigidbody*> rigidbodies;
+#include "SpriteRenderer.h"
 
 /**
  * Establishes inheritance between two tables by setting one to be the metatable of the other
@@ -46,6 +43,7 @@ void ComponentManager::EstablishInheritance(sol::table& instance_table, sol::tab
 bool ComponentManager::IsComponentTypeNative(std::string type)
 {
     if (type == "Rigidbody") {return true;}
+    if (type == "SpriteRenderer") {return true;}
     
     return false;
 }
@@ -62,6 +60,14 @@ sol::table ComponentManager::NewNativeComponent(std::string component_type)
     {
         Rigidbody rigidbody;
         sol::object r = sol::make_object(*LuaAPI::GetLuaState(), rigidbody);
+        sol::table new_component = r;
+        
+        return new_component;
+    }
+    if (component_type == "SpriteRenderer")
+    {
+        SpriteRenderer sprite_renderer;
+        sol::object r = sol::make_object(*LuaAPI::GetLuaState(), sprite_renderer);
         sol::table new_component = r;
         
         return new_component;
