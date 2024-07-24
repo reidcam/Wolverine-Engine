@@ -20,6 +20,7 @@
 #include "AudioManager.h"
 #include "SceneManager.h"
 #include "Rigidbody.h"
+#include "SpriteRenderer.h"
 
 class LuaAPI
 {

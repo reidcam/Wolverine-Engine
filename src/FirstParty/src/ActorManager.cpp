@@ -121,7 +121,7 @@ void Actors::Update()
     for (auto& component : components_to_update)
     {
         // If this component is dead, skip it
-        if ((*component).empty() || (*component)["REMOVED_FROM_ACTOR"] == true)
+        if ((*component)["REMOVED_FROM_ACTOR"] == true)
         {
             continue;
         }
@@ -170,7 +170,7 @@ void Actors::LateUpdate()
     for (auto& component : components_to_update_late)
     {
         // If this component is dead, skip it
-        if ((*component).empty() || (*component)["REMOVED_FROM_ACTOR"] == true)
+        if ((*component)["REMOVED_FROM_ACTOR"] == true)
         {
             continue;
         }

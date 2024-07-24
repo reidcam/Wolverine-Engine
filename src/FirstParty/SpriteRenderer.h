@@ -9,10 +9,13 @@
 #define SpriteRenderer_h
 
 #include <string>
+#include <iostream>
 
 #include "glm/glm.hpp"
 #include "SDL.h"
 #include "SDL_image.h"
+
+#include "Renderer.h"
 
 struct Actor; // forward declation
 
@@ -20,7 +23,7 @@ class SpriteRenderer {
 public:
     // image reference
     std::string sprite = "";
-
+    
     // parameters
     float x = 0.0f;
     float y = 0.0f;
@@ -37,12 +40,18 @@ public:
     std::string type = "SpriteRenderer";
     std::string key = "???";
     Actor* actor = nullptr;
+    bool REMOVED_FROM_ACTOR = false;
     bool enabled = true;
 
     /*
     * Lifecycle function for initializing the sprite renderer
     */
     void OnStart();
+    
+    /*
+    * Lifecycle function for updating the sprite renderer
+    */
+    void OnUpdate();
 
     /*
     * Lifecycle function for destroying the sprite renderer

@@ -167,6 +167,29 @@ void LuaAPI::ExposeLuaAPI()
 		"GetRightDirection", &Rigidbody::GetRightDirection
 	);
 
+    // SpriteRenderer Class
+    LuaAPI::GetLuaState()->new_usertype<SpriteRenderer>("SpriteRenderer",
+        "enabled", &SpriteRenderer::enabled,
+        "key", &SpriteRenderer::key,
+        "type", &SpriteRenderer::type,
+        "actor", &SpriteRenderer::actor,
+        "REMOVED_FROM_ACTOR", &SpriteRenderer::REMOVED_FROM_ACTOR,
+        "sprite", &SpriteRenderer::sprite,
+        "x", &SpriteRenderer::x,
+        "y", &SpriteRenderer::y,
+        "color", &SpriteRenderer::color,
+        "scale_x", &SpriteRenderer::scale_x,
+        "scale_y", &SpriteRenderer::scale_y,
+        "pivot_x", &SpriteRenderer::pivot_x,
+        "pivot_y", &SpriteRenderer::pivot_y,
+        "rotation", &SpriteRenderer::rotation,
+        "sorting_order", &SpriteRenderer::sorting_order,
+        "OnUpdate", &SpriteRenderer::OnUpdate,
+        "OnStart", &SpriteRenderer::OnStart,
+        "OnDestroy", &SpriteRenderer::OnDestroy
+    );
+
+    
 	// "Actor" Class
 	sol::usertype<Actor> actor_type = LuaAPI::GetLuaState()->new_usertype<Actor>("Actor");
 	actor_type["ID"] = &Actor::ID;
