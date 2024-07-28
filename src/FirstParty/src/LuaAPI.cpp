@@ -76,12 +76,14 @@ void LuaAPI::ExposeLuaAPI()
 	(*GetLuaState())["Camera"]["SetZoom"] = &RendererData::SetCameraZoom;
 	(*GetLuaState())["Camera"]["GetZoom"] = &RendererData::GetCameraZoom;
 
-	// Collision Namespace
-	(*GetLuaState())["Collision"] = GetLuaState()->create_table();
-	//(*GetLuaState())["Collision"]["other"] NEEDS TO BE IMPLEMENTED
-	//(*GetLuaState())["Collision"]["point"] NEEDS TO BE IMPLEMENTED
-	//(*GetLuaState())["Collision"]["relative_velocity"] NEEDS TO BE IMPLEMENTED
-	//(*GetLuaState())["Collision"]["normal"] NEEDS TO BE IMPLEMENTED
+	// Collision Class
+	LuaAPI::GetLuaState()->new_usertype<Collision>("Collision",
+		"other_actor_id", &Collision::other_actor_id,
+		"this_actor_id", &Collision::this_actor_id,
+		"point", &Collision::point,
+		"relative_velocity", &Collision::relative_velocity,
+		"normal", &Collision::normal
+		);
 
 	// Vec2 Namespace
 	(*GetLuaState())["vec2"] = GetLuaState()->create_table();
@@ -89,7 +91,6 @@ void LuaAPI::ExposeLuaAPI()
 	//(*GetLuaState())["vec2"]["Dot"] = static_cast<float (*)(const b2Vec2&, const b2Vec2&)>(&b2Dot);
 
 	// Vec2 Class
-	//sol::usertype<glm::vec2> vec2_type = LuaAPI::GetLuaState()->new_usertype<glm::vec2>("vec2");
 	LuaAPI::GetLuaState()->new_usertype<b2Vec2>("vec2",
 		sol::constructors<b2Vec2(float, float)>(),
 
@@ -112,11 +113,6 @@ void LuaAPI::ExposeLuaAPI()
 			sol::resolve<b2Vec2(float, const b2Vec2&)>(&b2Vec2::operator_mul)
 		)
 	);
-
-	//vec2_type["x"] = &glm::vec2::x;
-	//vec2_type["y"] = &glm::vec2::y;
-	//vec2_type["Normalize"] = &b2Vec2::Normalize;
-	//vec2_type["Length"] = &b2Vec2::Length;
 	
 	// Rigidbody Class
 	LuaAPI::GetLuaState()->new_usertype<Rigidbody>("Rigidbody",

@@ -16,6 +16,8 @@
 #include "SDL_image.h"
 #include "Renderer.h"
 #include "LuaAPI.h"
+#include "CollisionDetector.h"
+#include "PhysicsWorld.h"
 
 using namespace std;
 
@@ -58,5 +60,15 @@ bool CheckGameConfig();
  * Called once every frame by "Game".
 */
 int GameLoop();
+
+/*
+* Initializes the collision detection for the b2world
+* 
+* NOTE: can't be called from PhysicsWorld bc CollisionDetector would have to be included
+*/
+inline static void InitializeCollisions() {
+	PhysicsWorld::collision_detector = new CollisionDetector();
+    PhysicsWorld::world->SetContactListener(PhysicsWorld::collision_detector);
+}
 
 #endif /* Engine_h */

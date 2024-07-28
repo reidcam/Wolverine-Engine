@@ -68,11 +68,5 @@ public:
 	* @parameters    e           the sol error
 	*/
 	static void ReportError(const int actor_id, const sol::error& e);
-private:
-	struct SortComponentsByKey {
-		bool operator() (const std::pair<std::string, sol::table>& component_1, const std::pair<std::string, sol::table>& component_2) {
-			return component_1.first < component_2.first;
-		}
-	};
 };
 #endif

@@ -11,10 +11,13 @@
 
 #include "box2d/box2d.h"
 
+class CollisionDetector;
+
 class PhysicsWorld
 {
 public:
 	inline static bool world_initialized = false;
+	inline static CollisionDetector* collision_detector;
 	inline static b2World* world;
 	inline static float time_step = 1.0f / 60.0f;
 

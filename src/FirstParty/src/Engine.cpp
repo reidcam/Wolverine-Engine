@@ -179,6 +179,14 @@ int GameLoop()
     
     Scene::UpdateActors();
     
+    // Box2D Physics
+
+    if (PhysicsWorld::world_initialized) {
+        InitializeCollisions();
+    }
+
+    PhysicsWorld::AdvanceWorld();
+
     // RENDER STUFF HERE
     
     SDL_RenderPresent(RendererData::GetRenderer()); // present the frame into the window

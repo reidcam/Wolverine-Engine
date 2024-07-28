@@ -20,6 +20,8 @@
 #include "AudioManager.h"
 #include "SceneManager.h"
 #include "Rigidbody.h"
+#include "Collision.h"
+#include "CollisionDetector.h"
 
 class LuaAPI
 {
