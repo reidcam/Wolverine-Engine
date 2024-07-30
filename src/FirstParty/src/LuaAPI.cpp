@@ -196,6 +196,8 @@ void LuaAPI::ExposeLuaAPI()
 	actor_type["GetName"] = &Actors::GetName;
     actor_type["RemoveComponent"] = &Actors::RemoveComponentFromActor;
     actor_type["GetComponentByType"] = &Actors::GetComponentByType;
+    actor_type["GetComponentsByType"] = &Actors::GetComponentsByType;
+    actor_type["GetComponentByKey"] = &Actors::GetComponentByKey;
 }
 
 

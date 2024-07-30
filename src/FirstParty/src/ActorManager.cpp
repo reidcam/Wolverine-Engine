@@ -554,7 +554,7 @@ void Actors::RemoveComponentFromActor(int actor_id, sol::table component)
 */
 sol::table Actors::GetComponentByType(int actor_id, std::string type)
 {
-    sol::table null;
+    sol::table null; // An empty table, to be returned if the component(s) cannot be found
     
     int actor_index = GetIndex(actor_id);
     if (actor_index == -1) {return null;}
@@ -562,6 +562,61 @@ sol::table Actors::GetComponentByType(int actor_id, std::string type)
     for (int i = 0; i < components[actor_index].size(); i++)
     {
         if ((*components[actor_index][i])["type"] == type)
+        {
+            return *components[actor_index][i];
+        }
+    }
+    
+    // Return null if the component cannot be found.
+    return null;
+}
+
+/**
+ * Gets all of the components on the given actor with the given type if they exist.
+ *
+ * @param   actor_id        the id of the actor that this function is acting on
+ * @param   type                 the type of component we're searching for
+ * @return              a list of all the components with the given type, if none are found returns null
+*/
+sol::table Actors::GetComponentsByType(int actor_id, std::string type)
+{
+    sol::table null; // An empty table, to be returned if the component(s) cannot be found
+    
+    int actor_index = GetIndex(actor_id);
+    if (actor_index == -1) {return null;}
+    
+    sol::table components_of_type = LuaAPI::GetLuaState()->create_table();
+    components_of_type[0] = null;
+    int index = 1;
+    
+    for (int i = 0; i < components[actor_index].size(); i++)
+    {
+        if ((*components[actor_index][i])["type"] == type)
+        {
+            components_of_type[index] = *components[actor_index][i];
+        }
+    }
+    
+    return components_of_type;
+}
+
+/**
+ * Gets the component on the given actor with the given key if it exists.
+ *
+ * @param   actor_id        the id of the actor that this function is acting on
+ * @param   key                    the key of the component we're searching for
+ * @return              the component on the given actor with the given key, if none are found returns null
+*/
+sol::table Actors::GetComponentByKey(int actor_id, std::string key)
+{
+    sol::table null; // An empty table, to be returned if the component(s) cannot be found
+    
+    int actor_index = GetIndex(actor_id);
+    if (actor_index == -1) {return null;}
+    
+    for (int i = 0; i < components[actor_index].size(); i++)
+    {
+        if ((*components[actor_index][i])["key"] == key)
         {
             return *components[actor_index][i];
         }
