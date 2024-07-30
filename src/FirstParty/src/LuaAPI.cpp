@@ -44,11 +44,14 @@ void LuaAPI::ExposeLuaAPI()
     
     // Scene Namespace
     (*GetLuaState())["Scene"] = GetLuaState()->create_table();
+    // TODO: Move thse functions to the actor static class when its created
     (*GetLuaState())["Scene"]["Instantiate"] = &Scene::Instantiate;
     (*GetLuaState())["Scene"]["Destroy"] = &Scene::Destroy;
+    
     (*GetLuaState())["Scene"]["FindActorByID"] = &Scene::FindActorByID;
     (*GetLuaState())["Scene"]["FindActorWithName"] = &Scene::FindActorWithName;
     (*GetLuaState())["Scene"]["FindAllActorsWithName"] = &Scene::FindAllActorsWithName;
+    (*GetLuaState())["Scene"]["Load"] = &Scene::ChangeScene;
 
 	// Audio Namespace
 	(*GetLuaState())["Audio"] = GetLuaState()->create_table();
@@ -120,6 +123,7 @@ void LuaAPI::ExposeLuaAPI()
 		"key", &Rigidbody::key,
 		"type", &Rigidbody::type,
 		"actor", &Rigidbody::actor,
+        "REMOVED_FROM_ACTOR", &Rigidbody::REMOVED_FROM_ACTOR,
 		"x", &Rigidbody::x,
 		"y", &Rigidbody::y,
 		"body_type", &Rigidbody::body_type,
@@ -143,6 +147,7 @@ void LuaAPI::ExposeLuaAPI()
 		"GetPosition", &Rigidbody::GetPosition,
 		"GetRotation", &Rigidbody::GetRotation,
 		"OnStart", &Rigidbody::OnStart,
+        "OnDestroy", &Rigidbody::OnDestroy,
 		"AddForce", &Rigidbody::AddForce,
 		"SetVelocity", &Rigidbody::SetVelocity,
 		"SetPosition", &Rigidbody::SetPosition,
@@ -158,12 +163,37 @@ void LuaAPI::ExposeLuaAPI()
 		"GetRightDirection", &Rigidbody::GetRightDirection
 	);
 
+    // SpriteRenderer Class
+    LuaAPI::GetLuaState()->new_usertype<SpriteRenderer>("SpriteRenderer",
+        "enabled", &SpriteRenderer::enabled,
+        "key", &SpriteRenderer::key,
+        "type", &SpriteRenderer::type,
+        "actor", &SpriteRenderer::actor,
+        "REMOVED_FROM_ACTOR", &SpriteRenderer::REMOVED_FROM_ACTOR,
+        "sprite", &SpriteRenderer::sprite,
+        "x", &SpriteRenderer::x,
+        "y", &SpriteRenderer::y,
+        "color", &SpriteRenderer::color,
+        "scale_x", &SpriteRenderer::scale_x,
+        "scale_y", &SpriteRenderer::scale_y,
+        "pivot_x", &SpriteRenderer::pivot_x,
+        "pivot_y", &SpriteRenderer::pivot_y,
+        "rotation", &SpriteRenderer::rotation,
+        "sorting_order", &SpriteRenderer::sorting_order,
+        "OnUpdate", &SpriteRenderer::OnUpdate,
+        "OnStart", &SpriteRenderer::OnStart,
+        "OnDestroy", &SpriteRenderer::OnDestroy
+    );
+
+    
 	// "Actor" Class
 	sol::usertype<Actor> actor_type = LuaAPI::GetLuaState()->new_usertype<Actor>("Actor");
 	actor_type["ID"] = &Actor::ID;
 	actor_type["GetName"] = &Actors::GetName;
     actor_type["RemoveComponent"] = &Actors::RemoveComponentFromActor;
     actor_type["GetComponentByType"] = &Actors::GetComponentByType;
+    actor_type["GetComponentsByType"] = &Actors::GetComponentsByType;
+    actor_type["GetComponentByKey"] = &Actors::GetComponentByKey;
 }
 
 
@@ -178,15 +208,23 @@ void deny_write() { std::cout << "error: attempt to modify a dead lua table" << 
 */
 void LuaAPI::DeleteLuaTable(std::shared_ptr<sol::table> table)
 {
-    (*table).clear();
-    
-    // Create the new read-only table
-    sol::table dead_table = LuaAPI::GetLuaState()->create_table();
-    dead_table[sol::meta_function::new_index] = deny_write;
-    dead_table[sol::meta_function::index] = sol::lua_nil;
-    
-    // Set it on the actual table
-    (*table)[sol::metatable_key] = dead_table;
+    if (ComponentManager::IsComponentTypeNative((*table)["type"]))
+    {
+        // TODO: Find a way to delete native components FROM LUA STATE without memory shenanigans
+        // sol::objects cannot be cleared and locked the same way that tables can. So native components must be treated differently here
+    }
+    else
+    {
+        (*table).clear();
+        
+        // Create the new read-only table
+        sol::table dead_table = LuaAPI::GetLuaState()->create_table();
+        dead_table[sol::meta_function::new_index] = deny_write;
+        dead_table[sol::meta_function::index] = sol::lua_nil;
+        
+        // Set it on the actual table
+        (*table)[sol::metatable_key] = dead_table;
+    }
 }
 
 /*

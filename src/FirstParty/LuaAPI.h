@@ -22,6 +22,7 @@
 #include "Rigidbody.h"
 #include "Collision.h"
 #include "CollisionDetector.h"
+#include "SpriteRenderer.h"
 
 class LuaAPI
 {

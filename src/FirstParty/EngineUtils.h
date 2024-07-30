@@ -16,6 +16,7 @@
 
 #include "prettywriter.h"
 #include "stringbuffer.h"
+#include "FileUtils.h"
 
 class EngineUtils {
 public:
@@ -176,13 +177,6 @@ public:
                 }
             }
         }
-    }
-    
-    /**
-     * returns true if a given directory exists
-     */
-    static bool DirectoryExists(const std::string& path) {
-        return std::filesystem::exists(std::filesystem::path(path));
     }
 };
 

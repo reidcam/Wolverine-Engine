@@ -23,6 +23,7 @@
 #include "AudioDB.h"
 #include "TextDB.h"
 #include "TemplateDB.h"
+#include "SceneDB.h"
 #include "LuaAPI.h"
 
 #include "Engine.h"
@@ -33,6 +34,7 @@ std::unordered_map<std::string, Mix_Chunk*> loaded_sounds; // All of the loaded 
 std::unordered_map<std::string, std::unordered_map<int, TTF_Font*>> loaded_fonts; // All of the loaded fonts
 std::unordered_map<std::string, rapidjson::Document*> loaded_templates; // All of the loaded templates
 std::unordered_map<std::string, std::shared_ptr<sol::table>> loaded_component_types; // All of the loaded component types
+std::unordered_map<std::string, std::string> loaded_scene_paths; // All of the loaded scene paths
 
 //-------------------------------------------------------
 // Image Database
@@ -46,9 +48,9 @@ void LoadImages()
     const std::string path = "resources/images";
     
     // Fills up the database if the path exists
-    if (std::filesystem::exists(path))
+    if (FileUtils::DirectoryExists(path))
     {
-        for (const auto& file : std::filesystem::directory_iterator(path))
+        for (const auto& file : std::filesystem::directory_iterator(FileUtils::GetPath(path)))
         {
             if (file.path() != path + "/.DS_Store")
             {
@@ -89,9 +91,9 @@ void LoadSounds()
     const std::string path = "resources/audio";
     
     // Fills up the database if the path exists
-    if (std::filesystem::exists(path))
+    if (FileUtils::DirectoryExists(path))
     {
-        for (const auto& file : std::filesystem::directory_iterator(path))
+        for (const auto& file : std::filesystem::directory_iterator(FileUtils::GetPath(path)))
         {
             if (file.path() != path + "/.DS_Store")
             {
@@ -134,9 +136,9 @@ void LoadFonts()
     const std::string path = "resources/fonts";
     
     // Fills up the database if the path exists
-    if (std::filesystem::exists(path))
+    if (FileUtils::DirectoryExists(path))
     {
-        for (const auto& file : std::filesystem::directory_iterator(path))
+        for (const auto& file : std::filesystem::directory_iterator(FileUtils::GetPath(path)))
         {
             if (file.path() != path + "/.DS_Store")
             {
@@ -186,9 +188,9 @@ void LoadTemplates()
     const std::string path = "resources/actor_templates";
     
     // Fills up the database if the path exists
-    if (std::filesystem::exists(path))
+    if (FileUtils::DirectoryExists(path))
     {
-        for (const auto& file : std::filesystem::directory_iterator(path))
+        for (const auto& file : std::filesystem::directory_iterator(FileUtils::GetPath(path)))
         {
             if (file.path() != path + "/.DS_Store")
             {
@@ -231,9 +233,9 @@ void LoadComponentTypes()
     const std::string path = "resources/component_types";
     
     // Fills up the database if the path exists
-    if (std::filesystem::exists(path))
+    if (FileUtils::DirectoryExists(path))
     {
-        for (const auto& file : std::filesystem::directory_iterator(path))
+        for (const auto& file : std::filesystem::directory_iterator(FileUtils::GetPath(path)))
         {
             if (file.path() != path + "/.DS_Store")
             {
@@ -281,4 +283,46 @@ std::shared_ptr<sol::table> GetComponentType(std::string component_name)
     }
     
     return loaded_component_types[component_name];
+}
+
+//-------------------------------------------------------
+// Scene Path Database
+
+/**
+ * Loads all of the scene paths in the resources/scenes directory
+*/
+void LoadScenePaths()
+{
+    /* Load files from this path */
+    const std::string path = "resources/scenes";
+    
+    // Fills up the database if the path exists
+    if (FileUtils::DirectoryExists(path))
+    {
+        for (const auto& file : std::filesystem::directory_iterator(FileUtils::GetPath(path)))
+        {
+            if (file.path() != path + "/.DS_Store")
+            {
+                std::string scene_name = file.path().stem().string();
+                loaded_scene_paths[scene_name] = file.path().string();
+            }
+        }
+    }
+}
+
+/**
+ * Get a scene path based on the name of the scene
+ *
+ *`@param   scene_name      the name of the scene path to get from the database
+ * @returns                 the scene path with the specified name
+*/
+std::string GetScenePath(std::string scene_name)
+{
+    if (loaded_scene_paths.find(scene_name) == loaded_scene_paths.end())
+    {
+        std::cout << "error: missing scene " << scene_name;
+        exit(0);
+    }
+    
+    return loaded_scene_paths[scene_name];
 }

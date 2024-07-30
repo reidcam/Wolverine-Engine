@@ -19,7 +19,7 @@ class Actor; // forward declation
 class Rigidbody
 {
 public:
-	b2Body* body;
+	b2Body* body = nullptr;
 
 	// Rigidbody parameters
 	float x = 0.0f;
@@ -50,6 +50,7 @@ public:
 	std::string type = "Rigidbody";
 	std::string key = "???";
 	Actor* actor = nullptr;
+    bool REMOVED_FROM_ACTOR = false;
 	bool enabled = true;
 
 	/*

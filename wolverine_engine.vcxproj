@@ -112,7 +112,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>%(ProjcetDir)src/FirstParty;%(ProjectDir);%(ProjcetDir)src/ThirdParty/lua-5.4.6;%(ProjectDir)src/ThirdParty/sol2-3.3.0;%(ProjcetDIr)src/ThirdParty/box2d-2.4.1/box2d;%(ProjcetDIr)src/ThirdParty/box2d-2.4.1/src;%(ProjcetDIr)src/ThirdParty/box2d-2.4.1;%(ProjcetDIr)src/ThirdParty/SDL2_ttf/lib;%(ProjcetDIr)src/ThirdParty/SDL2_ttf;%(ProjcetDIr)src/ThirdParty/SDL2_mixer/lib;%(ProjcetDIr)src/ThirdParty/SDL2_mixer;%(ProjcetDIr)src/ThirdParty/SDL2_image/lib;%(ProjcetDIr)src/ThirdParty/SDL2_image;%(ProjcetDIr)src/ThirdParty/SDL2/lib;%(ProjcetDIr)src/ThirdParty/SDL2;%(ProjcetDir)src/ThirdParty/rapidjson-1.1.0/include/rapidjson;%(ProjcetDir)src/ThirdParty/glm;%(ProjcetDir)src/ThirdParty/glm/glm</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(ProjcetDir)src/FirstParty;%(ProjectDir);%(ProjcetDir)src/ThirdParty/lua-5.4.6;%(ProjectDir)src/ThirdParty/sol2-3.3.0;%(ProjcetDIr)src/ThirdParty/box2d-2.4.1/box2d;%(ProjcetDIr)src/ThirdParty/box2d-2.4.1/src;%(ProjcetDIr)src/ThirdParty/box2d-2.4.1;%(ProjcetDIr)src/ThirdParty/SDL2_ttf-2.22.0/lib;%(ProjcetDIr)src/ThirdParty/SDL2_ttf-2.22.0;%(ProjcetDIr)src/ThirdParty/SDL2_mixer-2.8.0/include;%(ProjcetDIr)src/ThirdParty/SDL2_image-2.8.2/include;%(ProjcetDIr)src/ThirdParty/SDL2-2.30.5/include;%(ProjcetDir)src/ThirdParty/rapidjson-1.1.0/include/rapidjson;%(ProjcetDir)src/ThirdParty/glm;%(ProjcetDir)src/ThirdParty/glm/glm</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
     </ClCompile>
@@ -133,7 +133,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>%(ProjcetDir)src/FirstParty;%(ProjectDir);%(ProjcetDir)src/ThirdParty/lua-5.4.6;%(ProjectDir)src/ThirdParty/sol2-3.3.0;%(ProjcetDIr)src/ThirdParty/box2d-2.4.1/box2d;%(ProjcetDIr)src/ThirdParty/box2d-2.4.1/src;%(ProjcetDIr)src/ThirdParty/box2d-2.4.1;%(ProjcetDIr)src/ThirdParty/SDL2_ttf/lib;%(ProjcetDIr)src/ThirdParty/SDL2_ttf;%(ProjcetDIr)src/ThirdParty/SDL2_mixer/lib;%(ProjcetDIr)src/ThirdParty/SDL2_mixer;%(ProjcetDIr)src/ThirdParty/SDL2_image/lib;%(ProjcetDIr)src/ThirdParty/SDL2_image;%(ProjcetDIr)src/ThirdParty/SDL2/lib;%(ProjcetDIr)src/ThirdParty/SDL2;%(ProjcetDir)src/ThirdParty/rapidjson-1.1.0/include/rapidjson;%(ProjcetDir)src/ThirdParty/glm;%(ProjcetDir)src/ThirdParty/glm/glm</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(ProjcetDir)src/FirstParty;%(ProjectDir);%(ProjcetDir)src/ThirdParty/lua-5.4.6;%(ProjectDir)src/ThirdParty/sol2-3.3.0;%(ProjcetDIr)src/ThirdParty/box2d-2.4.1/box2d;%(ProjcetDIr)src/ThirdParty/box2d-2.4.1/src;%(ProjcetDIr)src/ThirdParty/box2d-2.4.1;%(ProjcetDIr)src/ThirdParty/SDL2_ttf-2.22.0/lib;%(ProjcetDIr)src/ThirdParty/SDL2_ttf-2.22.0;%(ProjcetDIr)src/ThirdParty/SDL2_mixer-2.8.0/include;%(ProjcetDIr)src/ThirdParty/SDL2_image-2.8.2/include;%(ProjcetDIr)src/ThirdParty/SDL2-2.30.5/include;%(ProjcetDir)src/ThirdParty/rapidjson-1.1.0/include/rapidjson;%(ProjcetDir)src/ThirdParty/glm;%(ProjcetDir)src/ThirdParty/glm/glm</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
     </ClCompile>
@@ -265,7 +265,45 @@
     <ClInclude Include="src\FirstParty\SceneManager.h" />
     <ClInclude Include="src\FirstParty\TemplateDB.h" />
     <ClInclude Include="src\FirstParty\TextDB.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_api.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_block_allocator.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_body.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_broad_phase.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_chain_shape.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_circle_shape.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_collision.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_common.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_contact.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_contact_manager.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_distance.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_distance_joint.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_draw.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_dynamic_tree.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_edge_shape.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_fixture.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_friction_joint.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_gear_joint.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_growable_stack.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_joint.h" />
     <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_math.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_motor_joint.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_mouse_joint.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_polygon_shape.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_prismatic_joint.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_pulley_joint.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_revolute_joint.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_rope.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_settings.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_shape.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_stack_allocator.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_timer.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_time_of_impact.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_time_step.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_types.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_weld_joint.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_wheel_joint.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_world.h" />
+    <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\b2_world_callbacks.h" />
     <ClInclude Include="src\ThirdParty\box2d-2.4.1\box2d\box2d.h" />
     <ClInclude Include="src\ThirdParty\box2d-2.4.1\src\dynamics\b2_chain_circle_contact.h" />
     <ClInclude Include="src\ThirdParty\box2d-2.4.1\src\dynamics\b2_chain_polygon_contact.h" />
@@ -276,6 +314,56 @@
     <ClInclude Include="src\ThirdParty\box2d-2.4.1\src\dynamics\b2_island.h" />
     <ClInclude Include="src\ThirdParty\box2d-2.4.1\src\dynamics\b2_polygon_circle_contact.h" />
     <ClInclude Include="src\ThirdParty\box2d-2.4.1\src\dynamics\b2_polygon_contact.h" />
+    <ClInclude Include="src\ThirdParty\glm\glm\common.hpp" />
+    <ClInclude Include="src\ThirdParty\glm\glm\exponential.hpp" />
+    <ClInclude Include="src\ThirdParty\glm\glm\ext.hpp" />
+    <ClInclude Include="src\ThirdParty\glm\glm\fwd.hpp" />
+    <ClInclude Include="src\ThirdParty\glm\glm\geometric.hpp" />
+    <ClInclude Include="src\ThirdParty\glm\glm\glm.hpp" />
+    <ClInclude Include="src\ThirdParty\glm\glm\integer.hpp" />
+    <ClInclude Include="src\ThirdParty\glm\glm\mat2x2.hpp" />
+    <ClInclude Include="src\ThirdParty\glm\glm\mat2x3.hpp" />
+    <ClInclude Include="src\ThirdParty\glm\glm\mat2x4.hpp" />
+    <ClInclude Include="src\ThirdParty\glm\glm\mat3x2.hpp" />
+    <ClInclude Include="src\ThirdParty\glm\glm\mat3x3.hpp" />
+    <ClInclude Include="src\ThirdParty\glm\glm\mat3x4.hpp" />
+    <ClInclude Include="src\ThirdParty\glm\glm\mat4x2.hpp" />
+    <ClInclude Include="src\ThirdParty\glm\glm\mat4x3.hpp" />
+    <ClInclude Include="src\ThirdParty\glm\glm\mat4x4.hpp" />
+    <ClInclude Include="src\ThirdParty\glm\glm\matrix.hpp" />
+    <ClInclude Include="src\ThirdParty\glm\glm\packing.hpp" />
+    <ClInclude Include="src\ThirdParty\glm\glm\trigonometric.hpp" />
+    <ClInclude Include="src\ThirdParty\glm\glm\vec2.hpp" />
+    <ClInclude Include="src\ThirdParty\glm\glm\vec3.hpp" />
+    <ClInclude Include="src\ThirdParty\glm\glm\vec4.hpp" />
+    <ClInclude Include="src\ThirdParty\glm\glm\vector_relational.hpp" />
+    <ClInclude Include="src\ThirdParty\lua-5.4.6\lapi.h" />
+    <ClInclude Include="src\ThirdParty\lua-5.4.6\lauxlib.h" />
+    <ClInclude Include="src\ThirdParty\lua-5.4.6\lcode.h" />
+    <ClInclude Include="src\ThirdParty\lua-5.4.6\lctype.h" />
+    <ClInclude Include="src\ThirdParty\lua-5.4.6\ldebug.h" />
+    <ClInclude Include="src\ThirdParty\lua-5.4.6\ldo.h" />
+    <ClInclude Include="src\ThirdParty\lua-5.4.6\lfunc.h" />
+    <ClInclude Include="src\ThirdParty\lua-5.4.6\lgc.h" />
+    <ClInclude Include="src\ThirdParty\lua-5.4.6\ljumptab.h" />
+    <ClInclude Include="src\ThirdParty\lua-5.4.6\llex.h" />
+    <ClInclude Include="src\ThirdParty\lua-5.4.6\llimits.h" />
+    <ClInclude Include="src\ThirdParty\lua-5.4.6\lmem.h" />
+    <ClInclude Include="src\ThirdParty\lua-5.4.6\lobject.h" />
+    <ClInclude Include="src\ThirdParty\lua-5.4.6\lopcodes.h" />
+    <ClInclude Include="src\ThirdParty\lua-5.4.6\lopnames.h" />
+    <ClInclude Include="src\ThirdParty\lua-5.4.6\lparser.h" />
+    <ClInclude Include="src\ThirdParty\lua-5.4.6\lprefix.h" />
+    <ClInclude Include="src\ThirdParty\lua-5.4.6\lstate.h" />
+    <ClInclude Include="src\ThirdParty\lua-5.4.6\lstring.h" />
+    <ClInclude Include="src\ThirdParty\lua-5.4.6\ltable.h" />
+    <ClInclude Include="src\ThirdParty\lua-5.4.6\ltm.h" />
+    <ClInclude Include="src\ThirdParty\lua-5.4.6\lua.h" />
+    <ClInclude Include="src\ThirdParty\lua-5.4.6\lua.hpp" />
+    <ClInclude Include="src\ThirdParty\lua-5.4.6\luaconf.h" />
+    <ClInclude Include="src\ThirdParty\lua-5.4.6\lualib.h" />
+    <ClInclude Include="src\ThirdParty\lua-5.4.6\lundump.h" />
+    <ClInclude Include="src\ThirdParty\lua-5.4.6\lzio.h" />
     <ClInclude Include="src\ThirdParty\rapidjson-1.1.0\include\rapidjson\allocators.h" />
     <ClInclude Include="src\ThirdParty\rapidjson-1.1.0\include\rapidjson\document.h" />
     <ClInclude Include="src\ThirdParty\rapidjson-1.1.0\include\rapidjson\encodedstream.h" />
@@ -295,6 +383,7 @@
     <ClInclude Include="src\ThirdParty\rapidjson-1.1.0\include\rapidjson\stream.h" />
     <ClInclude Include="src\ThirdParty\rapidjson-1.1.0\include\rapidjson\stringbuffer.h" />
     <ClInclude Include="src\ThirdParty\rapidjson-1.1.0\include\rapidjson\writer.h" />
+    <ClInclude Include="src\ThirdParty\SDL2-2.30.5\include\SDL.h" />
     <ClInclude Include="src\ThirdParty\SDL2\begin_code.h" />
     <ClInclude Include="src\ThirdParty\SDL2\close_code.h" />
     <ClInclude Include="src\ThirdParty\SDL2\SDL.h" />
@@ -373,8 +462,11 @@
     <ClInclude Include="src\ThirdParty\SDL2\SDL_version.h" />
     <ClInclude Include="src\ThirdParty\SDL2\SDL_video.h" />
     <ClInclude Include="src\ThirdParty\SDL2\SDL_vulkan.h" />
+    <ClInclude Include="src\ThirdParty\SDL2_image-2.8.2\include\SDL_image.h" />
     <ClInclude Include="src\ThirdParty\SDL2_image\SDL_image.h" />
+    <ClInclude Include="src\ThirdParty\SDL2_mixer-2.8.0\include\SDL_mixer.h" />
     <ClInclude Include="src\ThirdParty\SDL2_mixer\SDL_mixer.h" />
+    <ClInclude Include="src\ThirdParty\SDL2_ttf-2.22.0\SDL_ttf.h" />
     <ClInclude Include="src\ThirdParty\SDL2_ttf\SDL_ttf.h" />
     <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\assert.hpp" />
     <ClInclude Include="src\ThirdParty\sol2-3.3.0\sol\as_args.hpp" />

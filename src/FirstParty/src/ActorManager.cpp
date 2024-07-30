@@ -121,7 +121,7 @@ void Actors::Update()
     for (auto& component : components_to_update)
     {
         // If this component is dead, skip it
-        if ((*component).empty() || (*component)["REMOVED_FROM_ACTOR"] == true)
+        if ((*component)["REMOVED_FROM_ACTOR"] == true)
         {
             continue;
         }
@@ -170,7 +170,7 @@ void Actors::LateUpdate()
     for (auto& component : components_to_update_late)
     {
         // If this component is dead, skip it
-        if ((*component).empty() || (*component)["REMOVED_FROM_ACTOR"] == true)
+        if ((*component)["REMOVED_FROM_ACTOR"] == true)
         {
             continue;
         }
@@ -344,7 +344,16 @@ int Actors::LoadActorWithJSON(const rapidjson::Value& actor_data)
             if (itr->value.HasMember("type"))
             {
                 std::string type = itr->value["type"].GetString();
-                ComponentManager::EstablishInheritance(new_component, *GetComponentType(type));
+                
+                // Establishes our new component according to its type
+                if (ComponentManager::IsComponentTypeNative(type))
+                {
+                    new_component = ComponentManager::NewNativeComponent(type);
+                }
+                else
+                {
+                    ComponentManager::EstablishInheritance(new_component, *GetComponentType(type));
+                }
                 
                 // Allows the component to know its own type
                 new_component["type"] = type;
@@ -381,9 +390,6 @@ int Actors::LoadActorWithJSON(const rapidjson::Value& actor_data)
             Actor* _a = new Actor();
             _a->ID = num_total_actors;
             new_component["actor"] = _a;
-            
-//            // Sets the component to uninitialized, it will become initialized after onstart has been called.
-//            new_component["IsComponentInitialized"] = false;
             
             // Add the new component to the "components_to_init" and "components" vectors
             std::shared_ptr<sol::table> ptr = std::make_shared<sol::table>(new_component);
@@ -461,7 +467,8 @@ void Actors::PrepareActorForDestruction(int actor_id)
     if (actor_index == -1) {return;}
     
     // Queues all of the components on the given actor for deletion
-    for (auto& component : components[actor_index])
+    std::vector<std::shared_ptr<sol::table>> components_to_remove = components[actor_index];
+    for (auto& component : components_to_remove)
     {
         RemoveComponentFromActor(actor_id, *component);
     }
@@ -525,7 +532,7 @@ void Actors::RemoveComponentFromActor(int actor_id, sol::table component)
     int component_index = -1;
     for (int i = 0; i < components[actor_index].size(); i++) // Find the index of this component
     {
-        if ((*components[actor_index][i]) == component)
+        if ((*components[actor_index][i]).pointer() == component.pointer())
         {
             (component)["REMOVED_FROM_ACTOR"] = true;
             components_to_delete.push(std::make_shared<sol::table>(component));
@@ -533,7 +540,9 @@ void Actors::RemoveComponentFromActor(int actor_id, sol::table component)
             break;
         }
     }
-    if (component_index != -1) { components[actor_index].erase(components[actor_index].begin() + component_index); } // remove the component from the actor
+    if (component_index != -1) {
+        components[actor_index].erase(components[actor_index].begin() + component_index);
+    } // remove the component from the actor
 }
 
 /**
@@ -545,7 +554,7 @@ void Actors::RemoveComponentFromActor(int actor_id, sol::table component)
 */
 sol::table Actors::GetComponentByType(int actor_id, std::string type)
 {
-    sol::table null;
+    sol::table null; // An empty table, to be returned if the component(s) cannot be found
     
     int actor_index = GetIndex(actor_id);
     if (actor_index == -1) {return null;}
@@ -595,4 +604,59 @@ sol::table Actors::GetComponentByIndex(int actor_id, int component_index)
 bool Actors::GetActorEnabled(int actor_id)
 {
     return actor_enabled[GetIndex(actor_id)];
+}
+
+/**
+ * Gets all of the components on the given actor with the given type if they exist.
+ *
+ * @param   actor_id        the id of the actor that this function is acting on
+ * @param   type                 the type of component we're searching for
+ * @return              a list of all the components with the given type, if none are found returns null
+*/
+sol::table Actors::GetComponentsByType(int actor_id, std::string type)
+{
+    sol::table null; // An empty table, to be returned if the component(s) cannot be found
+    
+    int actor_index = GetIndex(actor_id);
+    if (actor_index == -1) {return null;}
+    
+    sol::table components_of_type = LuaAPI::GetLuaState()->create_table();
+    components_of_type[0] = null;
+    int index = 1;
+    
+    for (int i = 0; i < components[actor_index].size(); i++)
+    {
+        if ((*components[actor_index][i])["type"] == type)
+        {
+            components_of_type[index] = *components[actor_index][i];
+        }
+    }
+    
+    return components_of_type;
+}
+
+/**
+ * Gets the component on the given actor with the given key if it exists.
+ *
+ * @param   actor_id        the id of the actor that this function is acting on
+ * @param   key                    the key of the component we're searching for
+ * @return              the component on the given actor with the given key, if none are found returns null
+*/
+sol::table Actors::GetComponentByKey(int actor_id, std::string key)
+{
+    sol::table null; // An empty table, to be returned if the component(s) cannot be found
+    
+    int actor_index = GetIndex(actor_id);
+    if (actor_index == -1) {return null;}
+    
+    for (int i = 0; i < components[actor_index].size(); i++)
+    {
+        if ((*components[actor_index][i])["key"] == key)
+        {
+            return *components[actor_index][i];
+        }
+    }
+    
+    // Return null if the component cannot be found.
+    return null;
 }
