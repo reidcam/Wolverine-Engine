@@ -30,11 +30,7 @@ file(GLOB CONFIG_FILES "${CMAKE_SOURCE_DIR}/resources/*.config")
 file(GLOB ACTOR_TEMPLATES "${CMAKE_SOURCE_DIR}/resources/actor_templates/*.template")
 file(GLOB COMPONENT_TYPES "${CMAKE_SOURCE_DIR}/resources/component_types/*.lua")
 file(GLOB SCENE_FILES "${CMAKE_SOURCE_DIR}/resources/scenes/*.scene")
-
-# Add executable
-add_executable("${PROJECT_NAME}" 
-        ${FIRST_PARTY}
-        # bundle resources
+file(GLOB ALL_RESOURCES 
         ${IMAGE_FILES}
         ${AUDIO_FILES}
         ${FONT_FILES}
@@ -42,6 +38,13 @@ add_executable("${PROJECT_NAME}"
         ${ACTOR_TEMPLATES}
         ${COMPONENT_TYPES}
         ${SCENE_FILES}
+)
+
+# Add executable
+add_executable("${PROJECT_NAME}" 
+        ${FIRST_PARTY}
+        # bundle resources
+        ${ALL_RESOURCES}
 )
 target_include_directories("${PROJECT_NAME}" PRIVATE "src/FirstParty")
 
@@ -75,39 +78,11 @@ target_include_directories("${PROJECT_NAME}_box2d"
 
 if(APPLE)
         # Add all of the game resources to the mac bundle
-        foreach(FILE ${IMAGE_FILES})
+        foreach(FILE ${ALL_RESOURCES})
+                file(RELATIVE_PATH NEW_FILE "${CMAKE_SOURCE_DIR}/resources" ${FILE})
+                get_filename_component(NEW_FILE_PATH ${NEW_FILE} DIRECTORY)
                 set_source_files_properties(${FILE} PROPERTIES
-                        MACOSX_PACKAGE_LOCATION "Resources/resources/images"
-                )
-        endforeach()
-        foreach(FILE ${AUDIO_FILES})
-                set_source_files_properties(${FILE} PROPERTIES
-                        MACOSX_PACKAGE_LOCATION "Resources/resources/audio"
-                )
-        endforeach()
-        foreach(FILE ${FONT_FILES})
-                set_source_files_properties(${FILE} PROPERTIES
-                        MACOSX_PACKAGE_LOCATION "Resources/resources/fonts"
-                )
-        endforeach()
-        foreach(FILE ${CONFIG_FILES})
-                set_source_files_properties(${FILE} PROPERTIES
-                        MACOSX_PACKAGE_LOCATION "Resources/resources"
-                )
-        endforeach()
-        foreach(FILE ${ACTOR_TEMPLATES})
-                set_source_files_properties(${FILE} PROPERTIES
-                        MACOSX_PACKAGE_LOCATION "Resources/resources/actor_templates"
-                )
-        endforeach()
-        foreach(FILE ${COMPONENT_TYPES})
-                set_source_files_properties(${FILE} PROPERTIES
-                        MACOSX_PACKAGE_LOCATION "Resources/resources/component_types"
-                )
-        endforeach()
-        foreach(FILE ${SCENE_FILES})
-                set_source_files_properties(${FILE} PROPERTIES
-                        MACOSX_PACKAGE_LOCATION "Resources/resources/scenes"
+                        MACOSX_PACKAGE_LOCATION "Resources/resources/${NEW_FILE_PATH}"
                 )
         endforeach()
 
@@ -117,6 +92,11 @@ if(APPLE)
                 MACOSX_BUNDLE_NAME "${PROJECT_NAME}"
                 MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
                 MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION}
+        )
+else()
+        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_directory
+                        "${CMAKE_SOURCE_DIR}/resources" "$<TARGET_FILE_DIR:${PROJECT_NAME}>/resources"
         )
 endif()
 
