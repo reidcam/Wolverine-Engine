@@ -83,12 +83,7 @@ void Initialize()
  */
 int CheckConfigFiles()
 {
-    std::filesystem::path currentFile = __FILE__;
-    std::filesystem::path currentDirectory = currentFile.parent_path();
-    std::filesystem::path relativePath = currentDirectory / ".." / ".." / ".." / "resources";
-    std::filesystem::path absolutePath = std::filesystem::canonical(relativePath);
-
-    if( !EngineUtils::DirectoryExists(absolutePath.string())) {
+    if(!FileUtils::DirectoryExists("resources/")) {
         std::cout << "error: resources/ missing";
         return 1;
     }
@@ -99,12 +94,12 @@ int CheckConfigFiles()
 
 bool CheckGameConfig()
 {
-    if( !EngineUtils::DirectoryExists("resources/game.config") ) {
+    if( !FileUtils::DirectoryExists("resources/game.config") ) {
         std::cout << "error: resources/game.config missing";
         return false;
     }
     rapidjson::Document game_config;
-    EngineUtils::ReadJsonFile("resources/game.config", game_config);
+    EngineUtils::ReadJsonFile(FileUtils::GetPath("resources/game.config"), game_config);
     
     if(game_config.HasMember("game_title")){
         EngineData::game_title = game_config["game_title"].GetString();
@@ -120,37 +115,6 @@ bool CheckGameConfig()
     }
     return true;
 }
-
-//bool CheckRenderingConfig()
-//{
-//    if( !EngineUtils::DirectoryExists("resources/rendering.config") ) {
-//        std::cout << "error: resources/rendering.config missing";
-//        return false;
-//    }
-//    rapidjson::Document rendering_config;
-//    EngineUtils::ReadJsonFile("resources/rendering.config", rendering_config);
-//
-//    if(rendering_config.HasMember("x_resolution")){
-//        EngineData::cam_x_resolution = rendering_config["x_resolution"].GetInt();
-//    }
-//    if(rendering_config.HasMember("y_resolution")){
-//        EngineData::cam_y_resolution = rendering_config["y_resolution"].GetInt();
-//    }
-//    // read clear color
-//    if(rendering_config.HasMember("clear_color_r")){
-//        EngineData::clear_color[0] = rendering_config["clear_color_r"].GetInt();
-//    }
-//    if(rendering_config.HasMember("clear_color_g")){
-//        EngineData::clear_color[1] = rendering_config["clear_color_g"].GetInt();
-//    }
-//    if(rendering_config.HasMember("clear_color_b")){
-//        EngineData::clear_color[2] = rendering_config["clear_color_b"].GetInt();
-//    }
-//    if(rendering_config.HasMember("zoom_factor")){
-//        EngineData::zoom_factor = rendering_config["zoom_factor"].GetDouble();
-//    }
-//    return true;
-//}
 
 //-------------------------------------------------------
 
@@ -183,6 +147,10 @@ int GameLoop()
     Scene::UpdateActors();
     
     // RENDER STUFF HERE
+    RendererData::RenderAndClearAllImageRequests();
+    RendererData::RenderAndClearAllTextRequests();
+    RendererData::RenderAndClearAllPixels();
+    RendererData::RenderAndClearAllUI();
     
     PhysicsWorld::AdvanceWorld();
     

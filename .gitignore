@@ -1,4 +1,3 @@
-
 build
 **/resources
 **/frames
@@ -473,3 +472,7 @@ xcuserdata/
 *.out
 *.app
 sdl_user_input.txt
+
+# Allow everything in third party
+!src/ThirdParty/**
+**.DS_Store

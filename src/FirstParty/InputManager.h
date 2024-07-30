@@ -16,7 +16,7 @@
 
 #include "KeycodeDB.h"
 
-#include "glm.hpp"
+#include "glm/glm.hpp"
 
 enum INPUT_STATE { INPUT_STATE_UP, INPUT_STATE_JUST_BECAME_DOWN, INPUT_STATE_DOWN, INPUT_STATE_JUST_BECAME_UP };
 

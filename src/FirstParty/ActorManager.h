@@ -170,6 +170,24 @@ public:
     */
     static sol::table GetComponentByType(int actor_id, std::string type);
     
+    /**
+     * Gets all of the components on the given actor with the given type if they exist.
+     *
+     * @param   actor_id        the id of the actor that this function is acting on
+     * @param   type                 the type of component we're searching for
+     * @return              a list of all the components with the given type, if none are found returns null
+    */
+    static sol::table GetComponentsByType(int actor_id, std::string type);
+    
+    /**
+     * Gets the component on the given actor with the given key if it exists.
+     *
+     * @param   actor_id        the id of the actor that this function is acting on
+     * @param   key                    the key of the component we're searching for
+     * @return              the component on the given actor with the given key, if none are found returns null
+    */
+    static sol::table GetComponentByKey(int actor_id, std::string key);
+    
 }; // Actors
 
 #endif /* ActorManager_h */

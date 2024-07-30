@@ -48,9 +48,9 @@ void LoadImages()
     const std::string path = "resources/images";
     
     // Fills up the database if the path exists
-    if (std::filesystem::exists(path))
+    if (FileUtils::DirectoryExists(path))
     {
-        for (const auto& file : std::filesystem::directory_iterator(path))
+        for (const auto& file : std::filesystem::directory_iterator(FileUtils::GetPath(path)))
         {
             if (file.path() != path + "/.DS_Store")
             {
@@ -91,9 +91,9 @@ void LoadSounds()
     const std::string path = "resources/audio";
     
     // Fills up the database if the path exists
-    if (std::filesystem::exists(path))
+    if (FileUtils::DirectoryExists(path))
     {
-        for (const auto& file : std::filesystem::directory_iterator(path))
+        for (const auto& file : std::filesystem::directory_iterator(FileUtils::GetPath(path)))
         {
             if (file.path() != path + "/.DS_Store")
             {
@@ -136,9 +136,9 @@ void LoadFonts()
     const std::string path = "resources/fonts";
     
     // Fills up the database if the path exists
-    if (std::filesystem::exists(path))
+    if (FileUtils::DirectoryExists(path))
     {
-        for (const auto& file : std::filesystem::directory_iterator(path))
+        for (const auto& file : std::filesystem::directory_iterator(FileUtils::GetPath(path)))
         {
             if (file.path() != path + "/.DS_Store")
             {
@@ -188,9 +188,9 @@ void LoadTemplates()
     const std::string path = "resources/actor_templates";
     
     // Fills up the database if the path exists
-    if (std::filesystem::exists(path))
+    if (FileUtils::DirectoryExists(path))
     {
-        for (const auto& file : std::filesystem::directory_iterator(path))
+        for (const auto& file : std::filesystem::directory_iterator(FileUtils::GetPath(path)))
         {
             if (file.path() != path + "/.DS_Store")
             {
@@ -233,9 +233,9 @@ void LoadComponentTypes()
     const std::string path = "resources/component_types";
     
     // Fills up the database if the path exists
-    if (std::filesystem::exists(path))
+    if (FileUtils::DirectoryExists(path))
     {
-        for (const auto& file : std::filesystem::directory_iterator(path))
+        for (const auto& file : std::filesystem::directory_iterator(FileUtils::GetPath(path)))
         {
             if (file.path() != path + "/.DS_Store")
             {
@@ -297,9 +297,9 @@ void LoadScenePaths()
     const std::string path = "resources/scenes";
     
     // Fills up the database if the path exists
-    if (std::filesystem::exists(path))
+    if (FileUtils::DirectoryExists(path))
     {
-        for (const auto& file : std::filesystem::directory_iterator(path))
+        for (const auto& file : std::filesystem::directory_iterator(FileUtils::GetPath(path)))
         {
             if (file.path() != path + "/.DS_Store")
             {
