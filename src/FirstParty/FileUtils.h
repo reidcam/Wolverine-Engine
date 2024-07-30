@@ -42,11 +42,7 @@ public:
         working_directory = path;
 #endif
 #ifdef _WIN32
-        std::filesystem::path current_file = __FILE__;
-        std::filesystem::path current_dir = current_file.parent_path();
-        std::filesystem::path relative_path = current_dir / ".." / ".." / ".." / "resources" / "..";
-        std::filesystem::path absolute_path = std::filesystem::canonical(relative_path);
-        working_directory = absolute_path.string();
+        working_directory = std::filesystem::current_path().string();
 #endif
     }
     
