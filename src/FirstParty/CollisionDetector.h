@@ -20,14 +20,14 @@ public:
 	* 
 	* @parameters    contact    a contact object containing the info about the contact
 	*/
-	static void BeginContact(b2Contact* contact);
+	void BeginContact(b2Contact* contact);
 
 	/*
 	* Handles physics contacts when the contact ends
 	*
 	* @parameters    contact    a contact object containing the info about the contact
 	*/
-	static void EndContact(b2Contact* contact);
+	void EndContact(b2Contact* contact);
 };
 
 class OnEnter
