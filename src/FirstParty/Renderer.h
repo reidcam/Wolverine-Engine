@@ -71,6 +71,8 @@ private:
 	static SDL_Texture* ConvertTextToTexture(SDL_Renderer* renderer, const std::string& text, const SDL_Color& font_color, const std::string font_name, const int font_size);
 
 public:
+    inline static const int PIXELS_PER_METER = 100;
+    
 	/*
 	Returns a pointer to the SDL_Window
 

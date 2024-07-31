@@ -23,6 +23,7 @@ void LuaAPI::ExposeLuaAPI()
 	(*GetLuaState())["Application"]["Sleep"] = &LuaAPI::Sleep;
 	(*GetLuaState())["Application"]["GetFrame"] = &LuaAPI::GetFrame;
 	(*GetLuaState())["Application"]["OpenURL"] = &LuaAPI::OpenURL;
+    (*GetLuaState())["Application"]["RandomNumber"] = &EngineUtils::RandomNumber;
 
 	// Input Namespace
 	(*GetLuaState())["Input"] = GetLuaState()->create_table();
@@ -162,6 +163,62 @@ void LuaAPI::ExposeLuaAPI()
 		"GetUpDirection", &Rigidbody::GetUpDirection,
 		"GetRightDirection", &Rigidbody::GetRightDirection
 	);
+    
+    // Particle System class
+    LuaAPI::GetLuaState()->new_usertype<ParticleSystem>("ParticleSystem",
+        // Member variables
+        "MAX_NUM_PARTICLES", &ParticleSystem::MAX_NUM_PARTICLES,
+        "type", &ParticleSystem::type,
+        "key", &ParticleSystem::key,
+        "actor", &ParticleSystem::actor,
+        "REMOVED_FROM_ACTOR", &ParticleSystem::REMOVED_FROM_ACTOR,
+        "enabled", &ParticleSystem::enabled,
+        "emitting", &ParticleSystem::emitting,
+        "duration", &ParticleSystem::duration,
+        "loop", &ParticleSystem::loop,
+        "emission_rate", &ParticleSystem::emission_rate,
+        "particle_lifetime", &ParticleSystem::particle_lifetime,
+        "emitter_pos_x", &ParticleSystem::emitter_pos_x,
+        "emitter_pos_y", &ParticleSystem::emitter_pos_y,
+        "emission_range_x", &ParticleSystem::emission_range_x,
+        "emission_range_y", &ParticleSystem::emission_range_y,
+        "emission_direction", &ParticleSystem::emission_direction,
+        "emission_direction_range", &ParticleSystem::emission_direction_range,
+        "change_movement", &ParticleSystem::change_movement,
+        "movement_pattern", &ParticleSystem::movement_pattern,
+        "speed", &ParticleSystem::speed,
+        "speed_sine_loop", &ParticleSystem::speed_sine_loop,
+        "speed_sine_amplitude", &ParticleSystem::speed_sine_amplitude,
+        "change_size", &ParticleSystem::change_size,
+        "size_pattern", &ParticleSystem::size_pattern,
+        "size_change_per_second", &ParticleSystem::size_change_per_second,
+        "size_sine_loop", &ParticleSystem::size_sine_loop,
+        "image", &ParticleSystem::image,
+        "change_color", &ParticleSystem::change_color,
+        "colors", &ParticleSystem::colors,
+        "sorting_order", &ParticleSystem::sorting_order,
+        "x", &ParticleSystem::x,
+        "y", &ParticleSystem::y,
+        "body_type", &ParticleSystem::body_type,
+        "precise", &ParticleSystem::precise,
+        "gravity_scale", &ParticleSystem::gravity_scale,
+        "density", &ParticleSystem::density,
+        "angular_friction", &ParticleSystem::angular_friction,
+        "rotation", &ParticleSystem::rotation,
+        "mass", &ParticleSystem::mass,
+        "has_collider", &ParticleSystem::has_collider,
+        "collider_type", &ParticleSystem::collider_type,
+        "starting_size", &ParticleSystem::starting_size,
+        "friction", &ParticleSystem::friction,
+        "bounciness", &ParticleSystem::bounciness,
+        
+        // Member functions
+        "StartEmitting", &ParticleSystem::StartEmitting,
+        "StopEmitting", &ParticleSystem::StopEmitting,
+        "OnStart", &ParticleSystem::OnStart,
+        "OnUpdate", &ParticleSystem::OnUpdate,
+        "OnDestroy", &ParticleSystem::OnDestroy
+    );
 
     // SpriteRenderer Class
     LuaAPI::GetLuaState()->new_usertype<SpriteRenderer>("SpriteRenderer",

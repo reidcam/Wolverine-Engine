@@ -45,7 +45,6 @@ public:
 	float friction = 0.3f;
 	float bounciness = 0.3f;
 
-
 	// component parameters
 	std::string type = "Rigidbody";
 	std::string key = "???";

@@ -14,6 +14,7 @@
 
 #include "Rigidbody.h"
 #include "SpriteRenderer.h"
+#include "ParticleSystem.h"
 
 /**
  * Establishes inheritance between two tables by setting one to be the metatable of the other
@@ -44,6 +45,7 @@ bool ComponentManager::IsComponentTypeNative(std::string type)
 {
     if (type == "Rigidbody") {return true;}
     if (type == "SpriteRenderer") {return true;}
+    if (type == "ParticleSystem") {return true;}
     
     return false;
 }
@@ -68,6 +70,14 @@ sol::table ComponentManager::NewNativeComponent(std::string component_type)
     {
         SpriteRenderer sprite_renderer;
         sol::object r = sol::make_object(*LuaAPI::GetLuaState(), sprite_renderer);
+        sol::table new_component = r;
+        
+        return new_component;
+    }
+    if (component_type == "ParticleSystem")
+    {
+        ParticleSystem particle_system;
+        sol::object r = sol::make_object(*LuaAPI::GetLuaState(), particle_system);
         sol::table new_component = r;
         
         return new_component;

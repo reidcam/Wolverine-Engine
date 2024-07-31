@@ -129,7 +129,6 @@ void RendererData::RenderAndClearAllImageRequests()
 	SDL_RenderSetScale(renderer, zoom_factor, zoom_factor);
 
 	for (auto& request : image_draw_request_queue) {
-		const int pixels_per_meter = 100;
 		glm::vec2 final_rendering_position = glm::vec2(request.x, request.y) - current_cam_pos;
 
 		SDL_Texture* tex = GetImage(request.image_name);
@@ -153,8 +152,8 @@ void RendererData::RenderAndClearAllImageRequests()
 
 		glm::ivec2 cam_dimensions = glm::ivec2(window_size.x, window_size.y);
 
-		tex_rect.x = static_cast<int>(final_rendering_position.x * pixels_per_meter + cam_dimensions.x * 0.5f * (1.0f / zoom_factor) - pivot_point.x);
-		tex_rect.y = static_cast<int>(final_rendering_position.y * pixels_per_meter + cam_dimensions.y * 0.5f * (1.0f / zoom_factor) - pivot_point.y);
+		tex_rect.x = static_cast<int>(final_rendering_position.x * PIXELS_PER_METER + cam_dimensions.x * 0.5f * (1.0f / zoom_factor) - pivot_point.x);
+		tex_rect.y = static_cast<int>(final_rendering_position.y * PIXELS_PER_METER + cam_dimensions.y * 0.5f * (1.0f / zoom_factor) - pivot_point.y);
 
 		// Apply tint / alpha to texture
 		SDL_SetTextureColorMod(tex, request.r, request.g, request.b);
@@ -180,7 +179,6 @@ Renders all text draw requests in the text_draw_request_queue
 void RendererData::RenderAndClearAllTextRequests()
 {
 	for (auto& request : text_draw_request_queue) {
-		const int pixels_per_meter = 100;
 		SDL_Color font_color = { static_cast<Uint8>(request.r), static_cast<Uint8>(request.g), static_cast<Uint8>(request.b), static_cast<Uint8>(request.a) };
 		SDL_Texture* text_texture = ConvertTextToTexture(renderer, request.text, font_color, request.font, request.size);
 
@@ -207,7 +205,6 @@ void RendererData::RenderAndClearAllUI()
 	SDL_RenderSetScale(renderer, 1, 1);
 
 	for (auto& request : ui_draw_request_queue) {
-		const int pixels_per_meter = 100;
 		glm::vec2 final_rendering_position = glm::vec2(request.x, request.y);
 
 		SDL_Texture* tex = GetImage(request.image_name);

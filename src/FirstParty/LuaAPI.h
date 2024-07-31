@@ -23,6 +23,7 @@
 #include "Collision.h"
 #include "CollisionDetector.h"
 #include "SpriteRenderer.h"
+#include "ParticleSystem.h"
 
 class LuaAPI
 {

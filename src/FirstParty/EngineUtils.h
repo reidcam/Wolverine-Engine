@@ -13,6 +13,8 @@
 #include "filereadstream.h"
 #include <filesystem>
 #include <iostream>
+#include <thread>
+#include <random>
 
 #include "prettywriter.h"
 #include "stringbuffer.h"
@@ -177,6 +179,33 @@ public:
                 }
             }
         }
+    }
+    
+    /**
+     * Generates a random number between the max and min values.
+     * Precision is the number of decimal places you want to be randomized.
+     *
+     * @param   min the lower bound of our random number generation
+     * @param   max the upper bound of our random number generation
+     * @param   precision   used to calculate the decimal precision in the random number
+     *
+     * @returns           the random number between min and max
+     */
+    static float RandomNumber(float min, float max, int precision)
+    {
+        // Random number engine
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        
+        int r_min = min * precision;
+        int r_max = max * precision;
+        
+        // Define a uniform distribution
+        std::uniform_int_distribution<> dis(r_min, r_max);
+        
+        // Generate and return the random number
+        float num = dis(gen) / (float)precision;
+        return num;
     }
 };
 
