@@ -56,6 +56,7 @@ void Initialize()
     
     LuaAPI::InitLuaState();
     LuaAPI::ExposeLuaAPI();
+    Input::Init();
     LoadComponentTypes();
     LoadScenePaths();
     
@@ -136,6 +137,7 @@ int GameLoop()
     SDL_Event event;
     while(SDL_PollEvent(&event))
     {
+        Input::ProcessEvent(event);
         if (event.type == SDL_QUIT)
         {
             EngineData::quit = true;
@@ -163,6 +165,8 @@ int GameLoop()
     PhysicsWorld::AdvanceWorld();
     
     SDL_RenderPresent(RendererData::GetRenderer()); // present the frame into the window
+    
+    Input::LateUpdate();
     
     // Load the new scene if asked for
     if (Scene::load_new_scene) {Scene::LoadNewScene();}
