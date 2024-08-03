@@ -45,10 +45,6 @@ void LuaAPI::ExposeLuaAPI()
     
     // Scene Namespace
     (*GetLuaState())["Scene"] = GetLuaState()->create_table();
-    // TODO: Move thse functions to the actor static class when its created
-    (*GetLuaState())["Scene"]["Instantiate"] = &Scene::Instantiate;
-    (*GetLuaState())["Scene"]["Destroy"] = &Scene::Destroy;
-    
     (*GetLuaState())["Scene"]["FindActorByID"] = &Scene::FindActorByID;
     (*GetLuaState())["Scene"]["FindActorWithName"] = &Scene::FindActorWithName;
     (*GetLuaState())["Scene"]["FindAllActorsWithName"] = &Scene::FindAllActorsWithName;
@@ -246,11 +242,17 @@ void LuaAPI::ExposeLuaAPI()
 	// "Actor" Class
 	sol::usertype<Actor> actor_type = LuaAPI::GetLuaState()->new_usertype<Actor>("Actor");
 	actor_type["ID"] = &Actor::ID;
-	actor_type["GetName"] = &Actors::GetName;
-    actor_type["RemoveComponent"] = &Actors::RemoveComponentFromActor;
-    actor_type["GetComponentByType"] = &Actors::GetComponentByType;
-    actor_type["GetComponentsByType"] = &Actors::GetComponentsByType;
-    actor_type["GetComponentByKey"] = &Actors::GetComponentByKey;
+    
+    // The "Actors" namespace
+    (*GetLuaState())["Actors"] = GetLuaState()->create_table();
+    (*GetLuaState())["Actors"]["GetName"] = &Actors::GetName;
+    (*GetLuaState())["Actors"]["GetActorEnabled"] = &Actors::GetActorEnabled;
+    (*GetLuaState())["Actors"]["RemoveComponent"] = &Actors::RemoveComponentFromActor;
+    (*GetLuaState())["Actors"]["GetComponentByType"] = &Actors::GetComponentByType;
+    (*GetLuaState())["Actors"]["GetComponentsByType"] = &Actors::GetComponentsByType;
+    (*GetLuaState())["Actors"]["GetComponentByKey"] = &Actors::GetComponentByKey;
+    (*GetLuaState())["Actors"]["Instantiate"] = &Scene::Instantiate;
+    (*GetLuaState())["Actors"]["Destroy"] = &Scene::Destroy;
 }
 
 
