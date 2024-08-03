@@ -104,13 +104,13 @@ void ParticleSystem::UpdateParticle(Particle* particle)
                 
             case 'e':
                 // Exponential pattern
-                delta_size = std::powf(particle->age / particle_lifetime, 3.0f);
+                delta_size = std::pow(particle->age / particle_lifetime, 3.0f);
                 particle->size += delta_size * size_change_per_second;
                 break;
                 
             case 's':
                 // Sine pattern
-                delta_size = std::sinf((particle->age / size_sine_loop) * (2.0f * b2_pi));
+                delta_size = std::sin((particle->age / size_sine_loop) * (2.0f * b2_pi));
                 particle->size = std::abs(delta_size * starting_size);
                 break;
                 
@@ -144,7 +144,7 @@ void ParticleSystem::UpdateParticle(Particle* particle)
         {
             case 's':
                 // Sine pattern
-                delta_speed = std::sinf((particle->age / speed_sine_loop) * (2.0f * b2_pi)) * speed_sine_amplitude;
+                delta_speed = std::sin((particle->age / speed_sine_loop) * (2.0f * b2_pi)) * speed_sine_amplitude;
                 
                 velocity = b2Vec2(-sin(particle->direction * (b2_pi / 180.0f)) * speed, cos(particle->direction * (b2_pi / 180.0f)) * speed);
                 velocity.Normalize();
