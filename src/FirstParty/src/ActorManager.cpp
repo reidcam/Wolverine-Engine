@@ -377,7 +377,7 @@ int Actors::LoadActorWithJSON(const rapidjson::Value& actor_data)
             {
                 std::string property_name = itr2->name.GetString();
                 sol::type property_type = new_component[property_name].get_type();
-                
+
                 sol::lua_value property = "";
                 
                 JsonToLuaObject(property, itr2->value, property_type);
@@ -451,6 +451,16 @@ void Actors::JsonToLuaObject(sol::lua_value& value, const rapidjson::Value& data
             i++;
         }
         value = _table;
+    }
+    else
+    {
+        // If the sol type is not any of the above, determine the object type based off of the json
+        sol::type second_type;
+        if (data.IsString()) { second_type = sol::type::string; }
+        else if (data.IsBool()) { second_type = sol::type::boolean; }
+        else if (data.IsNumber()) { second_type = sol::type::number; }
+        else if (data.IsObject()) { second_type = sol::type::table; }
+        JsonToLuaObject(value, data, second_type);
     }
 }
 
