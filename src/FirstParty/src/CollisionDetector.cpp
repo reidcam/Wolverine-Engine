@@ -121,6 +121,12 @@ void OnEnter::OnTriggerEnter(const Collision& collision)
 		try {
 			sol::table component = Actors::GetComponentByIndex(collision.this_actor_id, i);
 			sol::function OnTriggerEnter = component["OnTriggerEnter"];
+            
+            // If this component is dead, skip it
+            if ((component)["REMOVED_FROM_ACTOR"] == true)
+            {
+                continue;
+            }
 
 			// Skip this component if the actor or component aren't enabled
 			if (!Actors::GetActorEnabled(collision.this_actor_id) || (component)["enabled"] == false)
@@ -158,6 +164,12 @@ void OnEnter::OnTriggerExit(const Collision& collision)
 		try {
 			sol::table component = Actors::GetComponentByIndex(collision.this_actor_id, i);
 			sol::function OnTriggerExit = component["OnTriggerExit"];
+            
+            // If this component is dead, skip it
+            if ((component)["REMOVED_FROM_ACTOR"] == true)
+            {
+                continue;
+            }
 
 			// Skip this component if the actor or component aren't enabled
 			if (!Actors::GetActorEnabled(collision.this_actor_id) || (component)["enabled"] == false)
@@ -167,7 +179,7 @@ void OnEnter::OnTriggerExit(const Collision& collision)
 
 			if (OnTriggerExit.valid())
 			{
-				OnTriggerExit(OnTriggerExit, collision);
+				OnTriggerExit(component, collision);
 			}
 		}
 		catch (const sol::error& e) {
@@ -195,6 +207,12 @@ void OnEnter::OnCollisionEnter(const Collision& collision)
 		try {
 			sol::table component = Actors::GetComponentByIndex(collision.this_actor_id, i);
 			sol::function OnCollisionEnter = component["OnCollisionEnter"];
+            
+            // If this component is dead, skip it
+            if ((component)["REMOVED_FROM_ACTOR"] == true)
+            {
+                continue;
+            }
 
 			// Skip this component if the actor or component aren't enabled
 			if (!Actors::GetActorEnabled(collision.this_actor_id) || (component)["enabled"] == false)
@@ -204,7 +222,7 @@ void OnEnter::OnCollisionEnter(const Collision& collision)
 
 			if (OnCollisionEnter.valid())
 			{
-				OnCollisionEnter(OnCollisionEnter, collision);
+				OnCollisionEnter(component, collision);
 			}
 		}
 		catch (const sol::error& e) {
@@ -232,6 +250,12 @@ void OnEnter::OnCollisionExit(const Collision& collision)
 		try {
 			sol::table component = Actors::GetComponentByIndex(collision.this_actor_id, i);
 			sol::function OnCollisionExit = component["OnCollisionExit"];
+            
+            // If this component is dead, skip it
+            if ((component)["REMOVED_FROM_ACTOR"] == true)
+            {
+                continue;
+            }
 
 			// Skip this component if the actor or component aren't enabled
 			if (!Actors::GetActorEnabled(collision.this_actor_id) || (component)["enabled"] == false)
@@ -241,7 +265,7 @@ void OnEnter::OnCollisionExit(const Collision& collision)
 
 			if (OnCollisionExit.valid())
 			{
-				OnCollisionExit(OnCollisionExit, collision);
+				OnCollisionExit(component, collision);
 			}
 		}
 		catch (const sol::error& e) {
