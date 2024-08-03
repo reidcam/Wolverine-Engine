@@ -37,7 +37,7 @@ struct Particle
 class ParticleSystem
 {
 public:
-    int MAX_NUM_PARTICLES = 10000;
+    int MAX_NUM_PARTICLES = 1000;
     int num_particles = 0;
     int framesActive = 0; // The number of frames that this system has been emitting for.
     std::queue<Particle*> particles;

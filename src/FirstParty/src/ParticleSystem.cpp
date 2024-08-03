@@ -264,6 +264,9 @@ void ParticleSystem::OnStart()
     
     // Sets the mass data
     massData.mass = mass;
+    massData.center = b2Vec2_zero;
+    massData.I = 0.0f;
+    
 
     // Creates the body template to use for particles:
     // Sets the body type
