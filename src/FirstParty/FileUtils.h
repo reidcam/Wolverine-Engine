@@ -29,7 +29,11 @@ public:
     */
     static inline void SetWorkingDirectory()
     {
-#ifdef __APPLE__
+#if defined(_WIN32) || defined(_WIN64)
+        // Windows
+        working_directory = std::filesystem::current_path().string();
+#elif defined(__APPLE__) && defined(__MACH__)
+        // macOS
         // Credit for this solution goes to the people who responded to the thread https://stackoverflow.com/questions/516200/relative-paths-not-working-in-xcode-c
         CFBundleRef app_bundle = CFBundleGetMainBundle();
         CFURLRef resources_url = CFBundleCopyResourcesDirectoryURL(app_bundle);
@@ -40,9 +44,11 @@ public:
         }
         CFRelease(resources_url);
         working_directory = path;
-#endif
-#ifdef _WIN32
+#elif defined(__linux__) || defined(__linux) || defined(linux) || defined(__gnu_linux__)
+        // Linux
         working_directory = std::filesystem::current_path().string();
+#else
+        std::cerr << "Platform not supported!" << std::endl;
 #endif
     }
     
