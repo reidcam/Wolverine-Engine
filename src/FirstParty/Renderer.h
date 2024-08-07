@@ -37,12 +37,16 @@ private:
 	inline static Uint8 clear_color_g = 255;
 	inline static Uint8 clear_color_b = 255;
 	inline static Uint8 clear_color_a = 255;
+    
+    // Determines wether debug elements will be drawn
+    inline static bool draw_debug = false;
 	
 	// queues for different kinds of render requests
 	inline static std::deque<ImageDrawRequest> image_draw_request_queue;
 	inline static std::deque<TextRenderRequest> text_draw_request_queue;
 	inline static std::deque<UIRenderRequest> ui_draw_request_queue;
 	inline static std::deque<PixelDrawRequest> pixel_draw_request_queue;
+    inline static std::deque<LineDrawRequest> line_draw_request_queue;
 
 	/**
 	* Sets the SDL_Renderer for the Renderer
@@ -79,6 +83,11 @@ public:
 	* @returns	  a SDL_Window* to the SDL_Window
 	*/
 	inline static SDL_Window* GetWindow() { return RendererData::window; } // GetWindow()
+    
+    /**
+     * @return true if draw_debug is true, and false otherwise
+     */
+    inline static bool GetDebugDraw() { return RendererData::draw_debug; } // GetDebugDraw()
 
 	/**
 	* Returns a pointer to the SDL_Renderer
@@ -150,6 +159,11 @@ public:
 	* Renders all of the pixel draw requests in the pixel_draw_request_queue
 	*/
 	static void RenderAndClearAllPixels();
+    
+    /**
+    * Renders all of the line draw requests in the line_draw_request_queue
+    */
+    static void RenderAndClearAllLines();
 
 	/**
 	* Creates a UI draw request at the specified screen position using the image with name 'image_name'
@@ -217,6 +231,20 @@ public:
 	* @param	a	the alpha value of the color of the pixel to be drawn [0, 255]
 	*/
 	static void DrawPixel(const float x, const float y, const float r, const float g, const float b, const float a);
+    
+    /*
+    Creates a line draw request from the specified (x1, y1) to (x2, y2) world position with color {r, g, b, a}
+
+    @param    x1    the x of the world position for the first vertex of the line
+    @param    y1    the y of the world position for the first vertex of the line
+    @param    x2    the x of the world position for the second vertex of the line
+    @param    y2    the y of the world position for the second vertex of the line
+    @param    r    the red value of the color of the pixel to be drawn [0, 255]
+    @param    g    the green value of the color of the pixel to be drawn [0, 255]
+    @param    b    the blue value of the color of the pixel to be drawn [0, 255]
+    @param    a    the alpha value of the color of the pixel to be drawn [0, 255]
+    */
+    static void DrawLine(const float x1, const float y1, const float x2, const float y2, const float r, const float g, const float b, const float a);
 
 	/**
 	* Creates a text draw request for str_content at the specified (x, y) screen position

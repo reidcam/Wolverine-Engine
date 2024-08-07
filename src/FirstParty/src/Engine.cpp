@@ -152,14 +152,15 @@ int GameLoop()
 
     if (PhysicsWorld::world_initialized) {
         InitializeCollisions();
+        PhysicsWorld::AdvanceWorld();
+        PhysicsWorld::world->DebugDraw();
     }
-
-    PhysicsWorld::AdvanceWorld();
 
     // RENDER STUFF HERE
     RendererData::RenderAndClearAllImageRequests();
     RendererData::RenderAndClearAllTextRequests();
     RendererData::RenderAndClearAllPixels();
+    RendererData::RenderAndClearAllLines();
     RendererData::RenderAndClearAllUI();
     
     PhysicsWorld::AdvanceWorld();

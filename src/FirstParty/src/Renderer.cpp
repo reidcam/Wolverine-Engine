@@ -76,6 +76,9 @@ bool RendererData::LoadRenderingConfig()
 	if (doc.HasMember("zoom_factor")) {
 		zoom_factor = doc["zoom_factor"].GetFloat();
 	}
+    if (doc.HasMember("draw_debug")) {
+        draw_debug = doc["draw_debug"].GetBool();
+    }
 
 	return true;
 }
@@ -250,11 +253,41 @@ void RendererData::RenderAndClearAllPixels()
 }
 
 /**
+* Renders all of the line draw requests in the line_draw_request_queue
+*/
+void RendererData::RenderAndClearAllLines()
+{
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND); // needed to ensure that alpha works
+
+    for (auto& request : line_draw_request_queue) {
+        SDL_SetRenderDrawColor(renderer, request.r, request.g, request.b, request.a);
+        
+        glm::vec2 final_rendering_position1 = glm::vec2(request.x1, request.y1) - current_cam_pos;
+        glm::vec2 final_rendering_position2 = glm::vec2(request.x2, request.y2) - current_cam_pos;
+        
+        glm::ivec2 cam_dimensions = glm::ivec2(window_size.x, window_size.y);
+        
+        int x1 = static_cast<int>(final_rendering_position1.x * PIXELS_PER_METER + cam_dimensions.x * 0.5f * (1.0f / zoom_factor));
+        int y1 = static_cast<int>(final_rendering_position1.y * PIXELS_PER_METER + cam_dimensions.y * 0.5f * (1.0f / zoom_factor));
+        int x2 = static_cast<int>(final_rendering_position2.x * PIXELS_PER_METER + cam_dimensions.x * 0.5f * (1.0f / zoom_factor));
+        int y2 = static_cast<int>(final_rendering_position2.y * PIXELS_PER_METER + cam_dimensions.y * 0.5f * (1.0f / zoom_factor));
+        
+        SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
+    }
+
+    line_draw_request_queue.clear();
+
+    // reset renderer when finished
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+    SDL_SetRenderDrawColor(renderer, clear_color_r, clear_color_g, clear_color_b, 255);
+}
+
+/**
 * Creates a UI draw request at the specified screen position using the image with name 'image_name'
 *
-* @param	image_name	The name of the image to be draw
-* @param	x			The x position to draw the image at
-* @param	y			The y position to draw the image at
+* @param    image_name    The name of the image to be draw
+* @param    x            The x position to draw the image at
+* @param    y            The y position to draw the image at
 */
 void RendererData::DrawUI(const std::string& image_name, const float x, const float y)
 {
@@ -370,6 +403,33 @@ void RendererData::DrawPixel(const float x, const float y, const float r, const 
 
 	pixel_draw_request_queue.push_back(obj);
 }
+				
+/*
+Creates a line draw request from the specified (x1, y1) to (x2, y2) world position with color {r, g, b, a}
+
+@param    x1    the x of the world position for the first vertex of the line
+@param    y1    the y of the world position for the first vertex of the line
+@param    x2    the x of the world position for the second vertex of the line
+@param    y2    the y of the world position for the second vertex of the line
+@param    r    the red value of the color of the pixel to be drawn [0, 255]
+@param    g    the green value of the color of the pixel to be drawn [0, 255]
+@param    b    the blue value of the color of the pixel to be drawn [0, 255]
+@param    a    the alpha value of the color of the pixel to be drawn [0, 255]
+*/
+void RendererData::DrawLine(const float x1, const float y1, const float x2, const float y2, const float r, const float g, const float b, const float a)
+{
+    LineDrawRequest obj;
+    obj.x1 = x1;
+    obj.y1 = y1;
+    obj.x2 = x2;
+    obj.y2 = y2;
+    obj.r = static_cast<int>(r);
+    obj.g = static_cast<int>(g);
+    obj.b = static_cast<int>(b);
+    obj.a = static_cast<int>(a);
+    
+    line_draw_request_queue.push_back(obj);
+}
 
 /**
 * Creates a text draw request for str_content at the specified (x, y) screen position
@@ -382,7 +442,7 @@ void RendererData::DrawPixel(const float x, const float y, const float r, const 
 * @param	r	the red value of the color of the text to be drawn [0, 255]
 * @param	g	the green value of the color of the text to be drawn [0, 255]
 * @param	b	the blue value of the color of the text to be drawn [0, 255]
-* @param	a	the alpha value of the color of the text to be drawn [0, 255]				
+* @param	a	the alpha value of the color of the text to be drawn [0, 255]
 */
 void RendererData::DrawText(const std::string str_content, int x, int y, std::string font_name, int font_size, int r, int g, int b, int a)
 {

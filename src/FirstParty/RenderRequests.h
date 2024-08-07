@@ -72,4 +72,19 @@ struct PixelDrawRequest
 	int a = 255;
 }; // PixelDrawRequest
 
+// Line Render Request
+// default values are commented next to their respective data structure
+
+struct LineDrawRequest
+{
+    float x1 = 0.0;
+    float y1 = 0.0;
+    float x2 = 0.0;
+    float y2 = 0.0;
+    int r = 255;
+    int g = 255;
+    int b = 255;
+    int a = 255;
+}; // LineDrawRequest
+
 #endif /* RenderRequests.h */
