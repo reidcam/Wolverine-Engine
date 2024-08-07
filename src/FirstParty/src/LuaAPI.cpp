@@ -66,6 +66,7 @@ void LuaAPI::ExposeLuaAPI()
 	(*GetLuaState())["Image"]["Draw"] = &RendererData::DrawImage;
 	(*GetLuaState())["Image"]["DrawEx"] = &RendererData::DrawImageEx;
 	(*GetLuaState())["Image"]["DrawPixel"] = &RendererData::DrawPixel;
+    (*GetLuaState())["Image"]["DrawLine"] = &RendererData::DrawLine;
 	(*GetLuaState())["Image"]["DrawUI"] = &RendererData::DrawUI;
 	(*GetLuaState())["Image"]["DrawUIEx"] = &RendererData::DrawUIEx;
 

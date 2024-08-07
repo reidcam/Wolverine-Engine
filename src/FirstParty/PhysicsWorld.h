@@ -37,7 +37,17 @@ public:
     
     inline void DrawCircle(const b2Vec2& center, float radius, const b2Color& color) 
     {
-        
+        for (int i = 1; i < 360; i++)
+        {
+            b2Vec2 vertex1(cos(i - 1) * radius, sin(i - 1) * radius); // the coordinates of the previous point on the circle
+            b2Vec2 vertex2(cos(i) * radius, sin(i) * radius); // the coordinates of the current point on the circle
+            
+            // the points are now centered on the center of the circle
+            vertex1 = vertex1 + center;
+            vertex2 = vertex2 + center;
+            
+            RendererData::DrawLine(vertex1.x, vertex1.y, vertex2.x, vertex2.y, color.r * 255, color.g * 255, color.b * 255, color.a * 255);
+        }
     };
     
     // Not used so no need to fill function(s)

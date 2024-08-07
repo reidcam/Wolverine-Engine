@@ -32,8 +32,8 @@ public:
 	float rotation = 0.0f; // units of degrees (not radians), will need to convert to radians for box2D
 
 	// collider/trigger properties
-	bool has_collider = true;
-	bool has_trigger = true;
+	bool has_collider = false;
+	bool has_trigger = false;
 	std::string collider_type = "box";
 	std::string trigger_type = "box";
 	float collider_width = 1.0f;
