@@ -7,7 +7,7 @@
 
 #include "LuaAPI.h"
 
-/*
+/**
 * Exposes all of the API functions to Sol to be used in Lua
 */
 void LuaAPI::ExposeLuaAPI()
@@ -257,7 +257,8 @@ void LuaAPI::ExposeLuaAPI()
 
 
 void deny_write() { std::cout << "error: attempt to modify a dead lua table" << std::endl; }
-/*
+
+/**
  * Deletes a table on the lua stack
  *
  * Note: does not actualy delete a table from the lua stack as only lua's garbage collection can do that.
@@ -286,27 +287,27 @@ void LuaAPI::DeleteLuaTable(std::shared_ptr<sol::table> table)
     }
 }
 
-/*
+/**
 * Outputs a string to the console
 *
-* @parameters    message    the string to output to the console
+* @param    message    the string to output to the console
 */
 void LuaAPI::Log(const std::string& message)
 {
 	std::cout << message + "\n";
 }
 
-/*
+/**
 * Outputs an error message to the console
 *
-* @parameters    message    the string to output to the console
+* @param    message    the string to output to the console
 */
 void LuaAPI::LogError(const std::string& message)
 {
 	std::cerr << message + "\n";
 }
 
-/*
+/**
 * Quits the application.
 * Used in the Lua API Application namespace
 */
@@ -315,11 +316,11 @@ void LuaAPI::Quit()
 	exit(0);
 }
 
-/*
+/**
 * The app will sleep for the specified number of milliseconds.
 * Used in the Lua API Application namespace
 *
-* @parameter    milliseconds    the number of milliseconds to sleep the application for
+* @param    milliseconds    the number of milliseconds to sleep the application for
 */
 void LuaAPI::Sleep(const float milliseconds)
 {
@@ -328,7 +329,7 @@ void LuaAPI::Sleep(const float milliseconds)
 	std::this_thread::sleep_for(std::chrono::milliseconds(duration));
 }
 
-/*
+/**
 * Returns the current frame number
 *
 * @returns    the current frame number
@@ -338,11 +339,11 @@ int LuaAPI::GetFrame()
 	return current_frame;
 }
 
-/*
+/**
 * Opens the specified url in the browser
 * Used in the Lua API Application namespace
 *
-* @parameters    url    the url to open
+* @param    url    the url to open
 */
 void LuaAPI::OpenURL(const std::string& url)
 {

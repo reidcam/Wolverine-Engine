@@ -21,7 +21,7 @@ public:
 	inline static b2World* world;
 	inline static float time_step = 1.0f / 60.0f;
 
-	/*
+	/**
 	* Initializes the b2World if it has not already been initialized
 	*/
 	inline static void InitializeWorld() {
@@ -31,7 +31,7 @@ public:
 		}
 	};
 
-	/*
+	/**
 	* advances the b2World by the specified time step
 	*/
 	inline static void AdvanceWorld() {

@@ -19,7 +19,7 @@ void LoadTemplates();
 /**
  * Get a template based on the templates name
  *
- *`@param   template_name   the name of the template to get from the database
+ * @param   template_name   the name of the template to get from the database
  * @returns                 the template with the specified name
 */
 rapidjson::Document* GetTemplate(std::string template_name);

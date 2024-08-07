@@ -27,45 +27,96 @@ public:
      * Must be called before the first frame update, initializes all keycodes to INPUT\_STATE\_UP
      */
     static void Init();
+
     /**
      * Call every frame at the start of the event loop to process incoming inputs.
-     * @param   e               SDL_event taken from event queue
+     * @param    e    SDL_event taken from event queue
      */
     static void ProcessEvent(const SDL_Event & e);
+
     /**
      * Call every frame at the end of the event loop (removes frame-specific conditions)
      */
     static void LateUpdate();
+
     /**
      *  `GetKey` functions
-     * @param   keycode     SDL scancode code for key
-     * @returns         State of the keys (get, down, up)
+     * @param    keycode    SDL scancode code for key
+     * @returns             State of the keys (get, down, up)
      */
     static bool GetKey(SDL_Scancode keycode);
+
+    /**
+     *  `GetKey` functions
+     * @param    keycode    SDL scancode code for key
+     * @returns             State of the keys (get, down, up)
+     */
     static bool GetKeyDown(SDL_Scancode keycode);
+
+    /**
+     *  `GetKey` functions
+     * @param    keycode    SDL scancode code for key
+     * @returns             State of the keys (get, down, up)
+     */
     static bool GetKeyUp(SDL_Scancode keycode);
+
     /**
      *  `GetKey_S` functions (s is for string)
-     * @param   key             string code for key (listed in keycode_to_scancode)
+     * @param    key    string code for key (listed in keycode_to_scancode)
      * @returns         State of the keys (get, down, up)
      */
     static bool GetKey_S(std::string key);
+
+    /**
+     *  `GetKey_S` functions (s is for string)
+     * @param    key    string code for key (listed in keycode_to_scancode)
+     * @returns         State of the keys (get, down, up)
+     */
     static bool GetKeyDown_S(std::string key);
+
+    /**
+     *  `GetKey_S` functions (s is for string)
+     * @param    key    string code for key (listed in keycode_to_scancode)
+     * @returns         State of the keys (get, down, up)
+     */
     static bool GetKeyUp_S(std::string key);
+
     /**
      * Returns mouse position in world space
      */
     static glm::vec2 GetMousePosition();
+
     /**
      * Gets mouse buttons
-     * @param   button      1 = left click, 2 = right click, 3 = middle click
-     * @returns         State of the mouse buttons (get, down, up)
+     * @param    button    1 = left click, 2 = right click, 3 = middle click
+     * @returns            State of the mouse buttons (get, down, up)
      */
     static bool GetMouseButton(int button);
+
+    /**
+     * Gets mouse buttons
+     * @param    button    1 = left click, 2 = right click, 3 = middle click
+     * @returns            State of the mouse buttons (get, down, up)
+     */
     static bool GetMouseButtonDown(int button);
+
+    /**
+     * Gets mouse buttons
+     * @param    button    1 = left click, 2 = right click, 3 = middle click
+     * @returns            State of the mouse buttons (get, down, up)
+     */
     static bool GetMouseButtonUp(int button);
+
+    /**
+     * @returns    the change in scroll of the mouse wheel
+     */
     static float GetMouseWheelDelta();
 
+    /**
+     * NOTE: Not implemented
+     * 
+     * @returns    returns the corresponding index for the given mouse button name
+     */
     static int ConvertMouseButtonToIndex(const std::string& button_name);
 
 private:

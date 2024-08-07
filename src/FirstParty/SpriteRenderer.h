@@ -43,17 +43,17 @@ public:
     bool REMOVED_FROM_ACTOR = false;
     bool enabled = true;
 
-    /*
+    /**
     * Lifecycle function for initializing the sprite renderer
     */
     void OnStart();
     
-    /*
+    /**
     * Lifecycle function for updating the sprite renderer
     */
     void OnUpdate();
 
-    /*
+    /**
     * Lifecycle function for destroying the sprite renderer
     */
     void OnDestroy();

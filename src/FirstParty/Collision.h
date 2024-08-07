@@ -5,6 +5,9 @@
 
 class Actor; // forward declaration
 
+/**
+ * Defines the collision information for Box2D collisions
+*/
 class Collision
 {
 public:

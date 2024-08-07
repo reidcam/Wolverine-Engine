@@ -7,7 +7,7 @@
 
 #include "Rigidbody.h"
 
-/*
+/**
 * Lifecycle function for initializing a rigidbody
 */
 void Rigidbody::OnStart()
@@ -86,7 +86,7 @@ void Rigidbody::OnStart()
 
 }
 
-/*
+/**
 * Lifecycle function for destroying the rigidbody
 */
 void Rigidbody::OnDestroy()
@@ -97,10 +97,10 @@ void Rigidbody::OnDestroy()
 	PhysicsWorld::world->DestroyBody(body);
 }
 
-/*
+/**
 * Adds force to the center of the rigidbody
 *
-* @parameter	force		the force to add to the rb
+* @param	force    the force to add to the rb
 */
 void Rigidbody::AddForce(const b2Vec2& force)
 {
@@ -110,10 +110,10 @@ void Rigidbody::AddForce(const b2Vec2& force)
 	body->ApplyForceToCenter(force, true);
 }
 
-/*
+/**
 * Sets the velocity of the rigidbody
 *
-* @parameter	velocity	the new velocity of the rb
+* @param	velocity	the new velocity of the rb
 */
 void Rigidbody::SetVelocity(const b2Vec2& velocity)
 {
@@ -123,10 +123,10 @@ void Rigidbody::SetVelocity(const b2Vec2& velocity)
 	body->SetLinearVelocity(velocity);
 }
 
-/*
+/**
 * Sets the position of the rigidobdy
 *
-* @parameter	position	the new position of the rb
+* @param	position	the new position of the rb
 */
 void Rigidbody::SetPosition(const b2Vec2& position)
 {
@@ -140,10 +140,10 @@ void Rigidbody::SetPosition(const b2Vec2& position)
 	}
 }
 
-/*
+/**
 * Sets the rotation of the rigidbody
 *
-* @parameter	degrees_clockwise    the number of degrees clockwise to rotate the rb
+* @param	degrees_clockwise    the number of degrees clockwise to rotate the rb
 */
 void Rigidbody::SetRotation(const float degrees_clockwise)
 {
@@ -155,10 +155,10 @@ void Rigidbody::SetRotation(const float degrees_clockwise)
 	}
 }
 
-/*
+/**
 * Sets the angular velocity of the rigidbody
 *
-* @parameter	degrees_clockwise    the number of degrees clockwise to rotate the rb
+* @param	degrees_clockwise    the number of degrees clockwise to rotate the rb
 */
 void Rigidbody::SetAngularVelocity(const float degrees_clockwise)
 {
@@ -169,10 +169,10 @@ void Rigidbody::SetAngularVelocity(const float degrees_clockwise)
 	body->SetAngularVelocity(degrees_clockwise * (b2_pi / 180.0f));
 }
 
-/*
+/**
 * Set the gravity scale of the rigidbody
 *
-* @parameter	scale		the new gravity scale
+* @param	scale    the new gravity scale
 */
 void Rigidbody::SetGravityScale(const float scale)
 {
@@ -182,10 +182,10 @@ void Rigidbody::SetGravityScale(const float scale)
 		body->SetGravityScale(scale);
 }
 
-/*
+/**
 * Sets the upwards direction of the rigidbody
 *
-* @parameter	direction	the new upwards direction of the rb
+* @param	direction    the new upwards direction of the rb
 */
 void Rigidbody::SetUpDirection(b2Vec2 direction)
 {
@@ -201,10 +201,10 @@ void Rigidbody::SetUpDirection(b2Vec2 direction)
 	}
 }
 
-/*
+/**
 * Sets the right direction of the rigidbody
 *
-* @parameter	direction	the new right direction of the rb
+* @param	direction    the new right direction of the rb
 */
 void Rigidbody::SetRightDirection(b2Vec2 direction)
 {
@@ -220,10 +220,10 @@ void Rigidbody::SetRightDirection(b2Vec2 direction)
 	}
 }
 
-/*
+/**
 * Get the (x, y) position of the rigidbody
 *
-* @returns      a b2Vec2 containing the (x, y) position of the rb
+* @returns    a b2Vec2 containing the (x, y) position of the rb
 */
 b2Vec2 Rigidbody::GetPosition()
 {
@@ -233,10 +233,10 @@ b2Vec2 Rigidbody::GetPosition()
 	return body->GetPosition();
 }
 
-/*
+/**
 * Get the current rotation of the rigidbody
 *
-* @returns		a float of the current rotation of the rb in clockwise degrees
+* @returns    a float of the current rotation of the rb in clockwise degrees
 */
 float Rigidbody::GetRotation()
 {
@@ -247,7 +247,7 @@ float Rigidbody::GetRotation()
 	return body->GetAngle() * (180.0f / b2_pi);
 }
 
-/*
+/**
 * Returns the current velocity of the rigidbody
 *
 * @returns		a b2Vec2 containing the current velocity of the rb separated
@@ -261,7 +261,7 @@ b2Vec2 Rigidbody::GetVelocity()
 	return body->GetLinearVelocity();
 }
 
-/*
+/**
 * Returns the current angular velocity of the rigidbody
 *
 * @returns		a b2Vec2 containing the current angular velocity of the rb separated
@@ -275,7 +275,7 @@ float Rigidbody::GetAngularVelocity()
 	return body->GetAngularVelocity() * (180.0f / b2_pi);
 }
 
-/*
+/**
 * Returns the current gravity scale of the rigidbody
 *
 * @returns		a float of the current gravity scale of the rb
@@ -288,7 +288,7 @@ float Rigidbody::GetGravityScale()
 	return body->GetGravityScale();
 }
 
-/*
+/**
 * Returns the current upwards direction of rigidbody
 *
 * @returns		a b2Vec2 containing the current upwards direction of the rb
@@ -310,7 +310,7 @@ b2Vec2 Rigidbody::GetUpDirection()
 	return upDirection;
 }
 
-/*
+/**
 * Returns the current right direction of rigidbody
 *
 * @returns		a b2Vec2 containing the current right direction of the rb

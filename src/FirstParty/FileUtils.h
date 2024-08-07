@@ -55,8 +55,8 @@ public:
     /**
      * Get the path of a directory or file relative to the current working directory
      *
-     * @param   directory_name  the name of the directory or file to get the path of
-     * @returns                the path of the given file or directory relative to the current working directory
+     * @param    directory_name    the name of the directory or file to get the path of
+     * @returns                    the path of the given file or directory relative to the current working directory
     */
     static inline std::string GetPath(const std::string& directory_name)
     {
@@ -67,8 +67,8 @@ public:
     /**
      * Get the path of a directory or file relative to the current working directory
      *
-     * @param   directory_name  the name of the directory or file to get the path of
-     * @returns                the path of the given file or directory relative to the current working directory
+     * @param    directory_name    the name of the directory or file to get the path of
+     * @returns                    the path of the given file or directory relative to the current working directory
     */
     static inline bool DirectoryExists(const std::string& path)
     {

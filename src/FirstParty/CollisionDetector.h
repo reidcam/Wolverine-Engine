@@ -15,17 +15,17 @@
 class CollisionDetector : public b2ContactListener
 {
 public:
-	/*
+	/**
 	* Handles physics contacts when the contact first occurs
 	* 
-	* @parameters    contact    a contact object containing the info about the contact
+	* @param   contact    a contact object containing the info about the contact
 	*/
 	void BeginContact(b2Contact* contact);
 
-	/*
+	/**
 	* Handles physics contacts when the contact ends
 	*
-	* @parameters    contact    a contact object containing the info about the contact
+	* @param    contact    a contact object containing the info about the contact
 	*/
 	void EndContact(b2Contact* contact);
 };
@@ -33,39 +33,39 @@ public:
 class OnEnter
 {
 public:
-	/*
+	/**
 	* Called when contact begins between two triggers
 	* 
-	* @parameters    collision    info about the collision
+	* @param    collision    info about the collision
 	*/
 	static void OnTriggerEnter(const Collision& collision);
 
-	/*
+	/**
 	* Called when contact ends between two triggers
 	* 
-	* @parameters    collision    info about the collision
+	* @param   collision    info about the collision
 	*/
 	static void OnTriggerExit(const Collision& collision);
 
-	/*
+	/**
 	* Called when contact begins between two rigidbodies
 	* 
-	* @parameter    collision    info about the collision
+	* @param    collision    info about the collision
 	*/
 	static void OnCollisionEnter(const Collision& collision);
 
-	/*
+	/**
 	* Called when contact ends between two rigidbodies
 	*
-	* @parameter    collision    info about the collision
+	* @param    collision    info about the collision
 	*/
 	static void OnCollisionExit(const Collision& collision);
 
-	/*
+	/**
 	* Catches and outputs lua errors from sol
 	*
-	* @parameters    actor_id    the id of the actor that the error came from
-	* @parameters    e           the sol error
+	* @param    actor_id    the id of the actor that the error came from
+	* @param    e           the sol error
 	*/
 	static void ReportError(const int actor_id, const sol::error& e);
 };

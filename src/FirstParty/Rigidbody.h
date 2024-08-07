@@ -52,91 +52,91 @@ public:
     bool REMOVED_FROM_ACTOR = false;
 	bool enabled = true;
 
-	/*
+	/**
 	* Lifecycle function for initializing the rigidbody
 	*/
 	void OnStart();
 
-	/*
+	/**
 	* Lifecycle function for destroying the rigidbody
 	*/
 	void OnDestroy();
 
 	// Setter functions
 
-	/*
+	/**
 	* Adds force to the center of the rigidbody
 	*
-	* @parameter	force		the force to add to the rb
+	* @param	force    the force to add to the rb
 	*/
 	void AddForce(const b2Vec2& force);
 
-	/*
+	/**
 	* Sets the velocity of the rigidbody
 	*
-	* @parameter	velocity	the new velocity of the rb
+	* @param	velocity	the new velocity of the rb
 	*/
 	void SetVelocity(const b2Vec2& velocity);
 
-	/*
+	/**
 	* Sets the position of the rigidobdy
 	*
-	* @parameter	position	the new position of the rb
+	* @param	position	the new position of the rb
 	*/
 	void SetPosition(const b2Vec2& position);
 
-	/*
+	/**
 	* Sets the rotation of the rigidbody
 	*
-	* @parameter	degrees_clockwise    the number of degrees clockwise to rotate the rb
+	* @param	degrees_clockwise    the number of degrees clockwise to rotate the rb
 	*/
 	void SetRotation(const float degrees_clockwise);
 
-	/*
+	/**
 	* Sets the angular velocity of the rigidbody
 	*
-	* @parameter	degrees_clockwise    the number of degrees clockwise to rotate the rb
+	* @param	degrees_clockwise    the number of degrees clockwise to rotate the rb
 	*/
 	void SetAngularVelocity(const float degrees_clockwise);
 
-	/*
+	/**
 	* Set the gravity scale of the rigidbody
 	*
-	* @parameter	scale		the new gravity scale
+	* @param	scale    the new gravity scale
 	*/
 	void SetGravityScale(const float scale);
 
-	/*
+	/**
 	* Sets the upwards direction of the rigidbody
 	*
-	* @parameter	direction	the new upwards direction of the rb
+	* @param	direction    the new upwards direction of the rb
 	*/
 	void SetUpDirection(b2Vec2 direction);
 
-	/*
+	/**
 	* Sets the right direction of the rigidbody
 	*
-	* @parameter	direction	the new right direction of the rb
+	* @param	direction    the new right direction of the rb
 	*/
 	void SetRightDirection(b2Vec2 direction);
 
 	// Getter functions
 
-	/*
+	/**
 	* Get the (x, y) position of the rigidbody
 	*
-	* @returns      a b2Vec2 containing the (x, y) position of the rb
+	* @returns    a b2Vec2 containing the (x, y) position of the rb
 	*/
 	b2Vec2 GetPosition();
 
-	/*
+	/**
 	* Get the current rotation of the rigidbody
 	*
-	* @returns		a float of the current rotation of the rb in clockwise degrees
+	* @returns    a float of the current rotation of the rb in clockwise degrees
 	*/
 	float GetRotation();
 
-	/*
+	/**
 	* Returns the current velocity of the rigidbody
 	*
 	* @returns		a b2Vec2 containing the current velocity of the rb separated
@@ -144,7 +144,7 @@ public:
 	*/
 	b2Vec2 GetVelocity();
 
-	/*
+	/**
 	* Returns the current angular velocity of the rigidbody
 	*
 	* @returns		a b2Vec2 containing the current angular velocity of the rb separated
@@ -152,14 +152,14 @@ public:
 	*/
 	float GetAngularVelocity();
 
-	/*
+	/**
 	* Returns the current gravity scale of the rigidbody
 	*
 	* @returns		a float of the current gravity scale of the rb
 	*/
 	float GetGravityScale();
 
-	/*
+	/**
 	* Returns the current upwards direction of rigidbody
 	*
 	* @returns		a b2Vec2 containing the current upwards direction of the rb
@@ -167,7 +167,7 @@ public:
 	*/
 	b2Vec2 GetUpDirection();
 
-	/*
+	/**
 	* Returns the current right direction of rigidbody
 	*
 	* @returns		a b2Vec2 containing the current right direction of the rb

@@ -21,8 +21,8 @@ void LoadFonts();
 /**
  * Get an font based on its size and name
  *
- *`@param   font_name   the name of the font to get from the database
- * @param   font_size       the size of the font to get from the database
+ * @param   font_name   the name of the font to get from the database
+ * @param   font_size   the size of the font to get from the database
  * @returns             the font with the specified name and size
 */
 TTF_Font* GetFont(std::string font_name, int font_size);

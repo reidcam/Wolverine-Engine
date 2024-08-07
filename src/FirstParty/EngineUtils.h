@@ -185,11 +185,11 @@ public:
      * Generates a random number between the max and min values.
      * Precision is the number of decimal places you want to be randomized.
      *
-     * @param   min the lower bound of our random number generation
-     * @param   max the upper bound of our random number generation
-     * @param   precision   used to calculate the decimal precision in the random number
+     * @param   min          the lower bound of our random number generation
+     * @param   max          the upper bound of our random number generation
+     * @param   precision    used to calculate the decimal precision in the random number
      *
-     * @returns           the random number between min and max
+     * @returns              the random number between min and max
      */
     static float RandomNumber(float min, float max, int precision)
     {

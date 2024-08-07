@@ -10,7 +10,7 @@
 #include "AudioManager.h"
 #include "AudioDB.h"
 
-/*
+/**
 * Plays the audio file with 'clip_name' on channel 'channel' and loops 'num_loops' times.
 * If 'channel' is -1, play on the first free channel.
 * If 'num_loops' is -1 loop infinitely
@@ -28,7 +28,7 @@ void AudioManager::AudioPlay(const int channel, const std::string& clip_name, co
     }
 } // AudioPlay()
 
-/*
+/**
 * Halt playing of a particular channel, except for any playing music.
 * More Info: https://wiki.libsdl.org/SDL2_mixer/Mix_HaltChannel
 *
@@ -41,7 +41,7 @@ void AudioManager::AudioHalt(const int channel)
     }
 } // AudioHalt()
 
-/*
+/**
 * Pause a particular channel. Any music is unaffected.
 * More Info: https://wiki.libsdl.org/SDL2_mixer/Mix_Pause
 *
@@ -52,7 +52,7 @@ void AudioManager::AudioPause(const int channel)
     Mix_Pause(channel);
 } // AudioPause()
 
-/*
+/**
 * Resume a particular channel. Any music is unaffected.
 * More Info: https://wiki.libsdl.org/SDL2_mixer/Mix_Resume
 *
@@ -63,7 +63,7 @@ void AudioManager::AudioResume(const int channel)
     Mix_Resume(channel);
 } // AudioResume()
 
-/*
+/**
 * Sets the volume for a specific channel
 * More Info: https://wiki.libsdl.org/SDL2_mixer/Mix_Volume
 *
@@ -71,7 +71,7 @@ void AudioManager::AudioResume(const int channel)
 * @param	volume     the new volume, between 0 and MIX_MAX_VOLUME, or -1 to query
 *
 * @returns	Returns the previous volume. If the specified volume is -1, this returns
-            the current volume. If channel is -1, this returns the average of all channels.
+*           the current volume. If channel is -1, this returns the average of all channels.
 */
 int AudioManager::AudioSetVolume(const int channel, const int volume)
 {
@@ -79,7 +79,7 @@ int AudioManager::AudioSetVolume(const int channel, const int volume)
     return previous_volume;
 } // AudioSetVolume()
 
-/*
+/**
 * Close the mixer, halting all playing audio.
 * More Info: https://wiki.libsdl.org/SDL2_mixer/Mix_CloseAudio
 */
@@ -88,16 +88,16 @@ void AudioManager::AudioCloseMixer()
     Mix_CloseAudio();
 } // AudioCLoseMixer()
 
-/*
+/**
 * Deinitialize SDL_mixer.
 * More Info: https://wiki.libsdl.org/SDL2_mixer/Mix_Quit
 */
 void AudioManager::AudioDeinitMixer()
 {
     Mix_Quit();
-} // AudioDeinitMixer
+} // AudioDeinitMixer()
 
-/*
+/**
 * Set the master volume for all channels.
 * More Info: https://wiki.libsdl.org/SDL2_mixer/Mix_MasterVolume
 *

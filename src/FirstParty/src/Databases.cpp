@@ -65,8 +65,8 @@ void LoadImages()
 /**
  * Get an image from loaded_images based on the images name
  *
- *`@param   image_name  the name of the image to get from the database
- * @returns             the image with the specified name
+ * @param   image_name    the name of the image to get from the database
+ * @returns               the image with the specified name
 */
 SDL_Texture* GetImage(std::string image_name)
 {
@@ -110,8 +110,8 @@ void LoadSounds()
 /**
  * Get an audio clip based on the clips name
  *
- * @param   audio_name  the name of the audio clip to get from the database
- * @returns             the audio clip with the specified name
+ * @param   audio_name    the name of the audio clip to get from the database
+ * @returns               the audio clip with the specified name
 */
 Mix_Chunk* GetSound(const std::string& audio_name)
 {
@@ -152,7 +152,7 @@ void LoadFonts()
  * Get an font based on its size and name
  *
  * @param   font_name   the name of the font to get from the database
- * @param   font_size       the size of the font to get from the database
+ * @param   font_size   the size of the font to get from the database
  * @returns             the font with the specified name and size
 */
 TTF_Font* GetFont(std::string font_name, int font_size)
@@ -206,7 +206,7 @@ void LoadTemplates()
 /**
  * Get a template based on the templates name
  *
- *`@param   template_name   the name of the template to get from the database
+ * @param   template_name   the name of the template to get from the database
  * @returns                 the template with the specified name
 */
 rapidjson::Document* GetTemplate(std::string template_name)
@@ -271,8 +271,8 @@ void LoadComponentTypes()
 /**
  * Get a component type based on its name
  *
- *`@param   component_name  the name of the component type to get from the database
- * @returns                 the component type with the specified name
+ * @param   component_name    the name of the component type to get from the database
+ * @returns                   the component type with the specified name
 */
 std::shared_ptr<sol::table> GetComponentType(std::string component_name)
 {
@@ -313,7 +313,7 @@ void LoadScenePaths()
 /**
  * Get a scene path based on the name of the scene
  *
- *`@param   scene_name      the name of the scene path to get from the database
+ * @param   scene_name      the name of the scene path to get from the database
  * @returns                 the scene path with the specified name
 */
 std::string GetScenePath(std::string scene_name)

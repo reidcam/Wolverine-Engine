@@ -23,7 +23,10 @@ using namespace std;
 
 struct EngineData
 {
-    static bool quit;   // True if the game should be quit out of. 
+    /**
+     * True if the game should be quit out of. 
+    */
+    static bool quit;
     inline static std::string game_title = "";
 }; // EngineData
 
@@ -43,16 +46,12 @@ void Initialize();
  * parameters specified in config files are currently stored in EngineData
  */
 int CheckConfigFiles();
+
 /**
  * resources/game.config accepts fields:
  * `game_title` and `initial_scene`
  */
 bool CheckGameConfig();
-/**
- * resources/rendering.config accepts fields:
- * `x_resolution`, `y_resolution`, `zoom_factor`, `clear_color_r`, `clear_color_g`, `clear_color_b`
- */
-//bool CheckRenderingConfig();
 
 /**
  * Responsible for running the engine correctly on each frame.
@@ -61,7 +60,7 @@ bool CheckGameConfig();
 */
 int GameLoop();
 
-/*
+/**
 * Initializes the collision detection for the b2world
 * 
 * NOTE: can't be called from PhysicsWorld bc CollisionDetector would have to be included

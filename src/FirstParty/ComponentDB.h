@@ -19,8 +19,8 @@ void LoadComponentTypes();
 /**
  * Get a component type based on its name
  *
- *`@param   component_name  the name of the component type to get from the database
- * @returns                 the component type with the specified name
+ * @param   component_name    the name of the component type to get from the database
+ * @returns                   the component type with the specified name
 */
 std::shared_ptr<sol::table> GetComponentType(std::string component_name);
 

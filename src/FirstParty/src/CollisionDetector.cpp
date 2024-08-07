@@ -7,10 +7,10 @@
 
 #include "CollisionDetector.h"
 
-/*
+/**
 * Handles physics contacts when the contact first occurs
 *
-* @parameters    contact    a contact object containing the info about the contact
+* @param    contact    a contact object containing the info about the contact
 */
 void CollisionDetector::BeginContact(b2Contact* contact)
 {
@@ -60,10 +60,10 @@ void CollisionDetector::BeginContact(b2Contact* contact)
 	}
 }
 
-/*
+/**
 * Handles physics contacts when the contact ends
 *
-* @parameters    contact    a contact object containing the info about the contact
+* @param    contact    a contact object containing the info about the contact
 */
 void CollisionDetector::EndContact(b2Contact* contact)
 {
@@ -108,10 +108,10 @@ void CollisionDetector::EndContact(b2Contact* contact)
 	}
 }
 
-/*
+/**
 * Called when contact begins begins between two triggers
 *
-* @parameters    collision    info about the collision
+* @param    collision    info about the collision
 */
 void OnEnter::OnTriggerEnter(const Collision& collision)
 {
@@ -151,10 +151,10 @@ void OnEnter::OnTriggerEnter(const Collision& collision)
 	}
 }
 
-/*
+/**
 * Called when contact ends between two triggers
 *
-* @parameters    collision    info about the collision
+* @param    collision    info about the collision
 */
 void OnEnter::OnTriggerExit(const Collision& collision)
 {
@@ -194,10 +194,10 @@ void OnEnter::OnTriggerExit(const Collision& collision)
 	}
 }
 
-/*
+/**
 * Called when contact begins between two rigidbodies
 *
-* @parameter    collision    info about the collision
+* @param    collision    info about the collision
 */
 void OnEnter::OnCollisionEnter(const Collision& collision)
 {
@@ -237,10 +237,10 @@ void OnEnter::OnCollisionEnter(const Collision& collision)
 	}
 }
 
-/*
+/**
 * Called when contact ends between two rigidbodies
 *
-* @parameter    collision    info about the collision
+* @param    collision    info about the collision
 */
 void OnEnter::OnCollisionExit(const Collision& collision)
 {
@@ -280,11 +280,11 @@ void OnEnter::OnCollisionExit(const Collision& collision)
 	}
 }
 
-/*
+/**
 * Catches and outputs lua errors from sol
 * 
-* @parameters    actor_id    the id of the actor that the error came from
-* @parameters    e           the sol error
+* @param    actor_id    the id of the actor that the error came from
+* @param    e           the sol error
 */
 void OnEnter::ReportError(const int actor_id, const sol::error& e)
 {

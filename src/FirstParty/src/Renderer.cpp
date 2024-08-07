@@ -1,15 +1,15 @@
 #include "Renderer.h"
 #include "EngineUtils.h"
 
-/*
-Turns a string into an SDL_Texture using the specified font perameters
-
-@param		renderer	SDL_Renderer* to the renderer
-@param		text		the string of text that is going to be turned into a SDL_Texture
-@param		font_color	A SDL_Color for the color of the text
-@param		font_name	The name of the font to be used
-@param		font_size	The size of the font
-@returns	A SDL_Texture* to a SDL_Texture
+/**
+* Turns a string into an SDL_Texture using the specified font perameters
+*
+* @param		renderer	SDL_Renderer* to the renderer
+* @param		text		the string of text that is going to be turned into a SDL_Texture
+* @param		font_color	A SDL_Color for the color of the text
+* @param		font_name	The name of the font to be used
+* @param		font_size	The size of the font
+* @returns	    A SDL_Texture* to a SDL_Texture
 */
 SDL_Texture* RendererData::ConvertTextToTexture(SDL_Renderer* renderer, const std::string& text, const SDL_Color& font_color, const std::string font_name, const int font_size)
 {
@@ -20,10 +20,10 @@ SDL_Texture* RendererData::ConvertTextToTexture(SDL_Renderer* renderer, const st
 	return text_texture;
 }
 
-/*
-Initializes the renderer
-
-@param	title	the title of the window to create
+/**
+* Initializes the renderer
+*
+* @param	title	the title of the window to create
 */
 void RendererData::Init(const std::string& title)
 {
@@ -35,7 +35,7 @@ void RendererData::Init(const std::string& title)
     SDL_SetRenderDrawColor(RendererData::GetRenderer(), clear_color_r, clear_color_g, clear_color_b, clear_color_a); // set renderer draw color
 }
 
-/*
+/**
 Loads in the renderer settings from the rendering config
 */
 bool RendererData::LoadRenderingConfig()
@@ -80,15 +80,15 @@ bool RendererData::LoadRenderingConfig()
 	return true;
 }
 
-/*
-Puts the window in the specified fullscreen mode.
-More info: https://wiki.libsdl.org/SDL2/SDL_SetWindowFullscreen
-
-SDL_WINDOW_FULLSCREEN:			creates a zoomed in fullscreen that creates the largest possible square screen
-SDL_WINDOW_FULLSCREEN_DESKTOP:	makes the window the size of the current screen
-0:								returns the window to its non-full-screen size
-
-@param	flag					can be SDL_WINDOW_FULLSCREEN, SDL_WINDOW_FULLSCREEN_DESKTOP, or 0
+/**
+* Puts the window in the specified fullscreen mode.
+* More info: https://wiki.libsdl.org/SDL2/SDL_SetWindowFullscreen
+*
+* SDL_WINDOW_FULLSCREEN:			creates a zoomed in fullscreen that creates the largest possible square screen
+* SDL_WINDOW_FULLSCREEN_DESKTOP:	makes the window the size of the current screen
+* 0:								returns the window to its non-full-screen size
+*
+* @param	flag					can be SDL_WINDOW_FULLSCREEN, SDL_WINDOW_FULLSCREEN_DESKTOP, or 0
 */
 void RendererData::SetWindowFullscreen(int flag)
 {
@@ -96,31 +96,31 @@ void RendererData::SetWindowFullscreen(int flag)
 	SDL_SetWindowFullscreen(GetWindow(), flag);
 }
 
-/*
-Resizes the window when the window is not in full screen mode
-More info: https://wiki.libsdl.org/SDL2/SDL_SetWindowSize
-
-@param	w	the new width of the window
-@param	h	the new height of the window
+/**
+* Resizes the window when the window is not in full screen mode
+* More info: https://wiki.libsdl.org/SDL2/SDL_SetWindowSize
+*
+* @param	w	the new width of the window
+* @param	h	the new height of the window
 */
 void RendererData::SetNonFullScreenWindowSize(int w, int h)
 {
 	SDL_SetWindowSize(GetWindow(), w, h);
 }
 
-/*
-Resizes the window when the window is in full screen mode.
-More info: https://wiki.libsdl.org/SDL2/SDL_SetWindowDisplayMode
-		   https://wiki.libsdl.org/SDL2/SDL_DisplayMode
-
-@param	display_mode	a SDL_DisplayMode* representing the mode to use
+/**
+* Resizes the window when the window is in full screen mode.
+* More info: https://wiki.libsdl.org/SDL2/SDL_SetWindowDisplayMode
+*		     https://wiki.libsdl.org/SDL2/SDL_DisplayMode
+*
+* @param	display_mode	a SDL_DisplayMode* representing the mode to use
 */
 void RendererData::SetFullScreenWindowSize(const SDL_DisplayMode* display_mode)
 {
 	SDL_SetWindowDisplayMode(GetWindow(), display_mode);
 }
 
-/*
+/**
 Renders all image draw requests in the image_draw_request_queue
 */
 void RendererData::RenderAndClearAllImageRequests()
@@ -173,7 +173,7 @@ void RendererData::RenderAndClearAllImageRequests()
 	image_draw_request_queue.clear();
 }
 
-/*
+/**
 Renders all text draw requests in the text_draw_request_queue
 */
 void RendererData::RenderAndClearAllTextRequests()
@@ -196,7 +196,7 @@ void RendererData::RenderAndClearAllTextRequests()
 	text_draw_request_queue.clear();
 }
 
-/*
+/**
 Renders all UI draw requests in the ui_draw_request_queue
 */
 void RendererData::RenderAndClearAllUI()
@@ -230,7 +230,7 @@ void RendererData::RenderAndClearAllUI()
 	ui_draw_request_queue.clear();
 }
 
-/*
+/**
 Renders all of the pixel draw requests in the pixel_draw_request_queue
 */
 void RendererData::RenderAndClearAllPixels()
@@ -249,6 +249,13 @@ void RendererData::RenderAndClearAllPixels()
 	SDL_SetRenderDrawColor(renderer, clear_color_r, clear_color_g, clear_color_b, 255);
 }
 
+/**
+* Creates a UI draw request at the specified screen position using the image with name 'image_name'
+*
+* @param	image_name	The name of the image to be draw
+* @param	x			The x position to draw the image at
+* @param	y			The y position to draw the image at
+*/
 void RendererData::DrawUI(const std::string& image_name, const float x, const float y)
 {
 	UIRenderRequest obj;
@@ -259,18 +266,18 @@ void RendererData::DrawUI(const std::string& image_name, const float x, const fl
 	ui_draw_request_queue.push_back(obj);
 }
 
-/*
-Creates a UI draw request at the specified screen position, with the color {r, g, b, a},
-and in the given sorting layer
-
-@param	image_name		The name of the image to be draw
-@param	x				The x position to draw the image
-@param	y				The y position to draw the image
-@param	r				How red the image is [0, 255]
-@param	g				How green the image is [0, 255]
-@param	b				How blue the image is [0, 255]
-@param	a				The alpha value of the image [0, 255]
-@param	sorting_order	The sorting layer that the image should be drawn in
+/**
+* Creates a UI draw request at the specified screen position, with the color {r, g, b, a},
+* and in the given sorting layer
+*
+* @param	image_name		The name of the image to be draw
+* @param	x				The x position to draw the image at
+* @param	y				The y position to draw the image at
+* @param	r				[0, 255] How red the image is
+* @param	g				[0, 255] How green the image is
+* @param	b				[0, 255] How blue the image is
+* @param	a				[0, 255] The alpha value of the image
+* @param	sorting_order	The sorting layer that the image should be drawn in
 */
 void RendererData::DrawUIEx(const std::string& image_name, const float x, const float y, const float r, const float g, const float b, const float a, const float sorting_order)
 {
@@ -287,12 +294,12 @@ void RendererData::DrawUIEx(const std::string& image_name, const float x, const 
 	ui_draw_request_queue.push_back(obj);
 }
 
-/*
-Creates an image draw request at the specified screen position using the image with name 'image_name'
-
-@param	image_name	The name of the image to be drawn
-@param	x			The x position to draw the image at
-@param	y			The y position to draw the iamge at
+/**
+* Creates an image draw request at the specified screen position using the image with name 'image_name'
+*
+* @param	image_name	The name of the image to be drawn
+* @param	x			The x position to draw the image at
+* @param	y			The y position to draw the iamge at
 */
 void RendererData::DrawImage(const std::string& image_name, const float x, const float y)
 {
@@ -304,22 +311,22 @@ void RendererData::DrawImage(const std::string& image_name, const float x, const
 	image_draw_request_queue.push_back(obj);
 }
 
-/*
-Creates an image draw request for the image with name 'image_name' with more control than DrawImage
-
-@param	image_name			The name of the image to be drawn
-@param	x					The x position to draw the image at
-@param	y					The y position to draw the iamge at
-@param	rotation_degrees	The rotation of the image in degrees
-@param	scale_x				The scale to draw the x-axis. 1 is normal
-@param	scale_y				The scale to draw the y-axis. 1 is normal
-@param	pivot_x				[0, 1] Where on the x position of the image should be located. 0 is the left side of the image and 1 is the right.
-@param	pivot_y				[0, 1] Where on the y position of the image should be located. 0 is the top side of the image and 1 is the bottom.
-@param	r					[0, 255] How red the image is
-@param	g					[0, 255] How green the image is
-@param	b					[0, 255] How blue the image is
-@param	a					[0, 255] The alpha value of the image
-@param	sorting_order		The sorting layer that the image should be drawn in
+/**
+* Creates an image draw request for the image with name 'image_name' with more control than DrawImage
+*
+* @param	image_name			The name of the image to be drawn
+* @param	x					The x position to draw the image at
+* @param	y					The y position to draw the iamge at
+* @param	rotation_degrees	The rotation of the image in degrees
+* @param	scale_x				The scale to draw the x-axis. 1 is normal
+* @param	scale_y				The scale to draw the y-axis. 1 is normal
+* @param	pivot_x				[0, 1] Where on the x position of the image should be located. 0 is the left side of the image and 1 is the right.
+* @param	pivot_y				[0, 1] Where on the y position of the image should be located. 0 is the top side of the image and 1 is the bottom.
+* @param	r					[0, 255] How red the image is
+* @param	g					[0, 255] How green the image is
+* @param	b					[0, 255] How blue the image is
+* @param	a					[0, 255] The alpha value of the image
+* @param	sorting_order		The sorting layer that the image should be drawn in			
 */
 void RendererData::DrawImageEx(const std::string& image_name, const float x, const float y, const float rotation_degrees, const float scale_x, const float scale_y, const float pivot_x, const float pivot_y, const float r, const float g, const float b, const float a, const float sorting_order)
 {
@@ -341,15 +348,15 @@ void RendererData::DrawImageEx(const std::string& image_name, const float x, con
 	image_draw_request_queue.push_back(obj);
 }
 
-/*
-Creates a pixel draw request at the specified (x, y) screen position with color {r, g, b, a}
-
-@param	x	the x of the screen position for the pixel to be drawn
-@param	y	the x of the screen position for the pixel to be drawn
-@param	r	the red value of the color of the pixel to be drawn [0, 255]
-@param	g	the green value of the color of the pixel to be drawn [0, 255]
-@param	b	the blue value of the color of the pixel to be drawn [0, 255]
-@param	a	the alpha value of the color of the pixel to be drawn [0, 255]
+/**
+* Creates a pixel draw request at the specified (x, y) screen position with color {r, g, b, a}
+*
+* @param	x	the x of the screen position for the pixel to be drawn
+* @param	y	the x of the screen position for the pixel to be drawn
+* @param	r	the red value of the color of the pixel to be drawn [0, 255]
+* @param	g	the green value of the color of the pixel to be drawn [0, 255]
+* @param	b	the blue value of the color of the pixel to be drawn [0, 255]
+* @param	a	the alpha value of the color of the pixel to be drawn [0, 255]
 */
 void RendererData::DrawPixel(const float x, const float y, const float r, const float g, const float b, const float a)
 {
@@ -364,18 +371,18 @@ void RendererData::DrawPixel(const float x, const float y, const float r, const 
 	pixel_draw_request_queue.push_back(obj);
 }
 
-/*
-Creates a text draw request for str_content at the specified (x, y) screen position
-
-@param	str_content		the text to be drawn
-@param	x				the x of the screen position for top left corner of the text
-@param	y				the y of the screen position for top left corner of the text
-@param	font_name		the name of the font to draw the text with
-@param	font_size		how large the text should be drawn
-@param	r	the red value of the color of the text to be drawn [0, 255]
-@param	g	the green value of the color of the text to be drawn [0, 255]
-@param	b	the blue value of the color of the text to be drawn [0, 255]
-@param	a	the alpha value of the color of the text to be drawn [0, 255]
+/**
+* Creates a text draw request for str_content at the specified (x, y) screen position
+*	
+* @param	str_content		the text to be drawn
+* @param	x				the x of the screen position for top left corner of the text
+* @param	y				the y of the screen position for top left corner of the text
+* @param	font_name		the name of the font to draw the text with
+* @param	font_size		how large the text should be drawn
+* @param	r	the red value of the color of the text to be drawn [0, 255]
+* @param	g	the green value of the color of the text to be drawn [0, 255]
+* @param	b	the blue value of the color of the text to be drawn [0, 255]
+* @param	a	the alpha value of the color of the text to be drawn [0, 255]				
 */
 void RendererData::DrawText(const std::string str_content, int x, int y, std::string font_name, int font_size, int r, int g, int b, int a)
 {
@@ -393,41 +400,41 @@ void RendererData::DrawText(const std::string str_content, int x, int y, std::st
 	text_draw_request_queue.push_back(obj);
 }
 
-/*
-Set the (x, y) position of the camera
-
-@param	x	the new x screen position of the camera
-@param	y	the new y screen position of the camera
+/**
+* Set the (x, y) position of the camera
+*
+* @param	x	the new x screen position of the camera
+* @param	y	the new y screen position of the camera
 */
 void RendererData::SetCameraPosition(const float x, const float y)
 {
 	current_cam_pos = { x, y };
 }
 
-/*
-Get the (x, y) position of the camera as a glm::vec2
-
-@returns	a glm::vec2 containing the camera's current position
+/**
+* Get the (x, y) position of the camera as a glm::vec2
+*
+* @returns	  a glm::vec2 containing the camera's current position
 */
 glm::vec2 RendererData::GetCameraPosition()
 {
 	return current_cam_pos;
 }
 
-/*
-Set the zoom factor of the camera
-
-@param	new_zoom_factor		the new zoom factor for the camera
+/**
+* Set the zoom factor of the camera
+*
+* @param	new_zoom_factor		the new zoom factor for the camera
 */
 void RendererData::SetCameraZoom(const float new_zoom_factor)
 {
 	zoom_factor = new_zoom_factor;
 }
 
-/*
-Gets the current zoom factor of the camera
-
-@returns	the current zoom factor of the camera
+/**
+* Gets the current zoom factor of the camera
+*
+* @returns	  the current zoom factor of the camera
 */
 float RendererData::GetCameraZoom()
 {

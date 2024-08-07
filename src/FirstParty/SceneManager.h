@@ -37,7 +37,7 @@ public:
     /**
      * Loads a new scene with the given name.
      *
-     * @param   scene_name  the name of the scene to be loaded
+     * @param   scene_name    the name of the scene to be loaded
     */
     static void ChangeScene(std::string scene_name);
     
@@ -50,8 +50,8 @@ public:
     /**
      * Creates a new actor from a template and adds it to the current scene, then returns a reference to it
      *
-     * @param   actor_template_name the name of the template to make a copy of in the scene
-     * @returns                     the index of the newly created actor
+     * @param   actor_template_name    the name of the template to make a copy of in the scene
+     * @returns                        the index of the newly created actor
     */
     static int Instantiate(std::string actor_template_name);
     
@@ -68,7 +68,7 @@ public:
     /**
      * Gets the name of the current scene
      *
-     * @returns             the name of the currently loaded scene
+     * @returns    the name of the currently loaded scene
     */
     static std::string GetSceneName();
     
@@ -76,24 +76,24 @@ public:
      * Finds an actor in the current scene that has the provided name
      * If multiple actors have this name this returns the one that was loaded first
      *
-     * @param   actor_name  the name of the actor that this function is trying to find
-     * @returns            the found actor
+     * @param   actor_name    the name of the actor that this function is trying to find
+     * @returns               the found actor
     */
     static Actor FindActorWithName(std::string actor_name);
     
     /**
      * Finds all actors in the current scene that have the provided name
      *
-     * @param   actor_name  the name of the actors that this function is trying to find
-     * @returns             a list of indexes that represent actors with the given name
+     * @param   actor_name    the name of the actors that this function is trying to find
+     * @returns               a list of indexes that represent actors with the given name
     */
     static sol::table FindAllActorsWithName(std::string actor_name);
     
     /**
      * Finds an actor with the given ID
      *
-     * @param   ID                     the ID of the actor that this function is trying to find
-     * @returns             the found actor
+     * @param   ID    the ID of the actor that this function is trying to find
+     * @returns       the found actor
     */
     static Actor FindActorByID(int ID);
 }; // Scene

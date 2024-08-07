@@ -129,10 +129,10 @@ void Scene::LoadNewScene()
                 EngineUtils::CombineJsonDocuments(lhs, rhs, combined_actor);
                 
                 // FOR TESTS: Output the combined JSON as a string
-//                            rapidjson::StringBuffer buffer;
-//                            rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-//                            combined_actor.Accept(writer);
-//                            std::cout << buffer.GetString() << std::endl;
+                // rapidjson::StringBuffer buffer;
+                // rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+                // combined_actor.Accept(writer);
+                // std::cout << buffer.GetString() << std::endl;
                 
                 actors.push_back(Actors::LoadActorWithJSON(combined_actor));
             }
@@ -149,8 +149,8 @@ void Scene::LoadNewScene()
 /**
  * Creates a new actor from a template and adds it to the current scene, then returns a reference to it
  *
- * @param   actor_template_name the name of the template to make a copy of in the scene
- * @returns                     the id of the newly created actor
+ * @param   actor_template_name    the name of the template to make a copy of in the scene
+ * @returns                        the id of the newly created actor
 */
 int Scene::Instantiate(std::string actor_template_name)
 {
@@ -180,7 +180,7 @@ void Scene::Destroy(Actor actor)
 /**
  * Gets the name of the current scene
  *
- * @returns             the name of the currently loaded scene
+ * @returns    the name of the currently loaded scene
 */
 std::string Scene::GetSceneName()
 {
@@ -191,8 +191,8 @@ std::string Scene::GetSceneName()
  * Finds an actor in the current scene that has the provided name
  * If multiple actors have this name this returns the one that was loaded first
  *
- * @param   actor_name  the name of the actor that this function is trying to find
- * @returns            the found actor
+ * @param   actor_name    the name of the actor that this function is trying to find
+ * @returns               the found actor
 */
 Actor Scene::FindActorWithName(std::string actor_name)
 {
@@ -216,8 +216,8 @@ Actor Scene::FindActorWithName(std::string actor_name)
 /**
  * Finds all actors in the current scene that have the provided name
  *
- * @param   actor_name  the name of the actors that this function is trying to find
- * @returns             a list of indexes that represent actors with the given name
+ * @param   actor_name    the name of the actors that this function is trying to find
+ * @returns               a list of indexes that represent actors with the given name
 */
 sol::table Scene::FindAllActorsWithName(std::string actor_name)
 {
@@ -246,8 +246,8 @@ sol::table Scene::FindAllActorsWithName(std::string actor_name)
 /**
  * Finds an actor with the given ID
  *
- * @param   ID                     the ID of the actor that this function is trying to find
- * @returns             the found actor
+ * @param   ID    the ID of the actor that this function is trying to find
+ * @returns       the found actor
 */
 Actor Scene::FindActorByID(int ID)
 {

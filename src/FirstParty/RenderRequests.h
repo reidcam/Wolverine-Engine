@@ -11,9 +11,9 @@
 #include <string>
 #include <vector>
 
-// Image Render Request
-// default values are commented next to their respective data structure
-
+/**
+ * Information for an image draw request
+ */
 struct ImageDrawRequest {
 	std::string image_name = "";
 	float x = 0.0f;
@@ -30,9 +30,9 @@ struct ImageDrawRequest {
 	int sorting_order = 0;
 }; // ImageDrawRequest
 
-// Text Render Request
-// default values are commented next to their respective data structure
-
+/**
+ * Information for a text draw request
+ */
 struct TextRenderRequest {
 	std::string text = "";
 	std::string font = "";
@@ -45,9 +45,9 @@ struct TextRenderRequest {
 	int y = 0;
 }; // TextRenderRequest
 
-// UI Render Request
-// default values are commented next to their respective data structure
-
+/**
+ * Information for a UI draw request
+ */
 struct UIRenderRequest {
 	std::string image_name = "";
 	int x = 0;
@@ -59,9 +59,9 @@ struct UIRenderRequest {
 	int sorting_order = 0;
 }; // UIRenderRequest
 
-// Pixel Render Request
-// default values are commented next to their respective data structure
-
+/**
+ * Information for a pixel draw request
+ */
 struct PixelDrawRequest
 {
 	int x = 0;

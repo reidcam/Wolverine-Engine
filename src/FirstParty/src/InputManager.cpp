@@ -8,6 +8,9 @@
 #include "InputManager.h"
 #include "Engine.h"
 
+/**
+ * Must be called before the first frame update, initializes all keycodes to INPUT\_STATE\_UP
+ */
 void Input::Init(){
     // initialize keyboard_states
     for(int code = SDL_SCANCODE_UNKNOWN; code < SDL_NUM_SCANCODES; code++){
@@ -15,6 +18,10 @@ void Input::Init(){
     }
 }
 
+/**
+ * Call every frame at the start of the event loop to process incoming inputs.
+ * @param    e    SDL_event taken from event queue
+ */
 void Input::ProcessEvent(const SDL_Event & e){
 
     if(e.type == SDL_KEYDOWN){
@@ -73,6 +80,9 @@ void Input::ProcessEvent(const SDL_Event & e){
     }
 }
 
+/**
+ * Call every frame at the end of the event loop (removes frame-specific conditions)
+ */
 void Input::LateUpdate(){
     for(const SDL_Scancode& scancode : just_became_down_scancodes){
         keyboard_states[scancode] = INPUT_STATE_DOWN;
@@ -96,10 +106,20 @@ void Input::LateUpdate(){
     mouse_scroll_this_frame = 0.0f;
 }
 
+/**
+ *  `GetKey` functions
+ * @param    keycode    SDL scancode code for key
+ * @returns             State of the keys (get, down, up)
+ */
 bool Input::GetKey(SDL_Scancode keycode){
     return keyboard_states[keycode] == INPUT_STATE_DOWN || keyboard_states[keycode] == INPUT_STATE_JUST_BECAME_DOWN;
 }
 
+/**
+ *  `GetKey` functions
+ * @param    keycode    SDL scancode code for key
+ * @returns             State of the keys (get, down, up)
+ */
 bool Input::GetKey_S(std::string key){
     if(__keycode_to_scancode.find(key) == __keycode_to_scancode.end()){
         return false;
@@ -107,10 +127,20 @@ bool Input::GetKey_S(std::string key){
     return GetKey(__keycode_to_scancode.at(key));
 }
 
+/**
+ *  `GetKey` functions
+ * @param    keycode    SDL scancode code for key
+ * @returns             State of the keys (get, down, up)
+ */
 bool Input::GetKeyDown(SDL_Scancode keycode){
     return keyboard_states[keycode] == INPUT_STATE_JUST_BECAME_DOWN;
 }
 
+/**
+ *  `GetKey` functions
+ * @param    keycode    SDL scancode code for key
+ * @returns             State of the keys (get, down, up)
+ */
 bool Input::GetKeyDown_S(std::string key){
     if(__keycode_to_scancode.find(key) == __keycode_to_scancode.end()){
         return false;
@@ -118,10 +148,20 @@ bool Input::GetKeyDown_S(std::string key){
     return GetKeyDown(__keycode_to_scancode.at(key));
 }
 
+/**
+ *  `GetKey` functions
+ * @param    keycode    SDL scancode code for key
+ * @returns             State of the keys (get, down, up)
+ */
 bool Input::GetKeyUp(SDL_Scancode keycode){
     return keyboard_states[keycode] == INPUT_STATE_JUST_BECAME_UP;
 }
 
+/**
+ *  `GetKey` functions
+ * @param    keycode    SDL scancode code for key
+ * @returns             State of the keys (get, down, up)
+ */
 bool Input::GetKeyUp_S(std::string key){
     if(__keycode_to_scancode.find(key) == __keycode_to_scancode.end()){
         return false;
@@ -129,10 +169,18 @@ bool Input::GetKeyUp_S(std::string key){
     return GetKeyUp(__keycode_to_scancode.at(key));
 }
 
+/**
+ * Returns mouse position in world space
+ */
 glm::vec2 Input::GetMousePosition(){
     return mouse_position;
 }
 
+/**
+ * Gets mouse buttons
+ * @param    button    1 = left click, 2 = right click, 3 = middle click
+ * @returns            State of the mouse buttons (get, down, up)
+ */
 bool Input::GetMouseButton(int button){
     if(button < 1 || button > 3){
         return false;
@@ -140,6 +188,11 @@ bool Input::GetMouseButton(int button){
     return mouse_states[button] == INPUT_STATE_DOWN || mouse_states[button] == INPUT_STATE_JUST_BECAME_DOWN;
 }
 
+/**
+ * Gets mouse buttons
+ * @param    button    1 = left click, 2 = right click, 3 = middle click
+ * @returns            State of the mouse buttons (get, down, up)
+ */
 bool Input::GetMouseButtonDown(int button){
     if(button < 1 || button > 3){
         return false;
@@ -147,6 +200,11 @@ bool Input::GetMouseButtonDown(int button){
     return mouse_states[button] == INPUT_STATE_JUST_BECAME_DOWN;
 }
 
+/**
+ * Gets mouse buttons
+ * @param    button    1 = left click, 2 = right click, 3 = middle click
+ * @returns            State of the mouse buttons (get, down, up)
+ */
 bool Input::GetMouseButtonUp(int button){
     if(button < 1 || button > 3){
         return false;
@@ -154,6 +212,9 @@ bool Input::GetMouseButtonUp(int button){
     return mouse_states[button] == INPUT_STATE_JUST_BECAME_UP;
 }
 
+/**
+ * @returns    the change in scroll of the mouse wheel
+ */
 float Input::GetMouseWheelDelta(){
     return mouse_scroll_this_frame;
 }
