@@ -476,3 +476,6 @@ sdl_user_input.txt
 # Allow everything in third party
 !src/ThirdParty/**
 **.DS_Store
+
+## Allow everything in the docs/html folder
+!docs/html/**
