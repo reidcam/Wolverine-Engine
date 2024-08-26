@@ -79,10 +79,6 @@ Each actor has a name and a components list. Each component in the list must hav
 It also must have a type which tells the engine the kind of component that it is. Then you can list all of the variable overrides that you want to preform on the component.
 (i.e. If the default speed of an enemy is 1 but you want this enemies speed to be 2, tell the engine that here.)
 
-If you want to take a look at the engine itself to make changes or just to understand it better, the documentation is under docs/html/index.html.
-The documentation was written to help people understand the engine to make changes to it better, but it could help you if your a developer and want to know how
-to make things in it as well.
-
 Be sure to format it correctly for JSON!
 
 ## Actor Templates
@@ -118,3 +114,48 @@ These functions are: "OnUpdate", "OnStart", and "OnDestroy" respectively. There 
 
 Here is an example of a basic player controller that allows the player to move an actor left and right. It shows how to format a component and some uses the input system along with the native Rigidbody component that is on the player.
 
+PlayerControllerExample = {
+
+	movement_speed = 1.0,
+
+	OnStart = function(self)
+		self.rb = Actors.GetComponentByType(self.actor.ID, "Rigidbody")
+	end,
+
+	OnUpdate = function(self)
+		local v = vec2:new(0.0, 0.0)
+		v.y = self.rb:GetVelocity().y
+
+		if Input.GetKey("right") then
+			print("right")
+            		v.x = 1 * self.movement_speed
+		elseif Input.GetKey("left") then
+			print("left")
+			v.x = -1 * self.movement_speed
+		end
+		
+		self.rb:SetVelocity(v)
+	end
+}
+
+The name of the file must be the same as the Lua table, so the file here must be named PlayerControllerExample.Lua
+
+## Building Your Game
+
+Wolverine Engine does not have a cross system build enviroment, so OSX computers can only build for OSX, and the same goes for Windows devices.
+
+In order to build your game you must have CMake version 3.30 or higher installed on your device. Then navigate to the root of the engine in your terminal and execute the following command prompt:
+
+cmake -S . -B build -G "BUILD SYSTEM"
+
+Replace BUILD SYSTEM with whatever generator you want to use. To check what your options are run cmake --help.
+Note that you MUST use the XCode generator on OSX and the VS generator on Windows.
+
+Once the build system is generated you may open the newly created project file and run build to finally finish building your game!
+NOTE that you should double check you are building the wolverine-engine-demo executable, after the game is done building you can rename it to whatever you want.
+
+## Documentation
+
+If you want to take a look at the engine itself to make changes or just to understand it better, the documentation is under docs/html/index.html.
+The documentation was written to help people understand the engine to make changes to it better, but it could help you if your a developer and want to know how
+to make things in it as well.
