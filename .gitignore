@@ -478,4 +478,4 @@ sdl_user_input.txt
 **.DS_Store
 
 ## Allow everything in the docs/html folder
-!docs/html/**
+!docs/**
