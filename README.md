@@ -156,6 +156,6 @@ NOTE that you should double check you are building the wolverine-engine-demo exe
 
 ## Documentation
 
-If you want to take a look at the engine itself to make changes or just to understand it better, the documentation is under docs/html/index.html.
+If you want to take a look at the engine itself to make changes or just to understand it better, the documentation can be found here: https://reidcam.github.io/Wolverine-Engine/.
 The documentation was written to help people understand the engine to make changes to it better, but it could help you if your a developer and want to know how
 to make things in it as well.
