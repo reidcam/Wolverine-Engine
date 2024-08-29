@@ -5,21 +5,21 @@ It is based heavily off of the Unity engine, and composition is the development 
 
 In order to create a game you must have a resources folder in the root of the engine. It should be structured like this:
 
-.resources
-├── actor_templates
-│   └── Enemy.template
-├── audio
-│   └── GameMusic.mp3
-├── component_types
-│   └── GameScript.lua
-├── fonts
-│   └── BasicFont.ttf
-├── images
-│   └── GameImage.png
-├── scenes
-│    └── basic.scene
-├── rendering.config
-└── game.config
+	.resources
+	├── actor_templates
+	│   └── Enemy.template
+	├── audio
+	│   └── GameMusic.mp3
+	├── component_types
+	│   └── GameScript.lua
+	├── fonts
+	│   └── BasicFont.ttf
+	├── images
+	│   └── GameImage.png
+	├── scenes
+	│    └── basic.scene
+	├── rendering.config
+	└── game.config
 
 All of your resources (images, audio, fonts, components, actor templates, and scenes) need to be stored in the respective folders for the engine to recognize them.
 
@@ -41,7 +41,7 @@ initial_scene: the first scene that will be loaded when your game is opened
 ## Scenes
 
 The scenes should be structured like so:
-{
+
 	"actors": [
 		{
 			"name": "Player",
@@ -54,7 +54,7 @@ The scenes should be structured like so:
 					"type": "SpriteRenderer",
 					"sprite": "grass_platform_small"
 				},
-    				"3": {
+				"3": {
 					"type": "PlayerControllerExample"
 				}
 			}
@@ -62,17 +62,17 @@ The scenes should be structured like so:
 		{
 			"name": "Enemy",
 			"components": {
-				"1": {
-					"type": "Rigidbody"
-				},
-				"2": {
-					"type": "EnemyController",
-					"speed": 2
-				}
+					"1": {
+						"type": "Rigidbody"
+					},
+					"2": {
+						"type": "EnemyController",
+						"speed": 2
+					}
 			}
 		}
 	]
-}
+
 
 As you can see, they are functionally just a list of all the actors in the scene.
 Each actor has a name and a components list. Each component in the list must have a key which CAN be anything but is 1 or 2 in our example.
@@ -87,7 +87,7 @@ Actor templates function the same way as "prefabs" in Unity. They are basically 
 easily make multiple copies of it at runtime.
 
 A template for our enemy from the above scene would look like this:
-{
+
 	"name": "Enemy",
 	"components": {
 		"1": {
@@ -98,7 +98,7 @@ A template for our enemy from the above scene would look like this:
 			"speed": 2
 		}
 	}
-}
+
 
 Make sure to name the file Enemy.template and put it in the actor_templates folder so the engine can find it.
 
