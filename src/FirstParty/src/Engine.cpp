@@ -21,6 +21,12 @@
 #include "Engine.h"
 #include "EngineUtils.h"
 
+#ifndef NDEBUG
+#include "imgui.h"
+#include "backends/imgui_impl_sdl2.h"
+#include "backends/imgui_impl_sdlrenderer2.h"
+#endif
+
 bool EngineData::quit = false;   // True if the game should be quit out of.
 
 //-------------------------------------------------------
@@ -69,6 +75,23 @@ void Initialize()
     }
     
     RendererData::Init(EngineData::game_title);
+    
+#ifndef NDEBUG
+    // Set up imgui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;   // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;    // Enable Gamepad Controls
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;       // Enable Docking
+    
+    // Set up imgui style
+    ImGui::StyleColorsDark();
+    
+    // Set up platfomr/renderer backends
+    ImGui_ImplSDL2_InitForSDLRenderer(RendererData::GetWindow(), RendererData::GetRenderer());
+    ImGui_ImplSDLRenderer2_Init(RendererData::GetRenderer());
+#endif
     
     // Load Assets
     // Do this here because the renderer needs to be initialized before these assets can be loaded.
@@ -137,6 +160,11 @@ int GameLoop()
     SDL_Event event;
     while(SDL_PollEvent(&event))
     {
+#ifndef NDEBUG
+        // Pass events to imgui
+        ImGui_ImplSDL2_ProcessEvent(&event);
+#endif
+        
         Input::ProcessEvent(event);
         if (event.type == SDL_QUIT)
         {
