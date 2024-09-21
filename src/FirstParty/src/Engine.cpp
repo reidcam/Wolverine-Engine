@@ -177,7 +177,6 @@ int GameLoop()
     Scene::UpdateActors();
     
     // Box2D Physics
-
     if (PhysicsWorld::world_initialized) {
         InitializeCollisions();
         PhysicsWorld::AdvanceWorld();
@@ -190,6 +189,17 @@ int GameLoop()
     RendererData::RenderAndClearAllPixels();
     RendererData::RenderAndClearAllLines();
     RendererData::RenderAndClearAllUI();
+    
+#ifndef NDEBUG
+    ImGui_ImplSDLRenderer2_NewFrame();
+    ImGui_ImplSDL2_NewFrame();
+    ImGui::NewFrame();
+    
+    bool t = true;
+    ImGui::ShowDemoWindow(&t);
+    ImGui::Render();
+    ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), RendererData::GetRenderer());
+#endif
     
     PhysicsWorld::AdvanceWorld();
     
