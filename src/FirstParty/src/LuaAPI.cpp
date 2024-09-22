@@ -7,6 +7,8 @@
 
 #include "LuaAPI.h"
 
+#include "Engine.h"
+
 /**
 * Exposes all of the API functions to Sol to be used in Lua
 */
@@ -295,7 +297,9 @@ void LuaAPI::DeleteLuaTable(std::shared_ptr<sol::table> table)
 */
 void LuaAPI::Log(const std::string& message)
 {
+#ifndef NDEBUG
 	std::cout << message + "\n";
+#endif
 }
 
 /**
@@ -314,7 +318,7 @@ void LuaAPI::LogError(const std::string& message)
 */
 void LuaAPI::Quit()
 {
-	exit(0);
+    EngineData::quit = true;
 }
 
 /**

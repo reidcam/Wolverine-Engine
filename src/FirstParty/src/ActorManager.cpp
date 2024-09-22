@@ -669,3 +669,26 @@ sol::table Actors::GetComponentByKey(int actor_id, std::string key)
     // Return null if the component cannot be found.
     return null;
 }
+
+/**
+ * Clears all of the components and actors from this manager
+ * Used to do a hard reset of invincible actors and components before loading a new scene
+ * NOTE: DO NOT EXPOSE TO LUA! This function is primarily meant to reset the game for the editor
+*/
+void Actors::ResetManager()
+{
+    num_total_actors = 0;
+    num_loaded_actors = 0;
+    
+    id_to_index.clear();
+
+    names.clear();
+    IDs.clear();
+    actor_enabled.clear();
+    
+    components.clear();
+    components_to_init.clear();
+    components_to_delete = {};
+    components_to_update.clear();
+    components_to_update_late.clear();
+}

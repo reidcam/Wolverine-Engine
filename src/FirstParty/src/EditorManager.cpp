@@ -10,6 +10,10 @@
 #include <stdio.h>
 
 #include "EditorManager.h"
+#include "SceneManager.h"
+#include "PhysicsWorld.h"
+
+bool EditorManager::editor_mode = true;
 
 /**
 * Initializes the editor
@@ -52,6 +56,45 @@ void EditorManager::RenderEditor()
     
     bool t = true;
     ImGui::ShowDemoWindow(&t);
+    
+    ImGui::Begin("Editor Mode");
+    if (ImGui::Button("Editor Toggle")) { ToggleEditorMode(); }
+    if (ImGui::Button("Reset"))
+    {
+        // TOOD: Hot reload all modified scenes and scripts
+        editor_mode = true;
+        PhysicsWorld::ResetWorld();
+        Scene::ResetManager();
+    }
+    ImGui::End();
+    
     ImGui::Render();
     ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), RendererData::GetRenderer());
+}
+
+/**
+* Cleans up the imgui context when the game is closed
+*/
+void EditorManager::Cleanup()
+{
+    ImGui_ImplSDLRenderer2_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
+}
+
+/**
+* If editor mode is on, turn it off, if it is off, turn it on
+*/
+void EditorManager::ToggleEditorMode()
+{
+    if (editor_mode) { editor_mode = false; }
+    else { editor_mode = true; }
+}
+
+/**
+* Returns the editor mode
+*/
+bool EditorManager::GetEditorMode()
+{
+    return editor_mode;
 }

@@ -23,9 +23,6 @@
 
 #ifndef NDEBUG
 #include "EditorManager.h"
-#include "imgui.h"
-#include "backends/imgui_impl_sdl2.h"
-#include "backends/imgui_impl_sdlrenderer2.h"
 #endif
 
 bool EngineData::quit = false;   // True if the game should be quit out of.
@@ -78,6 +75,7 @@ void Initialize()
     RendererData::Init(EngineData::game_title);
     
 #ifndef NDEBUG
+    // Initializes imgui and the editor
     EditorManager::Init();
 #endif
     
@@ -118,6 +116,7 @@ bool CheckGameConfig()
     }
     if(game_config.HasMember("initial_scene")){
         std::string initial_scene = game_config["initial_scene"].GetString();
+        Scene::initial_scene_name = initial_scene;
         Scene::new_scene_name = initial_scene;
         Scene::LoadNewScene();
     }
@@ -137,10 +136,25 @@ bool CheckGameConfig()
 */
 int GameLoop()
 {
-    LuaAPI::IncrementFrameCounter();
+    // Used to pause certain engine functions if editor mode is active
+    bool editor_mode = false;
+#ifndef NDEBUG
+    editor_mode = EditorManager::GetEditorMode();
+#endif
+    
+    if (!editor_mode)
+    {
+        LuaAPI::IncrementFrameCounter();
+    }
 
     if (EngineData::quit)
     {
+#ifndef NDEBUG
+        // Cleans up the imgui context
+        EditorManager::Cleanup();
+#endif
+        // Cleans up the SDL widnow and renderer
+        RendererData::Cleanup();
         return 1;
     }
     
@@ -162,13 +176,16 @@ int GameLoop()
     
     SDL_RenderClear(RendererData::GetRenderer()); // clear the renderer with the render clear color
     
-    Scene::UpdateActors();
-    
-    // Box2D Physics
-    if (PhysicsWorld::world_initialized) {
-        InitializeCollisions();
-        PhysicsWorld::AdvanceWorld();
-        PhysicsWorld::world->DebugDraw();
+    if (!editor_mode)
+    {
+        Scene::UpdateActors();
+        
+        // Box2D Physics
+        if (PhysicsWorld::world_initialized) {
+            InitializeCollisions();
+            PhysicsWorld::AdvanceWorld();
+            PhysicsWorld::world->DebugDraw();
+        }
     }
 
     // RENDER STUFF HERE
@@ -181,8 +198,6 @@ int GameLoop()
 #ifndef NDEBUG
     EditorManager::RenderEditor();
 #endif
-    
-    PhysicsWorld::AdvanceWorld();
     
     SDL_RenderPresent(RendererData::GetRenderer()); // present the frame into the window
     

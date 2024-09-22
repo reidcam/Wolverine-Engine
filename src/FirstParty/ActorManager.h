@@ -218,6 +218,12 @@ public:
     */
     static sol::table GetComponentByKey(int actor_id, std::string key);
     
+    /**
+     * Clears all of the components and actors from this manager
+     * Used to do a hard reset of invincible actors and components before loading a new scene
+    */
+    static void ResetManager();
+    
 }; // Actors
 
 #endif /* ActorManager_h */

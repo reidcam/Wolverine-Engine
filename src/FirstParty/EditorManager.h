@@ -19,6 +19,7 @@
 class EditorManager
 {
 private:
+    static bool editor_mode;
 public:
     /**
     * Initializes the editor
@@ -27,6 +28,7 @@ public:
     
     /**
     * Passes SDL input events to imgui
+    *
     * @param    event   the SDL event to process
     */
     static void ImGuiProcessSDLEvent(const SDL_Event* event);
@@ -35,6 +37,21 @@ public:
      * Renders all of the editor windows
      */
     static void RenderEditor();
+    
+    /**
+    * Cleans up the imgui context when the game is closed
+    */
+    static void Cleanup();
+    
+    /**
+    * If editor mode is on, turn it off, if it is off, turn it on
+    */
+    static void ToggleEditorMode();
+    
+    /**
+    * Returns the editor mode
+    */
+    static bool GetEditorMode();
 };
 
 #endif /* EditorManager.h */

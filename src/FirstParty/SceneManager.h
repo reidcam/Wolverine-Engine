@@ -21,6 +21,7 @@ private:
     static std::vector<int> actors; // A list of active actors indexes
     static std::vector<int> dead_actors; // A list of actors that need to be deleted this frame
 public:
+    static std::string initial_scene_name; // The name of the first scene to be loaded in the game
     static std::string new_scene_name; // The name of the new scene we're loading into
     static bool load_new_scene; // True if we want to load a new scene at the end of this frame
     //-------------------------------------------------------
@@ -96,6 +97,14 @@ public:
      * @returns       the found actor
     */
     static Actor FindActorByID(int ID);
+    
+    /**
+     * Clears all of the data from this manager
+     * NOTE: DO NOT EXPOSE TO LUA! This function is primarily meant to reset the game for the editor
+     * Could cause unintended behavior if used improperly
+    */
+    static void ResetManager();
+    
 }; // Scene
 
 #endif /* SceneManager_h */
