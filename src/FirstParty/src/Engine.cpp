@@ -22,6 +22,7 @@
 #include "EngineUtils.h"
 
 #ifndef NDEBUG
+#include "EditorManager.h"
 #include "imgui.h"
 #include "backends/imgui_impl_sdl2.h"
 #include "backends/imgui_impl_sdlrenderer2.h"
@@ -77,20 +78,7 @@ void Initialize()
     RendererData::Init(EngineData::game_title);
     
 #ifndef NDEBUG
-    // Set up imgui context
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;   // Enable Keyboard Controls
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;    // Enable Gamepad Controls
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;       // Enable Docking
-    
-    // Set up imgui style
-    ImGui::StyleColorsDark();
-    
-    // Set up platfomr/renderer backends
-    ImGui_ImplSDL2_InitForSDLRenderer(RendererData::GetWindow(), RendererData::GetRenderer());
-    ImGui_ImplSDLRenderer2_Init(RendererData::GetRenderer());
+    EditorManager::Init();
 #endif
     
     // Load Assets
@@ -161,8 +149,8 @@ int GameLoop()
     while(SDL_PollEvent(&event))
     {
 #ifndef NDEBUG
-        // Pass events to imgui
-        ImGui_ImplSDL2_ProcessEvent(&event);
+        // Pass events to imgui for editor
+        EditorManager::ImGuiProcessSDLEvent(&event);
 #endif
         
         Input::ProcessEvent(event);
@@ -191,14 +179,7 @@ int GameLoop()
     RendererData::RenderAndClearAllUI();
     
 #ifndef NDEBUG
-    ImGui_ImplSDLRenderer2_NewFrame();
-    ImGui_ImplSDL2_NewFrame();
-    ImGui::NewFrame();
-    
-    bool t = true;
-    ImGui::ShowDemoWindow(&t);
-    ImGui::Render();
-    ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), RendererData::GetRenderer());
+    EditorManager::RenderEditor();
 #endif
     
     PhysicsWorld::AdvanceWorld();
