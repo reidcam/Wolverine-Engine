@@ -309,6 +309,9 @@ void Actors::SetActorEnabled(int actor_id, bool is_enabled)
     if (actor_index == -1) { return; }
     
     actor_enabled[actor_index] = is_enabled;
+    
+    // TODO: Enable or disable the Rigidbody Component to stop the collider from moving even while disabled
+    // Same for when the rigidbody component is manually disabled.
 }
 
 //-------------------------------------------------------

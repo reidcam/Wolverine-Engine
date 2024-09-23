@@ -238,6 +238,11 @@ void EditorManager::HierarchyView()
                     std::string parameter_name = key.as<std::string>();
                     const char* const_param_name = &parameter_name[0];
                     
+                    // Skip the parameters that exist for engine use: key, actor, type
+                    if (parameter_name == "key" || parameter_name == "type" || parameter_name == "actor") { continue; }
+                    
+                    // Skip the parameters 
+                    
                     // Invisible Parameter Name
                     // ## allows us to have a unique ImGui ID for this item without showing the ID in the UI
                     std::string invisible_id = "##" + key.as<std::string>();
@@ -251,8 +256,11 @@ void EditorManager::HierarchyView()
                     if (value.get_type() == sol::type::string)
                     {
                         std::string parameter_value = value.as<std::string>();
-                        const char* const_param_value = &parameter_value[0];
-                        ImGui::Text(const_param_value);
+                        char* const_param_value = &parameter_value[0];
+                        if (ImGui::InputText(const_invisible_id, const_param_value, parameter_value.size()))
+                        {
+                            component[const_param_name] = const_param_value;
+                        }
                     }
                     if (value.get_type() == sol::type::number)
                     {
