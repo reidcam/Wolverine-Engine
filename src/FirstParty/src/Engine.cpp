@@ -136,6 +136,15 @@ bool CheckGameConfig()
 */
 int GameLoop()
 {
+#ifndef NDEBUG
+    // Esures that modes are only switched at the start of any given frame
+    if (EditorManager::trigger_editor_mode_toggle)
+    {
+        EditorManager::ToggleEditorMode();
+        EditorManager::trigger_editor_mode_toggle = false;
+    }
+#endif
+    
     // Used to pause certain engine functions if editor mode is active
     bool editor_mode = false;
 #ifndef NDEBUG
@@ -187,6 +196,12 @@ int GameLoop()
             PhysicsWorld::world->DebugDraw();
         }
     }
+#ifndef NDEBUG
+    else
+    {
+        EditorManager::EditorUpdate();
+    }
+#endif
 
     // RENDER STUFF HERE
     RendererData::RenderAndClearAllImageRequests();

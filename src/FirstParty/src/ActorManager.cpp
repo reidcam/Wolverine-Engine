@@ -670,6 +670,9 @@ sol::table Actors::GetComponentByKey(int actor_id, std::string key)
     return null;
 }
 
+//-------------------------------------------------------
+// Editor Tools
+
 /**
  * Clears all of the components and actors from this manager
  * Used to do a hard reset of invincible actors and components before loading a new scene
@@ -691,4 +694,122 @@ void Actors::ResetManager()
     components_to_delete = {};
     components_to_update.clear();
     components_to_update_late.clear();
+}
+
+/**
+ * Loops through all the components and ONLY runs onupdate if its type is needed for the editor.
+ * This is primarily used to trigger SpriteRenderers and other visual components for the EDITOR in editor mode.
+ *
+ *@param    editor_components   a list of all the components that are needed for editor mode to function
+ */
+void Actors::EditorUpdateComponents(std::unordered_set<std::string> editor_components)
+{
+    std::vector<std::shared_ptr<sol::table>> living_components; // The "Update" list without any of the dead components
+    
+    for (auto& component : components_to_update)
+    {
+        // List of components that are needed in editor mode
+        if (editor_components.find((string)(*component)["type"]) == editor_components.end()) { continue; }
+        
+        // If this component is dead, skip it
+        if ((*component)["REMOVED_FROM_ACTOR"] == true)
+        {
+            continue;
+        }
+        
+        int actor_index = GetIndex((*component)["actor"]["ID"]);
+        
+        // The component is alive! add it to living components
+        living_components.push_back(component);
+    
+        // Skip this component if the actor or component aren't enabled
+        if (!actor_enabled[actor_index] || (*component)["enabled"] == false)
+        {
+            continue;
+        }
+        
+        // Call "OnUpdate"
+        try
+        {
+            sol::function OnUpdate = (*component)["OnUpdate"];
+            if (OnUpdate.valid())
+            {
+                OnUpdate(*component);
+            }
+        }
+        catch(const std::exception& e)
+        {
+            std::string errorMessage = e.what();
+#ifdef _WIN32
+            std::replace(errorMessage.begin(), errorMessage.end(), '\\', '/');
+#endif
+            std::cout << "\033[31m" << names[actor_index] << " : " << errorMessage << "\033[0m" << std::endl;
+        }
+    }
+    
+    components_to_update.clear();
+    components_to_update = living_components;
+}
+
+/**
+ * Loops through all the components and ONLY runs onstart if its type is needed for the editor.
+ * This is primarily used to prepare SpriteRenderers and other visual components for the EDITOR in editor mode.
+ *
+ *@param    editor_components   a list of all the components that are needed for editor mode to function
+ */
+void Actors::EditorStartComponents(std::unordered_set<std::string> editor_components)
+{
+    // Stores the components that didn't get processed this frame, so we can re-add
+    // them to "components_to_init" when we've finished processing the others
+    std::vector<std::shared_ptr<sol::table>> not_processed;
+    
+    for (auto& component : components_to_init)
+    {
+        // List of components that are needed in editor mode
+        if (editor_components.find((string)(*component)["type"]) == editor_components.end()) { continue; }
+        
+        int actor_index = GetIndex((*component)["actor"]["ID"]);
+        
+        // If this component has been removed, skip it
+        if ((*component)["REMOVED_FROM_ACTOR"] == true)
+        {
+            continue;
+        }
+        
+        // Skip this component if the actor or component aren't enabled
+        if (!actor_enabled[actor_index] || (*component)["enabled"] == false)
+        {
+            not_processed.push_back(component);
+            continue;
+        }
+        
+        // Add to the appropriate lifecycle functions list so that they will start being called by the engine.
+        sol::function OnUpdate = (*component)["OnUpdate"];
+        if (OnUpdate.valid()) { components_to_update.push_back(component); }
+        sol::function OnLateUpdate = (*component)["OnLateUpdate"];
+        if (OnLateUpdate.valid()) { components_to_update_late.push_back(component); }
+        
+        // Call "OnStart" if it exists for this component
+        try
+        {
+            // OnStart is called for each component the frame they are loaded into the game
+            sol::function OnStart = (*component)["OnStart"];
+            if (OnStart.valid())
+            {
+                OnStart(*component);
+            }
+        }
+        catch(const std::exception& e)
+        {
+            std::string errorMessage = e.what();
+#ifdef _WIN32
+            std::replace(errorMessage.begin(), errorMessage.end(), '\\', '/');
+#endif
+            std::cout << "\033[31m" << names[actor_index] << " : " << errorMessage << "\033[0m" << std::endl;
+        }
+    }
+    
+    // Remove all the processed components from the list
+    components_to_init.clear();
+    components_to_init = not_processed;
 }

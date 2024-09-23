@@ -10,6 +10,9 @@
 #ifndef EditorManager_h
 #define EditorManager_h
 
+#include <unordered_set>
+#include <string>
+
 #include "Renderer.h"
 
 #include "imgui.h"
@@ -20,7 +23,14 @@ class EditorManager
 {
 private:
     static bool editor_mode;
+    
+    inline static std::unordered_set<std::string> editor_components_list
+    {
+      "SpriteRenderer",
+    };
 public:
+    static bool trigger_editor_mode_toggle;
+    
     /**
     * Initializes the editor
     */
@@ -37,6 +47,12 @@ public:
      * Renders all of the editor windows
      */
     static void RenderEditor();
+    
+    /**
+     * Updates all of the needed aspects of the engine
+     * Run once every frame while in editor mode ONLY
+     */
+    static void EditorUpdate();
     
     /**
     * Cleans up the imgui context when the game is closed

@@ -12,6 +12,7 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <queue>
 
 #include "TemplateDB.h"
@@ -156,7 +157,7 @@ public:
     static void DestroyActor(int actor_id);
     
     //-------------------------------------------------------
-    // Components.
+    // Components
     
     /**
      * Removes a component from an actor and marks it for deletion
@@ -218,11 +219,30 @@ public:
     */
     static sol::table GetComponentByKey(int actor_id, std::string key);
     
+    //-------------------------------------------------------
+    // Editor Tools
+    
     /**
      * Clears all of the components and actors from this manager
      * Used to do a hard reset of invincible actors and components before loading a new scene
     */
     static void ResetManager();
+    
+    /**
+     * Loops through all the components and ONLY runs onupdate if its type is needed for the editor.
+     * This is primarily used to trigger SpriteRenderers and other visual components for the EDITOR in editor mode.
+     *
+     *@param    editor_components   a list of all the components that are needed for editor mode to function
+     */
+    static void EditorUpdateComponents(std::unordered_set<std::string> editor_components);
+    
+    /**
+     * Loops through all the components and ONLY runs onstart if its type is needed for the editor.
+     * This is primarily used to prepare SpriteRenderers and other visual components for the EDITOR in editor mode.
+     *
+     *@param    editor_components   a list of all the components that are needed for editor mode to function
+     */
+    static void EditorStartComponents(std::unordered_set<std::string> editor_components);
     
 }; // Actors
 

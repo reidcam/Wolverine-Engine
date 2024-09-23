@@ -14,6 +14,7 @@
 #include "PhysicsWorld.h"
 
 bool EditorManager::editor_mode = true;
+bool EditorManager::trigger_editor_mode_toggle = false;
 
 /**
 * Initializes the editor
@@ -58,7 +59,14 @@ void EditorManager::RenderEditor()
     ImGui::ShowDemoWindow(&t);
     
     ImGui::Begin("Editor Mode");
-    if (ImGui::Button("Editor Toggle")) { ToggleEditorMode(); }
+    if (ImGui::Button("Play"))
+    {
+        // TOOD: Hot reload all modified scenes and scripts
+        editor_mode = false;
+        PhysicsWorld::ResetWorld();
+        Scene::ResetManager();
+    }
+    if (ImGui::Button("Pause")) { trigger_editor_mode_toggle = true; }
     if (ImGui::Button("Reset"))
     {
         // TOOD: Hot reload all modified scenes and scripts
@@ -70,6 +78,16 @@ void EditorManager::RenderEditor()
     
     ImGui::Render();
     ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), RendererData::GetRenderer());
+}
+
+/**
+ * Updates all of the needed aspects of the engine
+ * Run once every frame while in editor mode ONLY
+ */
+void EditorManager::EditorUpdate()
+{
+    Actors::EditorStartComponents(editor_components_list);
+    Actors::EditorUpdateComponents(editor_components_list);
 }
 
 /**
