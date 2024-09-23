@@ -232,7 +232,9 @@ public:
      * Loops through all the components and ONLY runs onupdate if its type is needed for the editor.
      * This is primarily used to trigger SpriteRenderers and other visual components for the EDITOR in editor mode.
      *
-     *@param    editor_components   a list of all the components that are needed for editor mode to function
+     * Not very DRY I know...
+     *
+     * @param    editor_components   a list of all the components that are needed for editor mode to function
      */
     static void EditorUpdateComponents(std::unordered_set<std::string> editor_components);
     
@@ -240,7 +242,9 @@ public:
      * Loops through all the components and ONLY runs onstart if its type is needed for the editor.
      * This is primarily used to prepare SpriteRenderers and other visual components for the EDITOR in editor mode.
      *
-     *@param    editor_components   a list of all the components that are needed for editor mode to function
+     * Not very DRY I know...
+     *
+     * @param    editor_components   a list of all the components that are needed for editor mode to function
      */
     static void EditorStartComponents(std::unordered_set<std::string> editor_components);
     

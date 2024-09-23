@@ -16,6 +16,7 @@
 bool EditorManager::editor_mode = true; // True when the game is paused and edits can be made
 bool EditorManager::play_mode = false; // True after the play button is pressed until the stop button is pressed. No edits can be made in this mode.
 bool EditorManager::trigger_editor_mode_toggle = false;
+int EditorManager::selected_actor_id = -1; // The actor ID of the selected actor in the hierarchy view.
 
 /**
 * Initializes the editor
@@ -56,62 +57,9 @@ void EditorManager::RenderEditor()
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
     
-//    bool t = true;
-//    ImGui::ShowDemoWindow(&t);
-    bool display_window = true;
-    ImGuiWindowFlags flags = 0;
-    flags |= ImGuiWindowFlags_NoMove;
-    flags |= ImGuiWindowFlags_NoResize;
-    flags |= ImGuiWindowFlags_NoTitleBar;
-    
-    int window_w = 0;
-    int window_h = 0;
-    SDL_GetWindowSize(RendererData::GetWindow(), &window_w, &window_h);
-    
-    int imgui_window_w = 110.0f;
-    int imgui_window_h = 40.0f;
-    ImGui::SetNextWindowSize(ImVec2(imgui_window_w, imgui_window_h));
-    
-    int imgui_window_x = (window_w / 2) - (imgui_window_w / 2);
-    int imgui_window_y = 0.0f;
-    ImGui::SetNextWindowPos(ImVec2(imgui_window_x, imgui_window_y));
-    
-    // Alows developers to activate the play modes and editor modes
-    ImGui::Begin("Editor Mode", &display_window, flags);
-    if (!play_mode)
-    {
-        if (ImGui::Button("Play"))
-        {
-            // TOOD: Hot reload all modified scenes and scripts
-            editor_mode = false;
-            play_mode = true;
-            PhysicsWorld::ResetWorld();
-            Scene::ResetManager();
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("Pause") && play_mode) {trigger_editor_mode_toggle = true;}
-    }
-    else
-    {
-        if (ImGui::Button("Stop"))
-        {
-            // TOOD: Hot reload all modified scenes and scripts
-            editor_mode = true;
-            play_mode = false;
-            PhysicsWorld::ResetWorld();
-            Scene::ResetManager();
-        }
-        ImGui::SameLine();
-        if (editor_mode)
-        {
-            if (ImGui::Button("Unpause")) { trigger_editor_mode_toggle = true; }
-        }
-        else
-        {
-            if (ImGui::Button("Pause")) { trigger_editor_mode_toggle = true; }
-        }
-    }
-    ImGui::End();
+    // Create all of the ImGui windows
+    ModeSwitchButtons();
+    HierarchyView();
     
     ImGui::Render();
     ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), RendererData::GetRenderer());
@@ -152,4 +100,125 @@ void EditorManager::ToggleEditorMode()
 bool EditorManager::GetEditorMode()
 {
     return editor_mode;
+}
+
+/**
+ * Creates the mode switching buttons
+ */
+void EditorManager::ModeSwitchButtons()
+{
+    // Flags
+    bool* display_window = new bool(true);
+    ImGuiWindowFlags flags = 0;
+    flags |= ImGuiWindowFlags_NoMove;
+    flags |= ImGuiWindowFlags_NoResize;
+    flags |= ImGuiWindowFlags_NoTitleBar;
+    
+    int window_w = 0;
+    int window_h = 0;
+    SDL_GetWindowSize(RendererData::GetWindow(), &window_w, &window_h);
+    
+    // Window Size
+    int imgui_window_w = 110.0f;
+    int imgui_window_h = 40.0f;
+    ImGui::SetNextWindowSize(ImVec2(imgui_window_w, imgui_window_h));
+    
+    // Window Position
+    int imgui_window_x = (window_w / 2) - (imgui_window_w / 2);
+    int imgui_window_y = 0.0f;
+    ImGui::SetNextWindowPos(ImVec2(imgui_window_x, imgui_window_y));
+    
+    // Alows developers to activate the play modes and editor modes
+    ImGui::Begin("Editor Mode", display_window, flags);
+    if (!play_mode)
+    {
+        if (ImGui::Button("Play"))
+        {
+            // TOOD: Hot reload all modified scenes and scripts
+            editor_mode = false;
+            play_mode = true;
+            PhysicsWorld::ResetWorld();
+            Scene::ResetManager();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Pause") && play_mode) {trigger_editor_mode_toggle = true;}
+    }
+    else
+    {
+        if (ImGui::Button("Stop"))
+        {
+            // TOOD: Hot reload all modified scenes and scripts
+            editor_mode = true;
+            play_mode = false;
+            PhysicsWorld::ResetWorld();
+            Scene::ResetManager();
+        }
+        ImGui::SameLine();
+        if (editor_mode)
+        {
+            if (ImGui::Button("Unpause")) { trigger_editor_mode_toggle = true; }
+        }
+        else
+        {
+            if (ImGui::Button("Pause")) { trigger_editor_mode_toggle = true; }
+        }
+    }
+    ImGui::End();
+    delete display_window;
+}
+
+/**
+ * Creates the actor hierarchy view
+ */
+void EditorManager::HierarchyView()
+{
+    // Flags
+    bool* display_window = NULL;
+    ImGuiWindowFlags flags = 0;
+    flags |= ImGuiWindowFlags_NoMove;
+    flags |= ImGuiWindowFlags_NoResize;
+    
+    int window_w = 0;
+    int window_h = 0;
+    SDL_GetWindowSize(RendererData::GetWindow(), &window_w, &window_h);
+    
+    // Window Size
+    int imgui_window_w = 200.0f;
+    int imgui_window_h = window_h;
+    ImGui::SetNextWindowSize(ImVec2(imgui_window_w, imgui_window_h));
+    
+    // Window Position
+    int imgui_window_x = 0.0f;
+    int imgui_window_y = 0.0f;
+    ImGui::SetNextWindowPos(ImVec2(imgui_window_x, imgui_window_y));
+    
+    // Alows developers to click on specifc actors and components to change values
+    ImGui::Begin("Hierarchy View", display_window, flags);
+    
+    for (int actor_id : Scene::GetAllActorsInScene())
+    {
+        std::string actor_name = Actors::GetName(actor_id);
+        const char* const_name = &actor_name[0];
+        
+        // If an actor is clicked display its components
+        if (ImGui::Button(const_name)) { selected_actor_id = actor_id; };
+    }
+    
+    int number_of_components = Actors::GetNumberOfComponents(selected_actor_id);
+    for (int i = 0; i < number_of_components; i++)
+    {
+        sol::table component = Actors::GetComponentByIndex(selected_actor_id, i);
+        
+        if (component.valid())
+        {
+            std::string component_type = (string)component["type"];
+            const char* const_type = &component_type[0];
+            
+            // If a component is clicked display its properties
+            if (ImGui::CollapsingHeader(const_type)) {}
+        }
+    }
+    
+    ImGui::End();
+    delete display_window;
 }

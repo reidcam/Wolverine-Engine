@@ -27,6 +27,8 @@ private:
     static bool editor_mode; // True when the game is paused.
     static bool play_mode; // True after the play button is pressed until the stop button is pressed. No edits can be made in this mode.
     
+    static int selected_actor_id; // The actor ID of the selected actor in the hierarchy view.
+    
     inline static std::unordered_set<std::string> editor_components_list
     {
       "SpriteRenderer",
@@ -71,6 +73,16 @@ public:
     * Returns the editor mode
     */
     static bool GetEditorMode();
+    
+    /**
+     * Creates the mode switching buttons
+     */
+    static void ModeSwitchButtons();
+    
+    /**
+     * Creates the actor hierarchy view
+     */
+    static void HierarchyView();
 };
 
 #endif /* EditorManager.h */

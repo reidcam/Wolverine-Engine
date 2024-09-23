@@ -589,7 +589,10 @@ sol::table Actors::GetComponentByType(int actor_id, std::string type)
 */
 int Actors::GetNumberOfComponents(int actor_id)
 {
-    return components[GetIndex(actor_id)].size();
+    int actor_index = GetIndex(actor_id);
+    if (actor_index == -1) { return 0; }
+    
+    return components[actor_index].size();
 }
 
 /**
@@ -601,7 +604,13 @@ int Actors::GetNumberOfComponents(int actor_id)
 */
 sol::table Actors::GetComponentByIndex(int actor_id, int component_index)
 {
-    return *components[GetIndex(actor_id)][component_index];
+    sol::table null; // An empty table, to be returned if the component(s) cannot be found
+    
+    int actor_index = GetIndex(actor_id);
+    if (actor_index == -1) { return null; }
+    if (component_index < 0 || component_index >= GetNumberOfComponents(actor_id)) { return null; }
+    
+    return *components[actor_index][component_index];
 }
 
 /**
@@ -612,7 +621,10 @@ sol::table Actors::GetComponentByIndex(int actor_id, int component_index)
 */
 bool Actors::GetActorEnabled(int actor_id)
 {
-    return actor_enabled[GetIndex(actor_id)];
+    int actor_index = GetIndex(actor_id);
+    if (actor_index == -1) { return false; }
+    
+    return actor_enabled[actor_index];
 }
 
 /**
@@ -700,7 +712,9 @@ void Actors::ResetManager()
  * Loops through all the components and ONLY runs onupdate if its type is needed for the editor.
  * This is primarily used to trigger SpriteRenderers and other visual components for the EDITOR in editor mode.
  *
- *@param    editor_components   a list of all the components that are needed for editor mode to function
+ * Not very DRY I know...
+ *
+ * @param    editor_components   a list of all the components that are needed for editor mode to function
  */
 void Actors::EditorUpdateComponents(std::unordered_set<std::string> editor_components)
 {
@@ -755,7 +769,9 @@ void Actors::EditorUpdateComponents(std::unordered_set<std::string> editor_compo
  * Loops through all the components and ONLY runs onstart if its type is needed for the editor.
  * This is primarily used to prepare SpriteRenderers and other visual components for the EDITOR in editor mode.
  *
- *@param    editor_components   a list of all the components that are needed for editor mode to function
+ * Not very DRY I know...
+ *
+ * @param    editor_components   a list of all the components that are needed for editor mode to function
  */
 void Actors::EditorStartComponents(std::unordered_set<std::string> editor_components)
 {
@@ -779,7 +795,7 @@ void Actors::EditorStartComponents(std::unordered_set<std::string> editor_compon
             not_processed.push_back(component);
             continue;
         }
-        
+
         // Skip this component if it isn't needed in editor mode
         if (editor_components.find((string)(*component)["type"]) == editor_components.end())
         {

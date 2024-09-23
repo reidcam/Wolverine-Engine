@@ -98,12 +98,22 @@ public:
     */
     static Actor FindActorByID(int ID);
     
+    //-------------------------------------------------------
+    // Editor Tools
+    
     /**
      * Clears all of the data from this manager
      * NOTE: DO NOT EXPOSE TO LUA! This function is primarily meant to reset the game for the editor
      * Could cause unintended behavior if used improperly
     */
     static void ResetManager();
+    
+    /**
+     * Returns a copy of the 'actors' vector
+     * NOTE: DO NOT EXPOSE TO LUA! This function is primarily meant to pass actor data to the editor
+     * Could cause unintended behavior if used improperly
+    */
+    static std::vector<int> GetAllActorsInScene();
     
 }; // Scene
 

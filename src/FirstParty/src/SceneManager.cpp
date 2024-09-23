@@ -273,3 +273,13 @@ void Scene::ResetManager()
     new_scene_name = initial_scene_name;
     LoadNewScene();
 }
+
+/**
+ * Returns a copy of the 'actors' vector
+ * NOTE: DO NOT EXPOSE TO LUA! This function is primarily meant to pass actor data to the editor
+ * Could cause unintended behavior if used improperly
+*/
+std::vector<int> Scene::GetAllActorsInScene()
+{
+    return actors;
+}
