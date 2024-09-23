@@ -283,6 +283,34 @@ int Actors::GetID(int actor_id)
     return IDs[actor_index];
 }
 
+/**
+* Gets wether or not an actor is enabled
+*
+* @param     actor_id    the id of the actor that this function is acting on
+* @return    a bool for whether or not the actor is enabled
+*/
+bool Actors::GetActorEnabled(int actor_id)
+{
+    int actor_index = GetIndex(actor_id);
+    if (actor_index == -1) { return false; }
+    
+    return actor_enabled[actor_index];
+}
+
+/**
+* Sets wether or not an actor is enabled
+*
+* @param     actor_id    the id of the actor that this function is acting on
+* @param    is_enabled  the new enabled status of the actor
+*/
+void Actors::SetActorEnabled(int actor_id, bool is_enabled)
+{
+    int actor_index = GetIndex(actor_id);
+    if (actor_index == -1) { return; }
+    
+    actor_enabled[actor_index] = is_enabled;
+}
+
 //-------------------------------------------------------
 // Misc.
 
@@ -611,20 +639,6 @@ sol::table Actors::GetComponentByIndex(int actor_id, int component_index)
     if (component_index < 0 || component_index >= GetNumberOfComponents(actor_id)) { return null; }
     
     return *components[actor_index][component_index];
-}
-
-/**
-* Gets where or not an actor is enabled
-*
-* @param     actor_id    the id of the actor that this function is acting on
-* @return    a bool for whether or not the actor is enabled
-*/
-bool Actors::GetActorEnabled(int actor_id)
-{
-    int actor_index = GetIndex(actor_id);
-    if (actor_index == -1) { return false; }
-    
-    return actor_enabled[actor_index];
 }
 
 /**

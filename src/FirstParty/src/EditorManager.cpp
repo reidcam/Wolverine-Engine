@@ -183,7 +183,7 @@ void EditorManager::HierarchyView()
     SDL_GetWindowSize(RendererData::GetWindow(), &window_w, &window_h);
     
     // Window Size
-    int imgui_window_w = 400.0f;
+    int imgui_window_w = 300.0f;
     int imgui_window_h = window_h;
     ImGui::SetNextWindowSize(ImVec2(imgui_window_w, imgui_window_h));
     
@@ -199,6 +199,16 @@ void EditorManager::HierarchyView()
     {
         std::string actor_name = Actors::GetName(actor_id);
         const char* const_name = &actor_name[0];
+        
+        bool actor_enabled = Actors::GetActorEnabled(actor_id);
+        
+        // If the checkbox is clicked toggle the actor's 'enabled' status
+        // The ## hides the id for the item
+        std::string checkbox_id = "##" + actor_name;
+        const char* const_checkbox_id = &checkbox_id[0];
+        if (ImGui::Checkbox(const_checkbox_id, &actor_enabled)) { Actors::SetActorEnabled(actor_id, actor_enabled); }
+            
+        ImGui::SameLine();
         
         // If an actor is clicked display its components
         if (ImGui::Button(const_name)) { selected_actor_id = actor_id; };
@@ -217,6 +227,8 @@ void EditorManager::HierarchyView()
             // If a component is clicked display its properties
             if (ImGui::CollapsingHeader(const_type)) 
             {
+                // Table allows us to cleanly format our parameters
+                ImGui::BeginTable(const_type, 2);
                 for (auto& parameter : component)
                 {
                     sol::object key = parameter.first;
@@ -226,26 +238,48 @@ void EditorManager::HierarchyView()
                     std::string parameter_name = key.as<std::string>();
                     const char* const_param_name = &parameter_name[0];
                     
+                    // Invisible Parameter Name
+                    // ## allows us to have a unique ImGui ID for this item without showing the ID in the UI
+                    std::string invisible_id = "##" + key.as<std::string>();
+                    const char* const_invisible_id = &invisible_id[0];
+                    
+                    ImGui::TableNextColumn();
+                    ImGui::Text(const_param_name);
+                    ImGui::TableNextColumn();
+                    
                     // Parameter Value
                     if (value.get_type() == sol::type::string)
                     {
                         std::string parameter_value = value.as<std::string>();
                         const char* const_param_value = &parameter_value[0];
                         ImGui::Text(const_param_value);
-                        ImGui::SameLine(); ImGui::Text(const_param_name);
                     }
                     if (value.get_type() == sol::type::number)
                     {
                         // TODO: FLOATS
                         int parameter_value = value.as<int>();
-                        ImGui::DragInt(const_param_name, &parameter_value);
+                        
+                        // Set the value of this parameter if it's changed in the editor
+                        if (ImGui::DragInt(const_invisible_id, &parameter_value))
+                        {
+                            component[const_param_name] = parameter_value;
+                        }
                     }
                     if (value.get_type() == sol::type::boolean)
                     {
                         bool parameter_value = value.as<bool>();
-                        ImGui::Checkbox(const_param_name, &parameter_value);
+                        
+                        // Set the value of this parameter if it's changed in the editor
+                        if (ImGui::Checkbox(const_invisible_id, &parameter_value))
+                        {
+                            component[const_param_name] = parameter_value;
+                        }
                     }
+                    // TODO: TABLES
+                    
+                    ImGui::TableNextRow();
                 }
+                ImGui::EndTable();
             }
         }
     }

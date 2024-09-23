@@ -115,6 +115,22 @@ public:
     */
     static int GetID(int actor_id);
     
+    /**
+    * Gets wether or not an actor is enabled
+    *
+    * @param     actor_id    the id of the actor that this function is acting on
+    * @return                a bool for whether or not the actor is enabled
+    */
+    static bool GetActorEnabled(int actor_id);
+    
+    /**
+    * Sets wether or not an actor is enabled
+    *
+    * @param     actor_id    the id of the actor that this function is acting on
+    * @param    is_enabled  the new enabled status of the actor
+    */
+    static void SetActorEnabled(int actor_id, bool is_enabled);
+    
     //-------------------------------------------------------
     // Misc.
     
@@ -192,14 +208,6 @@ public:
     * @return                       a sol table containing the component
     */
     static sol::table GetComponentByIndex(int actor_id, int component_index);
-
-    /**
-    * Gets where or not an actor is enabled
-    * 
-    * @param     actor_id    the id of the actor that this function is acting on
-    * @return                a bool for whether or not the actor is enabled
-    */
-    static bool GetActorEnabled(int actor_id);
 
     /**
      * Gets all of the components on the given actor with the given type if they exist.
