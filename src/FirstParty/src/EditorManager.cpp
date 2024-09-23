@@ -183,7 +183,7 @@ void EditorManager::HierarchyView()
     SDL_GetWindowSize(RendererData::GetWindow(), &window_w, &window_h);
     
     // Window Size
-    int imgui_window_w = 200.0f;
+    int imgui_window_w = 400.0f;
     int imgui_window_h = window_h;
     ImGui::SetNextWindowSize(ImVec2(imgui_window_w, imgui_window_h));
     
@@ -215,7 +215,38 @@ void EditorManager::HierarchyView()
             const char* const_type = &component_type[0];
             
             // If a component is clicked display its properties
-            if (ImGui::CollapsingHeader(const_type)) {}
+            if (ImGui::CollapsingHeader(const_type)) 
+            {
+                for (auto& parameter : component)
+                {
+                    sol::object key = parameter.first;
+                    sol::object value = parameter.second;
+                    
+                    // Parameter Name
+                    std::string parameter_name = key.as<std::string>();
+                    const char* const_param_name = &parameter_name[0];
+                    
+                    // Parameter Value
+                    if (value.get_type() == sol::type::string)
+                    {
+                        std::string parameter_value = value.as<std::string>();
+                        const char* const_param_value = &parameter_value[0];
+                        ImGui::Text(const_param_value);
+                        ImGui::SameLine(); ImGui::Text(const_param_name);
+                    }
+                    if (value.get_type() == sol::type::number)
+                    {
+                        // TODO: FLOATS
+                        int parameter_value = value.as<int>();
+                        ImGui::DragInt(const_param_name, &parameter_value);
+                    }
+                    if (value.get_type() == sol::type::boolean)
+                    {
+                        bool parameter_value = value.as<bool>();
+                        ImGui::Checkbox(const_param_name, &parameter_value);
+                    }
+                }
+            }
         }
     }
     
