@@ -48,6 +48,18 @@ add_executable("${PROJECT_NAME}"
 )
 target_include_directories("${PROJECT_NAME}" PRIVATE "src/FirstParty")
 
+if (MSVC)
+        # Set Visual Studio Startup Project
+        set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT "${PROJECT_NAME}")
+
+        # Needed for Visual Studio due to the size of LuaAPI.cpp
+        target_compile_options("${PROJECT_NAME}" PRIVATE /bigobj)
+
+        # Set the output directory for Debug and Release to the root directory so that the resources folder can be properly found
+        set_target_properties("${PROJECT_NAME}" PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR})
+        set_target_properties("${PROJECT_NAME}" PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR})
+endif()
+
 # Add Lua library
 file(GLOB LUA_SRC "src/ThirdParty/lua-5.4.6/*.c")
 add_library("${PROJECT_NAME}_lua" ${LUA_SRC})
