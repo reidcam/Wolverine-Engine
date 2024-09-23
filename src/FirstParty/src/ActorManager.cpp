@@ -751,7 +751,7 @@ void Actors::EditorUpdateComponents(std::unordered_set<std::string> editor_compo
         living_components.push_back(component);
         
         // Skip this component if it isn't needed in editor mode
-        if (editor_components.find((string)(*component)["type"]) == editor_components.end()) { continue; }
+        if (editor_components.find((*component)["type"]) == editor_components.end()) { continue; }
     
         // Skip this component if the actor or component aren't enabled
         if (!actor_enabled[actor_index] || (*component)["enabled"] == false)
@@ -814,7 +814,7 @@ void Actors::EditorStartComponents(std::unordered_set<std::string> editor_compon
         }
 
         // Skip this component if it isn't needed in editor mode
-        if (editor_components.find((string)(*component)["type"]) == editor_components.end())
+        if (editor_components.find((*component)["type"]) == editor_components.end())
         {
             not_processed.push_back(component);
             continue;

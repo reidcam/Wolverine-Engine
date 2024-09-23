@@ -221,7 +221,7 @@ void EditorManager::HierarchyView()
         
         if (component.valid())
         {
-            std::string component_type = (string)component["type"];
+            std::string component_type = component["type"];
             const char* const_type = &component_type[0];
             
             // If a component is clicked display its properties
