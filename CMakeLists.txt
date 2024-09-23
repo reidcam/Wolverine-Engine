@@ -44,7 +44,7 @@ file(GLOB ALL_RESOURCES
 add_executable("${PROJECT_NAME}" 
         ${FIRST_PARTY}
         # bundle resources
-        #${ALL_RESOURCES}
+        ${ALL_RESOURCES}
 )
 target_include_directories("${PROJECT_NAME}" PRIVATE "src/FirstParty")
 
