@@ -22,7 +22,10 @@
 class EditorManager
 {
 private:
-    static bool editor_mode;
+    // If editor mode is on and play mode is off, ONLY THEN CAN REAL EDITS BE MADE TO THE GAME FILES!
+    
+    static bool editor_mode; // True when the game is paused.
+    static bool play_mode; // True after the play button is pressed until the stop button is pressed. No edits can be made in this mode.
     
     inline static std::unordered_set<std::string> editor_components_list
     {

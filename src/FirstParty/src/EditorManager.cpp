@@ -13,7 +13,8 @@
 #include "SceneManager.h"
 #include "PhysicsWorld.h"
 
-bool EditorManager::editor_mode = true;
+bool EditorManager::editor_mode = true; // True when the game is paused and edits can be made
+bool EditorManager::play_mode = false; // True after the play button is pressed until the stop button is pressed. No edits can be made in this mode.
 bool EditorManager::trigger_editor_mode_toggle = false;
 
 /**
@@ -55,24 +56,60 @@ void EditorManager::RenderEditor()
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
     
-    bool t = true;
-    ImGui::ShowDemoWindow(&t);
+//    bool t = true;
+//    ImGui::ShowDemoWindow(&t);
+    bool display_window = true;
+    ImGuiWindowFlags flags = 0;
+    flags |= ImGuiWindowFlags_NoMove;
+    flags |= ImGuiWindowFlags_NoResize;
+    flags |= ImGuiWindowFlags_NoTitleBar;
     
-    ImGui::Begin("Editor Mode");
-    if (ImGui::Button("Play"))
+    int window_w = 0;
+    int window_h = 0;
+    SDL_GetWindowSize(RendererData::GetWindow(), &window_w, &window_h);
+    
+    int imgui_window_w = 110.0f;
+    int imgui_window_h = 40.0f;
+    ImGui::SetNextWindowSize(ImVec2(imgui_window_w, imgui_window_h));
+    
+    int imgui_window_x = (window_w / 2) - (imgui_window_w / 2);
+    int imgui_window_y = 0.0f;
+    ImGui::SetNextWindowPos(ImVec2(imgui_window_x, imgui_window_y));
+    
+    // Alows developers to activate the play modes and editor modes
+    ImGui::Begin("Editor Mode", &display_window, flags);
+    if (!play_mode)
     {
-        // TOOD: Hot reload all modified scenes and scripts
-        editor_mode = false;
-        PhysicsWorld::ResetWorld();
-        Scene::ResetManager();
+        if (ImGui::Button("Play"))
+        {
+            // TOOD: Hot reload all modified scenes and scripts
+            editor_mode = false;
+            play_mode = true;
+            PhysicsWorld::ResetWorld();
+            Scene::ResetManager();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Pause") && play_mode) {trigger_editor_mode_toggle = true;}
     }
-    if (ImGui::Button("Pause")) { trigger_editor_mode_toggle = true; }
-    if (ImGui::Button("Reset"))
+    else
     {
-        // TOOD: Hot reload all modified scenes and scripts
-        editor_mode = true;
-        PhysicsWorld::ResetWorld();
-        Scene::ResetManager();
+        if (ImGui::Button("Stop"))
+        {
+            // TOOD: Hot reload all modified scenes and scripts
+            editor_mode = true;
+            play_mode = false;
+            PhysicsWorld::ResetWorld();
+            Scene::ResetManager();
+        }
+        ImGui::SameLine();
+        if (editor_mode)
+        {
+            if (ImGui::Button("Unpause")) { trigger_editor_mode_toggle = true; }
+        }
+        else
+        {
+            if (ImGui::Button("Pause")) { trigger_editor_mode_toggle = true; }
+        }
     }
     ImGui::End();
     
