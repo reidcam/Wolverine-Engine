@@ -708,9 +708,6 @@ void Actors::EditorUpdateComponents(std::unordered_set<std::string> editor_compo
     
     for (auto& component : components_to_update)
     {
-        // List of components that are needed in editor mode
-        if (editor_components.find((string)(*component)["type"]) == editor_components.end()) { continue; }
-        
         // If this component is dead, skip it
         if ((*component)["REMOVED_FROM_ACTOR"] == true)
         {
@@ -721,6 +718,9 @@ void Actors::EditorUpdateComponents(std::unordered_set<std::string> editor_compo
         
         // The component is alive! add it to living components
         living_components.push_back(component);
+        
+        // Skip this component if it isn't needed in editor mode
+        if (editor_components.find((string)(*component)["type"]) == editor_components.end()) { continue; }
     
         // Skip this component if the actor or component aren't enabled
         if (!actor_enabled[actor_index] || (*component)["enabled"] == false)
@@ -765,9 +765,6 @@ void Actors::EditorStartComponents(std::unordered_set<std::string> editor_compon
     
     for (auto& component : components_to_init)
     {
-        // List of components that are needed in editor mode
-        if (editor_components.find((string)(*component)["type"]) == editor_components.end()) { continue; }
-        
         int actor_index = GetIndex((*component)["actor"]["ID"]);
         
         // If this component has been removed, skip it
@@ -778,6 +775,13 @@ void Actors::EditorStartComponents(std::unordered_set<std::string> editor_compon
         
         // Skip this component if the actor or component aren't enabled
         if (!actor_enabled[actor_index] || (*component)["enabled"] == false)
+        {
+            not_processed.push_back(component);
+            continue;
+        }
+        
+        // Skip this component if it isn't needed in editor mode
+        if (editor_components.find((string)(*component)["type"]) == editor_components.end())
         {
             not_processed.push_back(component);
             continue;
