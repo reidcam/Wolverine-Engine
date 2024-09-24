@@ -37,6 +37,9 @@ private:
 public:
     static bool trigger_editor_mode_toggle;
     
+    //-------------------------------------------------------
+    // Lifecycle
+    
     /**
     * Initializes the editor
     */
@@ -65,6 +68,9 @@ public:
     */
     static void Cleanup();
     
+    //-------------------------------------------------------
+    // Getters/Setters
+    
     /**
     * If editor mode is on, turn it off, if it is off, turn it on
     */
@@ -74,6 +80,17 @@ public:
     * Returns the editor mode
     */
     static bool GetEditorMode();
+    
+    //-------------------------------------------------------
+    // ImGui Item Displays
+    
+    /**
+     * Displays the given variable in a sol::table in the heirarchy view as a sub-item of that table
+     *
+     * @param   table    the table that contains the variable we want to display
+     * @param   key         the key of the variable that we want to display
+     */
+    static void VariableView(sol::table* table, sol::lua_value key);
     
     /**
      * Creates the mode switching buttons

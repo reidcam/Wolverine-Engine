@@ -12,11 +12,15 @@
 #include "EditorManager.h"
 #include "SceneManager.h"
 #include "PhysicsWorld.h"
+#include "LuaAPI.h"
 
 bool EditorManager::editor_mode = true; // True when the game is paused and edits can be made
 bool EditorManager::play_mode = false; // True after the play button is pressed until the stop button is pressed. No edits can be made in this mode.
 bool EditorManager::trigger_editor_mode_toggle = false;
 int EditorManager::selected_actor_id = -1; // The actor ID of the selected actor in the hierarchy view.
+
+//-------------------------------------------------------
+// Lifecycle
 
 /**
 * Initializes the editor
@@ -85,6 +89,9 @@ void EditorManager::Cleanup()
     ImGui::DestroyContext();
 }
 
+//-------------------------------------------------------
+// Getters/Setters
+
 /**
 * If editor mode is on, turn it off, if it is off, turn it on
 */
@@ -100,6 +107,126 @@ void EditorManager::ToggleEditorMode()
 bool EditorManager::GetEditorMode()
 {
     return editor_mode;
+}
+
+//-------------------------------------------------------
+// ImGui Item Displays
+
+/**
+ * Displays the given variable in a sol::table in the heirarchy view as a sub-item of that table
+ *
+ * @param   table    the table that contains the variable we want to display
+ * @param   key         the key of the variable that we want to display
+ */
+void EditorManager::VariableView(sol::table* table, sol::lua_value key)
+{
+    sol::object value = (*table)[key];
+    
+    std::string var_name = "???";
+    // Converts the key to a string from its lua_type for use in imgui labels
+    if (key.is<std::string>()) { var_name = key.as<std::string>(); }
+    if (key.is<bool>()) { var_name = key.as<bool>() ? "true" : "false"; }
+    if (key.is<int>() || key.is<float>() || key.is<double>()) { var_name = to_string(key.as<int>()); }
+    
+    
+    const char* const_var_name = &var_name[0];
+    
+    // Skip the variables that exist for engine use: key, actor, type, or any native component values added by Lua
+    if (var_name == "key" || var_name == "type" || var_name == "actor" ||
+        var_name == "class_cast" || var_name == "REMOVED_FROM_ACTOR" || var_name == "class_check" ||
+        var_name == "__type" || var_name == "__name") { return; }
+    
+    // Skip functions
+    if (value.get_type() == sol::type::function) { return; }
+    
+    // Invisible variable Name
+    // ## allows us to have a unique ImGui ID for this item without showing the ID in the UI
+    std::string invisible_id = "##" + var_name;
+    const char* const_invisible_id = &invisible_id[0];
+    
+    // Sets the first column to be the name of the variable
+    ImGui::TableNextColumn();
+    ImGui::Text(const_var_name);
+    
+    // Moves to the second column to get ready to be the value of the variable
+    ImGui::TableNextColumn();
+    
+    // Variable value
+    if (value.get_type() == sol::type::string)
+    {
+        std::string variable_value = value.as<std::string>();
+        char* const_var_value = &variable_value[0];
+        if (ImGui::InputText(const_invisible_id, const_var_value, variable_value.size()))
+        {
+            (*table)[key] = const_var_value;
+        }
+    }
+    if (value.get_type() == sol::type::number)
+    {
+        if (value.is<int>())
+        {
+            int variable_value = value.as<int>();
+            
+            // Set the value of this variable if it's changed in the editor
+            if (ImGui::InputInt(const_invisible_id, &variable_value))
+            {
+                (*table)[key] = variable_value;
+            }
+        }
+        else if (value.is<double>())
+        {
+            double variable_value = value.as<double>();
+            
+            // Set the value of this variable if it's changed in the editor
+            if (ImGui::InputDouble(const_invisible_id, &variable_value))
+            {
+                (*table)[key] = variable_value;
+            }
+        }
+    }
+    if (value.get_type() == sol::type::boolean)
+    {
+        bool variable_value = value.as<bool>();
+        
+        // Set the value of this variable if it's changed in the editor
+        if (ImGui::Checkbox(const_invisible_id, &variable_value))
+        {
+            (*table)[key] = variable_value;
+        }
+    }
+    if (value.get_type() == sol::type::table)
+    {
+        sol::table variable_value = value.as<sol::table>();
+        
+        // If this table variable is a Lua component, DO NOT RENDER AS TABLE IN HIERARCHY!
+        // This would cause massive problems
+        if (!variable_value["actor"].valid())
+        {
+            // Table allows us to cleanly format our variables
+            ImGui::BeginTable(const_invisible_id, 2);
+            for (auto& item : variable_value)
+            {
+                sol::lua_value item_key = item.first;
+                // Sets this row of the table to be the variable with the given key
+                VariableView(&variable_value, item_key);
+            }
+            ImGui::EndTable();
+            
+            (*table)[key] = variable_value;
+        }
+        else
+        {
+            // If the table variable is a component, write out its actor owner and type instead
+            std::string actor_name = Actors::GetName(variable_value["actor"].get<Actor*>()->ID);
+            std::string component_type = variable_value["type"];
+            std::string placeholder_value =  actor_name + "_" + component_type;
+            const char* const_var_value = &placeholder_value[0];
+            ImGui::Text(const_var_value);
+        }
+    }
+    
+    // Move on to the next row of the table
+    ImGui::TableNextRow();
 }
 
 /**
@@ -195,6 +322,7 @@ void EditorManager::HierarchyView()
     // Alows developers to click on specifc actors and components to change values
     ImGui::Begin("Hierarchy View", display_window, flags);
     
+    // Find the selected actor
     for (int actor_id : Scene::GetAllActorsInScene())
     {
         std::string actor_name = Actors::GetName(actor_id);
@@ -214,6 +342,7 @@ void EditorManager::HierarchyView()
         if (ImGui::Button(const_name)) { selected_actor_id = actor_id; };
     }
     
+    // Display the components of the selected actor
     int number_of_components = Actors::GetNumberOfComponents(selected_actor_id);
     for (int i = 0; i < number_of_components; i++)
     {
@@ -227,86 +356,18 @@ void EditorManager::HierarchyView()
             // If a component is clicked display its properties
             if (ImGui::CollapsingHeader(const_type)) 
             {
-                // Table allows us to cleanly format our parameters
-                ImGui::BeginTable(const_type, 2);
-                
                 sol::table metatable = component[sol::metatable_key];
                 
-                // If component is not native, metatable needs to be indexed at __index
+                // If component is native, metatable needs to be indexed at __index
                 if (!ComponentManager::IsComponentTypeNative(component_type)) { metatable = metatable["__index"]; }
                 
-                for (auto& parameter : metatable)
+                // Table allows us to cleanly format our variables
+                ImGui::BeginTable(const_type, 2);
+                for (auto& variable : metatable)
                 {
-                    sol::object key = parameter.first;
-                    sol::object value = component[key];
-                    
-                    // Parameter Name
-                    std::string parameter_name = key.as<std::string>();
-                    const char* const_param_name = &parameter_name[0];
-                    
-                    // Skip the parameters that exist for engine use: key, actor, type, or any native component values added by Lua
-                    if (parameter_name == "key" || parameter_name == "type" || parameter_name == "actor" ||
-                        parameter_name == "class_cast" || parameter_name == "REMOVED_FROM_ACTOR" || parameter_name == "class_check" ||
-                        parameter_name == "__type" || parameter_name == "__name") { continue; }
-                    
-                    // Skip functions
-                    if (value.get_type() == sol::type::function) { continue; }
-                    
-                    // Invisible Parameter Name
-                    // ## allows us to have a unique ImGui ID for this item without showing the ID in the UI
-                    std::string invisible_id = "##" + key.as<std::string>();
-                    const char* const_invisible_id = &invisible_id[0];
-                    
-                    ImGui::TableNextColumn();
-                    ImGui::Text(const_param_name);
-                    ImGui::TableNextColumn();
-                    
-                    // Parameter Value
-                    if (value.get_type() == sol::type::string)
-                    {
-                        std::string parameter_value = value.as<std::string>();
-                        char* const_param_value = &parameter_value[0];
-                        if (ImGui::InputText(const_invisible_id, const_param_value, parameter_value.size()))
-                        {
-                            component[const_param_name] = const_param_value;
-                        }
-                    }
-                    if (value.get_type() == sol::type::number)
-                    {
-                        if (value.is<int>())
-                        {
-                            int parameter_value = value.as<int>();
-                            
-                            // Set the value of this parameter if it's changed in the editor
-                            if (ImGui::InputInt(const_invisible_id, &parameter_value))
-                            {
-                                component[const_param_name] = parameter_value;
-                            }
-                        }
-                        else if (value.is<double>())
-                        {
-                            double parameter_value = value.as<double>();
-                            
-                            // Set the value of this parameter if it's changed in the editor
-                            if (ImGui::InputDouble(const_invisible_id, &parameter_value))
-                            {
-                                component[const_param_name] = parameter_value;
-                            }
-                        }
-                    }
-                    if (value.get_type() == sol::type::boolean)
-                    {
-                        bool parameter_value = value.as<bool>();
-                        
-                        // Set the value of this parameter if it's changed in the editor
-                        if (ImGui::Checkbox(const_invisible_id, &parameter_value))
-                        {
-                            component[const_param_name] = parameter_value;
-                        }
-                    }
-                    // TODO: TABLES
-                    
-                    ImGui::TableNextRow();
+                    sol::lua_value key = variable.first;
+                    // Sets this row of the table to be the variable with the given key
+                    VariableView(&component, key);
                 }
                 ImGui::EndTable();
             }
