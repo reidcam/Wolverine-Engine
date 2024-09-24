@@ -14,6 +14,7 @@
 #include <string>
 
 #include "Renderer.h"
+#include "ComponentManager.h"
 
 #include "imgui.h"
 #include "backends/imgui_impl_sdl2.h"

@@ -229,19 +229,28 @@ void EditorManager::HierarchyView()
             {
                 // Table allows us to cleanly format our parameters
                 ImGui::BeginTable(const_type, 2);
-                for (auto& parameter : component)
+                
+                sol::table metatable = component[sol::metatable_key];
+                
+                // If component is not native, metatable needs to be indexed at __index
+                if (!ComponentManager::IsComponentTypeNative(component_type)) { metatable = metatable["__index"]; }
+                
+                for (auto& parameter : metatable)
                 {
                     sol::object key = parameter.first;
-                    sol::object value = parameter.second;
+                    sol::object value = component[key];
                     
                     // Parameter Name
                     std::string parameter_name = key.as<std::string>();
                     const char* const_param_name = &parameter_name[0];
                     
-                    // Skip the parameters that exist for engine use: key, actor, type
-                    if (parameter_name == "key" || parameter_name == "type" || parameter_name == "actor") { continue; }
+                    // Skip the parameters that exist for engine use: key, actor, type, or any native component values added by Lua
+                    if (parameter_name == "key" || parameter_name == "type" || parameter_name == "actor" ||
+                        parameter_name == "class_cast" || parameter_name == "REMOVED_FROM_ACTOR" || parameter_name == "class_check" ||
+                        parameter_name == "__type" || parameter_name == "__name") { continue; }
                     
-                    // Skip the parameters 
+                    // Skip functions
+                    if (value.get_type() == sol::type::function) { continue; }
                     
                     // Invisible Parameter Name
                     // ## allows us to have a unique ImGui ID for this item without showing the ID in the UI
@@ -264,13 +273,25 @@ void EditorManager::HierarchyView()
                     }
                     if (value.get_type() == sol::type::number)
                     {
-                        // TODO: FLOATS
-                        int parameter_value = value.as<int>();
-                        
-                        // Set the value of this parameter if it's changed in the editor
-                        if (ImGui::DragInt(const_invisible_id, &parameter_value))
+                        if (value.is<int>())
                         {
-                            component[const_param_name] = parameter_value;
+                            int parameter_value = value.as<int>();
+                            
+                            // Set the value of this parameter if it's changed in the editor
+                            if (ImGui::InputInt(const_invisible_id, &parameter_value))
+                            {
+                                component[const_param_name] = parameter_value;
+                            }
+                        }
+                        else if (value.is<double>())
+                        {
+                            double parameter_value = value.as<double>();
+                            
+                            // Set the value of this parameter if it's changed in the editor
+                            if (ImGui::InputDouble(const_invisible_id, &parameter_value))
+                            {
+                                component[const_param_name] = parameter_value;
+                            }
                         }
                     }
                     if (value.get_type() == sol::type::boolean)
