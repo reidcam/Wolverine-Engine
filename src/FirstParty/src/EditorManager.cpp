@@ -125,8 +125,11 @@ void EditorManager::VariableView(sol::table* table, sol::lua_value key)
     std::string var_name = "???";
     // Converts the key to a string from its lua_type for use in imgui labels
     if (key.is<std::string>()) { var_name = key.as<std::string>(); }
-    if (key.is<bool>()) { var_name = key.as<bool>() ? "true" : "false"; }
-    if (key.is<int>() || key.is<float>() || key.is<double>()) { var_name = to_string(key.as<int>()); }
+    else if (key.is<bool>()) { var_name = key.as<bool>() ? "true" : "false"; }
+    else if (key.is<int>() || key.is<float>() || key.is<double>()) { var_name = to_string(key.as<int>()); }
+    else if (key.is<sol::function>()) { var_name = "FUNCTION_KEY"; }
+    else if (key.is<sol::table>()) { var_name = "TABLE_KEY"; }
+    else { var_name = "UNKNOWN_KEY"; }
     
     
     const char* const_var_name = &var_name[0];
