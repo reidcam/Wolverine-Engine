@@ -196,21 +196,42 @@ void EditorManager::VariableView(sol::table* table, sol::lua_value key)
     }
     if (value.get_type() == sol::type::table)
     {
-        sol::table variable_value = value.as<sol::table>();
+        sol::table variable_value = value;
+        sol::table metatable = variable_value[sol::metatable_key]["__index"];
         
         // If this table variable is a Lua component, DO NOT RENDER AS TABLE IN HIERARCHY!
         // This would cause massive problems
         if (!variable_value["actor"].valid())
         {
+            // Used to detect the items in our variable that aren't contained in its metatable
+            // by storing the ones that the metatable contains.
+            sol::table found_items = LuaAPI::GetLuaState()->create_table();
+            
             // Table allows us to cleanly format our variables
             ImGui::BeginTable(const_invisible_id, 2);
-            for (auto& item : variable_value)
+            // Displays all of the items in the table that exist before its initialized
+            for (auto& item : metatable)
             {
                 sol::lua_value item_key = item.first;
+                found_items[item_key] = 0;
                 // Sets this row of the table to be the variable with the given key
                 VariableView(&variable_value, item_key);
             }
+            // Displays all of the items in the table that are created during runtime
+            for (auto& item : variable_value)
+            {
+                sol::lua_value item_key = item.first;
+                if (!found_items[item_key].valid())
+                {
+                    // Sets this row of the table to be the variable with the given key
+                    VariableView(&variable_value, item_key);
+                }
+            }
             ImGui::EndTable();
+            
+            // Not sure if this is needed, but I want to make sure that Lua knows it can throw away this table since we're
+            // done with it.
+            found_items = sol::lua_nil;
             
             (*table)[key] = variable_value;
         }
