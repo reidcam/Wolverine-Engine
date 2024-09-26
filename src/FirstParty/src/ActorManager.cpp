@@ -68,7 +68,7 @@ void Actors::ProcessAddedComponents()
         int actor_index = GetIndex((*component)["actor"]["ID"]);
         
         // If this component has been removed, skip it
-        if ((*component)["REMOVED_FROM_ACTOR"] == true)
+        if ((*component)["REMOVED_FROM_ACTOR"] == true || (*component)["actor"] == sol::lua_nil)
         {
             continue;
         }
@@ -118,10 +118,11 @@ void Actors::Update()
 {
     std::vector<std::shared_ptr<sol::table>> living_components; // The "Update" list without any of the dead components
     
+    int i = 0;
     for (auto& component : components_to_update)
     {
         // If this component is dead, skip it
-        if ((*component)["REMOVED_FROM_ACTOR"] == true)
+        if ((*component)["REMOVED_FROM_ACTOR"] == true || (*component)["actor"] == sol::lua_nil)
         {
             continue;
         }
@@ -154,6 +155,7 @@ void Actors::Update()
 #endif
             std::cout << "\033[31m" << names[actor_index] << " : " << errorMessage << "\033[0m" << std::endl;
         }
+        i++;
     }
     
     components_to_update.clear();
@@ -170,7 +172,7 @@ void Actors::LateUpdate()
     for (auto& component : components_to_update_late)
     {
         // If this component is dead, skip it
-        if ((*component)["REMOVED_FROM_ACTOR"] == true)
+        if ((*component)["REMOVED_FROM_ACTOR"] == true || (*component)["actor"] == sol::lua_nil)
         {
             continue;
         }
