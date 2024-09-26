@@ -11,6 +11,7 @@
 
 #include "document.h"
 #include "filereadstream.h"
+#include "filewritestream.h"
 #include <filesystem>
 #include <iostream>
 #include <thread>
@@ -41,6 +42,25 @@ public:
             std::cout << "error parsing json at [" << path << "]";
             exit(0);
         }
+    }
+    
+    /**
+     * Reads 'in_document' into the json file located at 'path'
+     */
+    static void WriteJsonFile(const std::string& path, rapidjson::Document& in_document) {
+        FILE* file_pointer = nullptr;
+    #ifdef _WIN32
+        fopen_s(&file_pointer, path.c_str(), "wb");
+    #else
+        file_pointer = fopen(path.c_str(), "wb");
+    #endif
+        char buffer[65536];
+        rapidjson::FileWriteStream stream(file_pointer, buffer, sizeof(buffer));
+        
+        rapidjson::PrettyWriter<rapidjson::FileWriteStream> writer(stream);
+        in_document.Accept(writer);
+        
+        std::fclose(file_pointer);
     }
     
     /**

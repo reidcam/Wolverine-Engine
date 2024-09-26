@@ -68,6 +68,11 @@ public:
     */
     static void Cleanup();
     
+    /**
+     * Remakes the local scene file with all of our changes
+     */
+    static void UpdateSceneLocal();
+    
     //-------------------------------------------------------
     // Getters/Setters
     

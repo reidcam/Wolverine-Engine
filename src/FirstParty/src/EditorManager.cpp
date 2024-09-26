@@ -89,6 +89,42 @@ void EditorManager::Cleanup()
     ImGui::DestroyContext();
 }
 
+/**
+ * Remakes the local scene file with all of our changes
+ */
+void EditorManager::UpdateSceneLocal()
+{
+    rapidjson::Document updated_scene;
+    updated_scene.SetObject(); // Init the scene file as an object
+    
+    // Create an allocator (required for memory management in RapidJSON)
+    rapidjson::Document::AllocatorType& allocator = updated_scene.GetAllocator();
+    
+    rapidjson::Value actors;
+    actors.SetArray();
+    
+    for (int actor_id : Scene::GetAllActorsInScene())
+    {
+        rapidjson::Document actor;
+        actor.SetObject(); // Init the actor as an object
+        
+        // Create an allocator (required for memory management in RapidJSON)
+        rapidjson::Document::AllocatorType& a_allocator = actor.GetAllocator();
+        
+        // Adds the contents of the actor to its json object:
+        rapidjson::Value actor_name;
+        std::string name = Actors::GetName(actor_id);
+        actor_name.SetString(&name[0], name.length());
+        actor.AddMember("name", actor_name, a_allocator);
+        
+        actors.PushBack(actor, allocator);
+    }
+    
+    updated_scene.AddMember("actors", actors, allocator);
+    
+    EngineUtils::WriteJsonFile(GetScenePath("writing_test"), updated_scene);
+}
+
 //-------------------------------------------------------
 // Getters/Setters
 
@@ -200,7 +236,6 @@ void EditorManager::VariableView(sol::table* table, sol::lua_value key)
     if (value.get_type() == sol::type::table)
     {
         sol::table variable_value = value;
-        sol::table metatable = variable_value[sol::metatable_key]["__index"];
         
         // If this table variable is a Lua component, DO NOT RENDER AS TABLE IN HIERARCHY!
         // This would cause massive problems
@@ -212,13 +247,18 @@ void EditorManager::VariableView(sol::table* table, sol::lua_value key)
             
             // Table allows us to cleanly format our variables
             ImGui::BeginTable(const_invisible_id, 2);
-            // Displays all of the items in the table that exist before its initialized
-            for (auto& item : metatable)
+        
+            // Displays all of the items in the table that exist before its initialized, IFF this table is an instance at all
+            if (variable_value[sol::metatable_key].valid())
             {
-                sol::lua_value item_key = item.first;
-                found_items[item_key] = 0;
-                // Sets this row of the table to be the variable with the given key
-                VariableView(&variable_value, item_key);
+                sol::table metatable = variable_value[sol::metatable_key]["__index"];
+                for (auto& item : metatable)
+                {
+                    sol::lua_value item_key = item.first;
+                    found_items[item_key] = 0;
+                    // Sets this row of the table to be the variable with the given key
+                    VariableView(&variable_value, item_key);
+                }
             }
             // Displays all of the items in the table that are created during runtime
             for (auto& item : variable_value)
@@ -286,6 +326,7 @@ void EditorManager::ModeSwitchButtons()
         if (ImGui::Button("Play"))
         {
             // TOOD: Hot reload all modified scenes and scripts
+//            UpdateSceneLocal();
             editor_mode = false;
             play_mode = true;
             PhysicsWorld::ResetWorld();
