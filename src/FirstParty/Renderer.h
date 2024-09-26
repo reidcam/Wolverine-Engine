@@ -26,7 +26,7 @@ private:
 	inline static SDL_Renderer* renderer = nullptr;
 
 	// initial window size and position
-	inline static glm::vec2 window_position = glm::vec2(0, 0);
+	inline static glm::vec2 window_position = glm::vec2(0, 30);
 	inline static glm::vec2 window_size = glm::vec2(640, 360);
 	inline static float zoom_factor = 1;
 
