@@ -195,7 +195,7 @@ void EditorManager::VariableView(sol::table* table, sol::lua_value key)
     {
         std::string variable_value = value.as<std::string>();
         char* const_var_value = &variable_value[0];
-        if (ImGui::InputText(const_invisible_id, const_var_value, variable_value.size()))
+        if (ImGui::InputText(const_invisible_id, const_var_value, variable_value.size()) && (ImGui::IsItemEdited() && ImGui::IsItemDeactivated()))
         {
             (*table)[key] = const_var_value;
         }
