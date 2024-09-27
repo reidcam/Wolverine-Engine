@@ -106,6 +106,11 @@ public:
      * Creates the actor hierarchy view
      */
     static void HierarchyView();
+
+    /**
+    * Renders all image draw requests in the image_draw_request_queue to a ImGui widget
+    */
+    static void RenderAndClearAllImageRequestsToWidget();
 };
 
 #endif /* EditorManager.h */

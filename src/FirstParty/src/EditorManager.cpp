@@ -64,7 +64,7 @@ void EditorManager::RenderEditor()
     // Create all of the ImGui windows
     ModeSwitchButtons();
     HierarchyView();
-    
+    RenderAndClearAllImageRequestsToWidget();
     ImGui::Render();
     ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), RendererData::GetRenderer());
 }
@@ -441,4 +441,62 @@ void EditorManager::HierarchyView()
     
     ImGui::End();
     delete display_window;
+}
+
+/**
+* Renders all image draw requests in the image_draw_request_queue to a ImGui widget
+*/
+void EditorManager::RenderAndClearAllImageRequestsToWidget()
+{
+    std::stable_sort((*RendererData::GetImageDrawRequestQueue()).begin(), (*RendererData::GetImageDrawRequestQueue()).end(), CompareImageRequests());
+
+    // Create a new ImGui window
+    ImGui::Begin("Image Renderer");
+
+    for (auto& request : *RendererData::GetImageDrawRequestQueue()) {
+        glm::vec2 final_rendering_position = glm::vec2(request.x, request.y) - RendererData::GetCameraPosition();
+
+        SDL_Texture* tex = GetImage(request.image_name);
+        int tex_w, tex_h;
+        SDL_QueryTexture(tex, NULL, NULL, &tex_w, &tex_h);
+
+        // Apply scale
+        float x_scale = std::abs(request.scale_x);
+        float y_scale = std::abs(request.scale_y);
+
+        ImVec2 tex_size = ImVec2(tex_w * x_scale, tex_h * y_scale);
+
+        // Calculate pivot point
+        ImVec2 pivot_point = ImVec2(request.pivot_x * tex_size.x, request.pivot_y * tex_size.y);
+
+        //ImVec2 window_size = ImGui::GetContentRegionAvail();
+        ImVec2 window_size = ImGui::GetWindowSize();
+
+        // center the image
+        float center_offset = 0.5f;
+
+        // account for current zoom factor
+        float zoom = (1.0f / RendererData::GetCameraZoom());
+
+        // Calculate final rendering position
+        ImVec2 final_pos = ImVec2(final_rendering_position.x * RendererData::PIXELS_PER_METER + window_size.x * center_offset * zoom - pivot_point.x,
+                                  final_rendering_position.y * RendererData::PIXELS_PER_METER + window_size.y * center_offset * zoom - pivot_point.y);
+
+        // Apply tint / alpha to texture
+        SDL_SetTextureColorMod(tex, request.r, request.g, request.b);
+        SDL_SetTextureAlphaMod(tex, request.a);
+
+        // Render using ImGui
+        ImGui::SetCursorPos(final_pos);
+        ImGui::Image((void*)tex, tex_size);
+
+        // Remove tint / alpha from texture
+        SDL_SetTextureColorMod(tex, 255, 255, 255);
+        SDL_SetTextureAlphaMod(tex, 255);
+    }
+
+    // End the ImGui window
+    ImGui::End();
+
+    (*RendererData::GetImageDrawRequestQueue()).clear();
 }

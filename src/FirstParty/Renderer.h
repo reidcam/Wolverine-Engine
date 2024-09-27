@@ -295,6 +295,41 @@ public:
      * Cleans up the SDL renderer and window
      */
     static void Cleanup();
+
+	/**
+	* Gets a pointer to the image_draw_request_queue
+	* 
+	* @returns    a pointer to the image_draw_request_queue
+	*/
+	static inline std::deque<ImageDrawRequest>* GetImageDrawRequestQueue() { return &image_draw_request_queue; };
+
+	/**
+	* Gets a pointer to the image_draw_request_queue
+	*
+	* @returns    a pointer to the text_draw_request_queue
+	*/
+	static inline std::deque<TextRenderRequest>* GetTextDrawRequestQueue() { return &text_draw_request_queue; };
+
+	/**
+	* Gets a pointer to the image_draw_request_queue
+	*
+	* @returns    a pointer to the ui_draw_request_queue
+	*/
+	static inline std::deque<UIRenderRequest>* GetUIDrawRequestQueue() { return &ui_draw_request_queue; };
+
+	/**
+	* Gets a pointer to the image_draw_request_queue
+	*
+	* @returns    a pointer to the pixel_draw_request_queue
+	*/
+	static inline std::deque<PixelDrawRequest>* GetPixelDrawRequestQueue() { return &pixel_draw_request_queue; };
+
+	/**
+	* Gets a pointer to the image_draw_request_queue
+	*
+	* @returns    a pointer to the line_draw_request_queue
+	*/
+	static inline std::deque<LineDrawRequest>* GetLineDrawRequestQueue() { return &line_draw_request_queue; };
 };
 
 /**
