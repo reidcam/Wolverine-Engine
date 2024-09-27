@@ -61,7 +61,9 @@ private:
 	* @param	new_window    A SDL_Window* to the new window
 	*/
 	inline static void SetWindow(SDL_Window* new_window) { RendererData::window = new_window; } // SetWindow()
-
+public:
+    inline static const int PIXELS_PER_METER = 100;
+    
 	/**
 	* Turns a string into an SDL_Texture using the specified font perameters
 	*
@@ -74,9 +76,6 @@ private:
 	*/
 	static SDL_Texture* ConvertTextToTexture(SDL_Renderer* renderer, const std::string& text, const SDL_Color& font_color, const std::string font_name, const int font_size);
 
-public:
-    inline static const int PIXELS_PER_METER = 100;
-    
 	/**
 	* Returns a pointer to the SDL_Window
 	*

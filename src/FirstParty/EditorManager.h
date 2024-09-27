@@ -108,9 +108,19 @@ public:
     static void HierarchyView();
 
     /**
-    * Renders all image draw requests in the image_draw_request_queue to a ImGui widget
+    * Creates the widget for the viewport and handles rendering
     */
-    static void RenderAndClearAllImageRequestsToWidget();
+    static void ViewportWidget();
+
+    /**
+    * Renders all image draw requests in the image_draw_request_queue to imgui
+    */
+    static void ImageToImGUI();
+
+    /**
+    * Renders all text draw requests in the to to imgui
+    */
+    static void TextToImGUI();
 };
 
 #endif /* EditorManager.h */

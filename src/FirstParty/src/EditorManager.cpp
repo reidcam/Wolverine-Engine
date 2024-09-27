@@ -64,7 +64,8 @@ void EditorManager::RenderEditor()
     // Create all of the ImGui windows
     ModeSwitchButtons();
     HierarchyView();
-    RenderAndClearAllImageRequestsToWidget();
+    ViewportWidget();
+
     ImGui::Render();
     ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), RendererData::GetRenderer());
 }
@@ -444,20 +445,29 @@ void EditorManager::HierarchyView()
 }
 
 /**
+* Creates the widget for the viewport and handles rendering
+*/
+void EditorManager::ViewportWidget()
+{
+    ImGui::Begin("Viewport");
+    ImageToImGUI();
+    TextToImGUI();
+    ImGui::End();
+}
+
+/**
 * Renders all image draw requests in the image_draw_request_queue to a ImGui widget
 */
-void EditorManager::RenderAndClearAllImageRequestsToWidget()
+void EditorManager::ImageToImGUI()
 {
-    std::stable_sort((*RendererData::GetImageDrawRequestQueue()).begin(), (*RendererData::GetImageDrawRequestQueue()).end(), CompareImageRequests());
-
-    // Create a new ImGui window
-    ImGui::Begin("Image Renderer");
+    std::stable_sort(RendererData::GetImageDrawRequestQueue()->begin(), RendererData::GetImageDrawRequestQueue()->end(), CompareImageRequests());
 
     for (auto& request : *RendererData::GetImageDrawRequestQueue()) {
         glm::vec2 final_rendering_position = glm::vec2(request.x, request.y) - RendererData::GetCameraPosition();
 
         SDL_Texture* tex = GetImage(request.image_name);
-        int tex_w, tex_h;
+        int tex_w = 0; 
+        int tex_h = 0;
         SDL_QueryTexture(tex, NULL, NULL, &tex_w, &tex_h);
 
         // Apply scale
@@ -495,8 +505,46 @@ void EditorManager::RenderAndClearAllImageRequestsToWidget()
         SDL_SetTextureAlphaMod(tex, 255);
     }
 
-    // End the ImGui window
-    ImGui::End();
+    RendererData::GetImageDrawRequestQueue()->clear();
+}
 
-    (*RendererData::GetImageDrawRequestQueue()).clear();
+/**
+* Renders all text draw requests in the to to imgui
+* 
+* TODO: Currently Broken. Text doesn't render
+*/
+void EditorManager::TextToImGUI()
+{
+    std::deque<TextRenderRequest>* text_requests = RendererData::GetTextDrawRequestQueue();
+    for (auto& request : *text_requests) {
+        //create the texture
+        SDL_Color font_color = { static_cast<Uint8>(request.r), static_cast<Uint8>(request.g), static_cast<Uint8>(request.b), static_cast<Uint8>(request.a) };
+        SDL_Texture* text_texture = RendererData::ConvertTextToTexture(RendererData::GetRenderer(), request.text, font_color, request.font, request.size);
+
+        // set position
+        ImVec2 position;
+        position.x = request.x;
+        position.y = request.y;
+
+        // Set the width and height
+        int tex_w = 0;
+        int tex_h = 0;
+        SDL_QueryTexture(text_texture, nullptr, nullptr, &tex_w, &tex_h); // get w and h from the text
+
+        // Render using ImGui
+        ImGui::SetCursorPos(position);
+
+        ImTextureID imgui_texture = (ImTextureID)(intptr_t)text_texture;
+        if (imgui_texture) {
+            ImGui::Image(imgui_texture, ImVec2(100, 100));
+        }
+        else {
+            printf("Texture is null\n");
+        }
+
+
+        SDL_DestroyTexture(text_texture);
+    }
+
+    text_requests->clear();
 }

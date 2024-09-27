@@ -14,8 +14,18 @@
 SDL_Texture* RendererData::ConvertTextToTexture(SDL_Renderer* renderer, const std::string& text, const SDL_Color& font_color, const std::string font_name, const int font_size)
 {
 	SDL_Surface* text_surface = TTF_RenderText_Solid(GetFont(font_name, font_size), text.c_str(), font_color);
-	SDL_Texture* text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
-	SDL_FreeSurface(text_surface);
+	SDL_Texture* text_texture = nullptr;
+	if (!text_surface) {
+		printf("TTF_RenderText_Blended Error: %s\n", TTF_GetError());
+	}
+	else {
+		text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
+		SDL_FreeSurface(text_surface);
+
+		if (!text_texture) {
+			printf("SDL_CreateTextureFromSurface Error: %s\n", SDL_GetError());
+		}
+	}
 
 	return text_texture;
 }
@@ -183,7 +193,7 @@ void RendererData::RenderAndClearAllTextRequests()
 {
 	for (auto& request : text_draw_request_queue) {
 		SDL_Color font_color = { static_cast<Uint8>(request.r), static_cast<Uint8>(request.g), static_cast<Uint8>(request.b), static_cast<Uint8>(request.a) };
-		SDL_Texture* text_texture = ConvertTextToTexture(renderer, request.text, font_color, request.font, request.size);
+		SDL_Texture* text_texture = ConvertTextToTexture(GetRenderer(), request.text, font_color, request.font, request.size);
 
 		SDL_Rect dest_rect;
 		dest_rect.x = request.x;
