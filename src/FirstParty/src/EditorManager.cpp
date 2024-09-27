@@ -452,6 +452,7 @@ void EditorManager::ViewportWidget()
     ImGui::Begin("Viewport");
     ImageToImGUI();
     TextToImGUI();
+    UIToImGUI();
     ImGui::End();
 }
 
@@ -547,4 +548,45 @@ void EditorManager::TextToImGUI()
     }
 
     text_requests->clear();
+}
+
+/**
+* Renders all ui draw requests in the to to imgui
+*/
+void EditorManager::UIToImGUI()
+{
+    std::stable_sort(RendererData::GetUIDrawRequestQueue()->begin(), RendererData::GetUIDrawRequestQueue()->end(), CompareUIRequests());
+
+    for (auto& request : *RendererData::GetUIDrawRequestQueue()) {
+        // Assuming GetImage returns an ImGui-compatible texture ID
+        SDL_Texture* tex = GetImage(request.image_name);
+ 
+        int tex_w = 0;
+        int tex_h = 0;
+        SDL_QueryTexture(tex, NULL, NULL, &tex_w, &tex_h);
+
+        ImVec2 tex_size;
+        tex_size.x = tex_w;
+        tex_size.y = tex_h;
+
+        ImVec2 tex_pos = ImVec2(request.x, request.y);
+
+        // Apply tint / alpha to texture
+        ImVec4 tint_color = ImVec4(request.r / 255.0f, request.g / 255.0f, request.b / 255.0f, request.a / 255.0f);
+
+        // Render the image
+        ImGui::SetCursorPos(tex_pos);
+        ImTextureID tex_id = (ImTextureID)(intptr_t)tex;
+        if (tex_id) {
+            ImGui::Image(tex_id, tex_size, ImVec2(0, 0), ImVec2(1, 1), tint_color);
+        }
+        else {
+            printf("texture is null\n");
+        }
+
+        // Remove tint / alpha from texture (reset to default)
+        tint_color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+    }
+
+    RendererData::GetUIDrawRequestQueue()->clear();
 }

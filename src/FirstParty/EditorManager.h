@@ -121,6 +121,11 @@ public:
     * Renders all text draw requests in the to to imgui
     */
     static void TextToImGUI();
+
+    /**
+    * Renders all ui draw requests in the to to imgui
+    */
+    static void UIToImGUI();
 };
 
 #endif /* EditorManager.h */
