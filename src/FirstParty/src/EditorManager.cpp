@@ -59,6 +59,7 @@ void EditorManager::RenderEditor()
 {
     ImGui_ImplSDLRenderer2_NewFrame();
     ImGui_ImplSDL2_NewFrame();
+    //LoadFontsImGUI(); // NOTE: Must be called before ImGui::NewFrame() and after ImGui::Render()
     ImGui::NewFrame();
     
     // Create all of the ImGui windows
@@ -453,6 +454,7 @@ void EditorManager::ViewportWidget()
     ImageToImGUI();
     TextToImGUI();
     UIToImGUI();
+    PixelToImGUI();
     ImGui::End();
 }
 
@@ -518,33 +520,27 @@ void EditorManager::TextToImGUI()
 {
     std::deque<TextRenderRequest>* text_requests = RendererData::GetTextDrawRequestQueue();
     for (auto& request : *text_requests) {
-        //create the texture
-        SDL_Color font_color = { static_cast<Uint8>(request.r), static_cast<Uint8>(request.g), static_cast<Uint8>(request.b), static_cast<Uint8>(request.a) };
-        SDL_Texture* text_texture = RendererData::ConvertTextToTexture(RendererData::GetRenderer(), request.text, font_color, request.font, request.size);
+        /*ImFont* font = GetImGuiFont(request.font, request.size);*/
+        ImFont* font = nullptr;
+        if (font) {
+            ImGui::PushFont(font);
+        }
+
+        ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
         // set position
         ImVec2 position;
         position.x = request.x;
         position.y = request.y;
 
-        // Set the width and height
-        int tex_w = 0;
-        int tex_h = 0;
-        SDL_QueryTexture(text_texture, nullptr, nullptr, &tex_w, &tex_h); // get w and h from the text
+        // color
+        ImU32 col = IM_COL32(request.r, request.g, request.b, request.a);
 
-        // Render using ImGui
-        ImGui::SetCursorPos(position);
+        draw_list->AddText(position, col, request.text.c_str());
 
-        ImTextureID imgui_texture = (ImTextureID)(intptr_t)text_texture;
-        if (imgui_texture) {
-            ImGui::Image(imgui_texture, ImVec2(100, 100));
-        }
-        else {
-            printf("Texture is null\n");
-        }
-
-
-        SDL_DestroyTexture(text_texture);
+        // return to the previous font, if used
+        if (font)
+            ImGui::PopFont();
     }
 
     text_requests->clear();
@@ -589,4 +585,90 @@ void EditorManager::UIToImGUI()
     }
 
     RendererData::GetUIDrawRequestQueue()->clear();
+}
+
+/**
+* Renders all pixel draw requests in the pixel_draw_request_queue to imgui
+* 
+* TODO: Pixels render on the SDL renderer and not the imgui widget even though there is no call to sdl...
+*/
+void EditorManager::PixelToImGUI()
+{
+    ImDrawList* draw_list = ImGui::GetBackgroundDrawList();
+
+    for (auto& request : *RendererData::GetPixelDrawRequestQueue()) {
+        draw_list->AddRectFilled(ImVec2(request.x, request.y), ImVec2(request.x + 10, request.y + 10), IM_COL32(request.r, request.g, request.b, request.a));
+    }
+
+    RendererData::GetPixelDrawRequestQueue()->clear();
+}
+
+/**
+* Loads the fonts that are needed for text requests this frame, if not already loaded
+* 
+* NOTE: Must be called before ImGui::NewFrame() and after ImGui::Render()
+*/
+void EditorManager::LoadFontsImGUI()
+{
+    std::deque<TextRenderRequest>* text_requests = RendererData::GetTextDrawRequestQueue();
+    for (auto& request : *text_requests) {
+        bool font_found = false;
+        
+        // check for the font needed and that it is the correct size
+        for (auto& font : imgui_fonts[request.font]) {
+            if (font->FontSize == request.size) {
+                font_found = true;
+                break;
+            }
+        }
+
+        // the font was not found with the size needed, load it
+        if (!font_found) {
+            const std::string path = "resources/fonts/" + request.font + ".ttf";
+
+            if (FileUtils::DirectoryExists(path))
+            {
+                ImGuiIO& io = ImGui::GetIO();
+                ImFontConfig fontConfig;
+                fontConfig.FontDataOwnedByAtlas = false; // Set to false if loading from memory
+                ImFont* font = io.Fonts->AddFontFromFileTTF(path.c_str(), request.size, &fontConfig);
+
+                if (font == nullptr) {
+                    std::cerr << "Failed to load font!" << std::endl;
+                }
+
+                io.Fonts->Build();
+
+                imgui_fonts[request.font].push_back(font); // save the font for later
+            }
+            else {
+                // output an error and move to the next request
+                std::cout << "font " + request.font + "does not exist at " + path << std::endl;
+                continue;
+            }
+        }
+    }
+}
+
+/**
+* Gets a specified font for ImGui
+*
+* @returns    A ImFont* to the specified font if it exists, nullptr otherwise
+*/
+ImFont* EditorManager::GetImGuiFont(const std::string& name, const float size)
+{
+    ImFont* return_font = nullptr;
+
+    for (auto& font : imgui_fonts.at(name)) {
+        if (font->FontSize == size) {
+            return_font = font;
+            break;
+        }
+    }
+
+    if (!return_font) {
+        std::cout << "font " + name + "not found at size " << size << std::endl;
+    }
+
+    return return_font;
 }
