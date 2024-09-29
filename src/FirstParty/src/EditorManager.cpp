@@ -456,6 +456,23 @@ void EditorManager::ViewportWidget()
     UIToImGUI();
     PixelToImGUI();
     ImGui::End();
+
+    ImGui::Begin("test");
+    ImGui::Text("Hello World!");
+    ImGui::End();
+
+
+    ImGui::Begin("My Window");
+
+    ImVec2 window_pos = ImGui::GetWindowPos();
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
+    // Adjust coordinates by adding window position
+    ImVec2 start_pos = ImVec2(10 + window_pos.x, 10 + window_pos.y);
+    ImVec2 end_pos = ImVec2(100 + window_pos.x, 100 + window_pos.y);
+    draw_list->AddLine(start_pos, end_pos, IM_COL32(255, 0, 0, 255), 2.0f);
+
+    ImGui::End();
 }
 
 /**
