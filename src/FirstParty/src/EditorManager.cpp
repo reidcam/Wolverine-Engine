@@ -126,6 +126,12 @@ void EditorManager::UpdateSceneLocal()
             {
                 rapidjson::Value json_comp(rapidjson::kObjectType); // Init the component as an object
                 
+                /* 
+                 Used to store the types of the keys and values for the variables in this component
+                 so that the engine can properly translate the values back from json into lua when the scene is loaded
+                 */
+                rapidjson::Value key_value_type_pairs(rapidjson::kArrayType);
+                
                 std::string component_type = component["type"];
                 rapidjson::Value type;
                 type.SetString(component_type.c_str(), allocator);
@@ -154,9 +160,21 @@ void EditorManager::UpdateSceneLocal()
                     // Skip if the value is the same as it is in the metatable
                     if (component[variable.first] == variable.second) { continue; }
                     
+                    // Skip if the value is a table and its empty
+                    if (variable.second.get_type() == sol::type::table)
+                    {
+                        if (variable.second.as<sol::table>().empty()) { continue; }
+                    }
+                    
                     rapidjson::Value json_var;
                     // Gets the value of the lua value and stores it in a json value.
-                    EngineUtils::LuaObjectToJson(json_var, component[variable.first], allocator);
+                    std::string key_value_pair = "string_";
+                    key_value_pair += EngineUtils::LuaObjectToJson(json_var, component[variable.first], allocator);
+                    
+                    // Adds the key_value_pair to the 'key_value_type_pairs' array
+                    rapidjson::Value pair;
+                    pair.SetString(key_value_pair.c_str(), allocator);
+                    key_value_type_pairs.PushBack(pair, allocator);
                     
                     // Gets the name of this variable as a string
                     rapidjson::Value variable_name;
@@ -165,6 +183,9 @@ void EditorManager::UpdateSceneLocal()
                     // Adds the variable to the current component
                     json_comp.AddMember(variable_name, json_var, allocator);
                 }
+                
+                // Adds the 'key_value_type_pairs' array to the component
+                json_comp.AddMember("__type_pairs", key_value_type_pairs, allocator);
                 
                 // Add this component to the 'components' list
                 rapidjson::Value component_id;
@@ -223,10 +244,9 @@ void EditorManager::VariableView(sol::table* table, sol::lua_value key)
     // Converts the key to a string from its lua_type for use in imgui labels
     if (key.is<std::string>()) { var_name = key.as<std::string>(); }
     else if (key.is<bool>()) { var_name = key.as<bool>() ? "true" : "false"; }
-    else if (key.is<int>() || key.is<float>() || key.is<double>()) { var_name = to_string(key.as<int>()); }
-    else if (key.is<sol::function>()) { var_name = "FUNCTION_KEY"; }
-    else if (key.is<sol::table>()) { var_name = "TABLE_KEY"; }
-    else { var_name = "UNKNOWN_KEY"; }
+    else if (key.is<int>()) { var_name = to_string(key.as<int>()); }
+    else if (key.is<float>() || key.is<double>()) { var_name = to_string(key.as<float>()); }
+    else { return; }
     
     const char* const_var_name = &var_name[0];
     
@@ -386,7 +406,7 @@ void EditorManager::ModeSwitchButtons()
         if (ImGui::Button("Play"))
         {
             // TOOD: Hot reload all modified scenes and scripts
-            //UpdateSceneLocal();
+//            UpdateSceneLocal();
             editor_mode = false;
             play_mode = true;
             PhysicsWorld::ResetWorld();
