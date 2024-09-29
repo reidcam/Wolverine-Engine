@@ -94,30 +94,91 @@ void EditorManager::Cleanup()
  */
 void EditorManager::UpdateSceneLocal()
 {
-    rapidjson::Document updated_scene;
-    updated_scene.SetObject(); // Init the scene file as an object
-    
+    rapidjson::Document updated_scene(rapidjson::kObjectType); // Init the scene file as an object
     // Create an allocator (required for memory management in RapidJSON)
     rapidjson::Document::AllocatorType& allocator = updated_scene.GetAllocator();
     
-    rapidjson::Value actors;
-    actors.SetArray();
+    rapidjson::Value actors(rapidjson::kArrayType); // Init the list of actors as an array
     
     for (int actor_id : Scene::GetAllActorsInScene())
     {
-        rapidjson::Document actor;
-        actor.SetObject(); // Init the actor as an object
-        
-        // Create an allocator (required for memory management in RapidJSON)
-        rapidjson::Document::AllocatorType& a_allocator = actor.GetAllocator();
+        rapidjson::Value actor(rapidjson::kObjectType); // Init the actor as an object
         
         // Adds the contents of the actor to its json object:
+        // Get the 'name' value
         rapidjson::Value actor_name;
         std::string name = Actors::GetName(actor_id);
-        actor_name.SetString(&name[0], name.length());
-        actor.AddMember("name", actor_name, a_allocator);
+        actor_name.SetString(name.c_str(), allocator);
         
+        // Add the 'name' value to the actor
+        actor.AddMember("name", actor_name, allocator);
+        
+        // Get the 'components' value
+        rapidjson::Value components(rapidjson::kObjectType);
+        
+        // Add all of the components to the 'components' value
+        int number_of_components = Actors::GetNumberOfComponents(actor_id);
+        for (int i = 0; i < number_of_components; i++)
+        {
+            sol::table component = Actors::GetComponentByIndex(actor_id, i);
+            
+            if (component.valid())
+            {
+                rapidjson::Value json_comp(rapidjson::kObjectType); // Init the component as an object
+                
+                std::string component_type = component["type"];
+                rapidjson::Value type;
+                type.SetString(component_type.c_str(), allocator);
+                
+                // Add the 'type' value to the component
+                json_comp.AddMember("type", type, allocator);
+                
+                sol::table metatable = component[sol::metatable_key];
+                
+                // If component is not native, metatable needs to be indexed at __index
+                if (!ComponentManager::IsComponentTypeNative(component_type)) { metatable = metatable["__index"]; }
+                
+                // Loop through the varaiables and add them to our json component
+                for (auto& variable : metatable)
+                {
+                    std::string var_name = variable.first.as<std::string>();
+                    
+                    // Skip the variables that exist for engine use: key, actor, type, or any native component values added by Lua
+                    if (var_name == "key" || var_name == "type" || var_name == "actor" ||
+                        var_name == "class_cast" || var_name == "REMOVED_FROM_ACTOR" || var_name == "class_check" ||
+                        var_name == "__type" || var_name == "__name") { continue; }
+                    
+                    // Skip functions
+                    if (component[variable.first].get_type() == sol::type::function) { continue; }
+                    
+                    // Skip if the value is the same as it is in the metatable
+                    if (component[variable.first] == variable.second) { continue; }
+                    
+                    rapidjson::Value json_var;
+                    // Gets the value of the lua value and stores it in a json value.
+                    EngineUtils::LuaObjectToJson(json_var, component[variable.first], allocator);
+                    
+                    // Gets the name of this variable as a string
+                    rapidjson::Value variable_name;
+                    variable_name.SetString(var_name.c_str(), allocator);
+                    
+                    // Adds the variable to the current component
+                    json_comp.AddMember(variable_name, json_var, allocator);
+                }
+                
+                // Add this component to the 'components' list
+                rapidjson::Value component_id;
+                component_id.SetString(to_string(i).c_str(), allocator);
+                components.AddMember(component_id, json_comp, allocator);
+            }
+        }
+        
+        // Add the 'components' value to the actor
+        actor.AddMember("components", components, allocator);
+        
+        // Adds the actor to the 'actors' array
         actors.PushBack(actor, allocator);
+        
     }
     
     updated_scene.AddMember("actors", actors, allocator);
@@ -166,7 +227,6 @@ void EditorManager::VariableView(sol::table* table, sol::lua_value key)
     else if (key.is<sol::function>()) { var_name = "FUNCTION_KEY"; }
     else if (key.is<sol::table>()) { var_name = "TABLE_KEY"; }
     else { var_name = "UNKNOWN_KEY"; }
-    
     
     const char* const_var_name = &var_name[0];
     
@@ -326,7 +386,7 @@ void EditorManager::ModeSwitchButtons()
         if (ImGui::Button("Play"))
         {
             // TOOD: Hot reload all modified scenes and scripts
-//            UpdateSceneLocal();
+            //UpdateSceneLocal();
             editor_mode = false;
             play_mode = true;
             PhysicsWorld::ResetWorld();
@@ -423,7 +483,7 @@ void EditorManager::HierarchyView()
             {
                 sol::table metatable = component[sol::metatable_key];
                 
-                // If component is native, metatable needs to be indexed at __index
+                // If component is not native, metatable needs to be indexed at __index
                 if (!ComponentManager::IsComponentTypeNative(component_type)) { metatable = metatable["__index"]; }
                 
                 // Table allows us to cleanly format our variables
