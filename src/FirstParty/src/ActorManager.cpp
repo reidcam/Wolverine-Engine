@@ -370,6 +370,9 @@ int Actors::LoadActorWithJSON(const rapidjson::Value& actor_data)
             // Creates and gets a reference to a new table on the Lua stack
             sol::table new_component = LuaAPI::GetLuaState()->create_table();
             
+            // Gets the key_value type pairs for this component
+            auto key_value_type_pairs = itr->value["__type_pairs"].GetArray();
+            
             // The key of this component
             std::string key = itr->name.GetString();
             
@@ -406,16 +409,26 @@ int Actors::LoadActorWithJSON(const rapidjson::Value& actor_data)
             // Preform required overrides on component properties
             // Sets component properties to specified values
             const rapidjson::Value& component_properties = itr->value;
+            int i = 0;
             for (rapidjson::Value::ConstMemberIterator itr2 = component_properties.MemberBegin(); itr2 != component_properties.MemberEnd(); itr2++)
             {
                 std::string property_name = itr2->name.GetString();
-                sol::type property_type = new_component[property_name].get_type();
-
-                sol::lua_value property = "";
+                std::string pair = key_value_type_pairs[i].GetString();
+                std::size_t splitter = pair.find('_');
                 
-                EngineUtils::JsonToLuaObject(property, itr2->value, property_type);
-                
-                new_component[property_name] = property;
+                // Error output if the key_value pair was formatted incorrectly
+                if (splitter == std::string::npos) { std::cout << "error: Incorrect key_value pair formatting in json"; }
+                else
+                {
+                    std::string property_type = pair.substr(splitter + 1);
+                    sol::lua_value property = "";
+                    
+                    EngineUtils::JsonToLuaObject(property, itr2->value, property_type);
+                    
+                    new_component[property_name] = property;
+                    
+                    i++;
+                }
             }
 
             //-------------------------------------------------------

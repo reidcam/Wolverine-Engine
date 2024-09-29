@@ -197,54 +197,58 @@ void EngineUtils::CombineJsonDocuments(rapidjson::Document& d1, rapidjson::Docum
  * @param   data     the JSON that will be processed into the table
  * @param   type     the intended type of the lua value
 */
-void EngineUtils::JsonToLuaObject(sol::lua_value& value, const rapidjson::Value& data, sol::type type)
+void EngineUtils::JsonToLuaObject(sol::lua_value& value, const rapidjson::Value& data, std::string type)
 {
     // Adds the property to the component
-    if (type == sol::type::string) { value = data.GetString(); }
-    else if (type == sol::type::boolean) { value = data.GetBool(); }
-    else if (type == sol::type::number)
-    {
-        if (data.IsDouble()) { value = data.GetDouble(); }
-        else { value = data.GetInt(); }
-    }
-    else if (type == sol::type::table)
+    if (type == "string") { value = data.GetString(); }
+    else if (type == "bool") { value = data.GetBool(); }
+    else if (type == "int") { value = data.GetInt(); }
+    else if (type == "float") { value = data.GetFloat(); }
+    else if (type == "double") { value = data.GetDouble(); }
+    else if (type == "table")
     {
         sol::table _table = LuaAPI::GetLuaState()->create_table();
         _table[0] = sol::object(*LuaAPI::GetLuaState());
         
+        // Gets the key_value type pairs for this table
+        auto key_value_type_pairs = data["__type_pairs"].GetArray();
+        
         // Add all of the values in the data to our new table.
-        int i = 1;
+        int i = 0;
         for (rapidjson::Value::ConstMemberIterator itr = data.MemberBegin(); itr != data.MemberEnd(); itr++)
         {
             const rapidjson::Value& _data = itr->value;
             
             sol::lua_value _value = "";
             
-            // Determine the type of value that is being added to the table
-            sol::type _type = sol::type::none;
-            if (itr->value.IsString()) { _type = sol::type::string; }
-            else if (itr->value.IsBool()) { _type = sol::type::boolean; }
-            else if (itr->value.IsInt() || itr->value.IsDouble()) { _type = sol::type::number; }
-            else if (itr->value.IsObject()) { _type = sol::type::table; }
+            std::string pair = key_value_type_pairs[i].GetString();
+            std::size_t splitter = pair.find('_');
             
-            JsonToLuaObject(_value, _data, _type);
-            
-            // Add the value to the new table
-            _table[i] = _value;
+            // Error output if the key_value pair was formatted incorrectly
+            if (splitter == std::string::npos) { std::cout << "error: Incorrect key_value pair formatting in json"; }
+            else
+            {
+                std::string property_type = pair.substr(splitter + 1);
+                
+                JsonToLuaObject(_value, _data, property_type);
+                
+                // Add the value to the new table
+                _table[i] = _value;
+            }
             i++;
         }
         value = _table;
     }
-    else
-    {
-        // If the sol type is not any of the above, determine the object type based off of the json
-        sol::type second_type;
-        if (data.IsString()) { second_type = sol::type::string; }
-        else if (data.IsBool()) { second_type = sol::type::boolean; }
-        else if (data.IsNumber()) { second_type = sol::type::number; }
-        else if (data.IsObject()) { second_type = sol::type::table; }
-        JsonToLuaObject(value, data, second_type);
-    }
+//    else
+//    {
+//        // If the sol type is not any of the above, determine the object type based off of the json
+//        sol::type second_type;
+//        if (data.IsString()) { second_type = sol::type::string; }
+//        else if (data.IsBool()) { second_type = sol::type::boolean; }
+//        else if (data.IsNumber()) { second_type = sol::type::number; }
+//        else if (data.IsObject()) { second_type = sol::type::table; }
+//        JsonToLuaObject(value, data, second_type);
+//    }
 }
 
 /**
@@ -275,7 +279,7 @@ std::string EngineUtils::LuaObjectToJson(rapidjson::Value& value, const sol::lua
         value.SetInt(data.as<int>());
         return "int";
     }
-    else if (data.is<float>()) 
+    else if (data.is<float>() || data.is<double>())
     {
         value.SetFloat(data.as<float>());
         return "float";

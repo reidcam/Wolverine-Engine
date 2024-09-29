@@ -406,7 +406,7 @@ void EditorManager::ModeSwitchButtons()
         if (ImGui::Button("Play"))
         {
             // TOOD: Hot reload all modified scenes and scripts
-//            UpdateSceneLocal();
+            UpdateSceneLocal();
             editor_mode = false;
             play_mode = true;
             PhysicsWorld::ResetWorld();
