@@ -11,6 +11,7 @@
 #define EditorManager_h
 
 #include <unordered_set>
+#include <unordered_map>
 #include <string>
 
 #include "GUIRenderer.h"
@@ -35,6 +36,9 @@ private:
     {
       "SpriteRenderer",
     };
+
+    // bools to track if a window is shown
+    inline static bool hierarchy = true;
 public:
     static bool trigger_editor_mode_toggle;
     
@@ -112,6 +116,11 @@ public:
     * Creates main menu for the editor window
     */
     static void MainMenuBar();
+
+    /**
+    * Initializes the state variables of windows and adds them to window_states
+    */
+    static void InitWindowStates();
 };
 
 #endif /* EditorManager.h */

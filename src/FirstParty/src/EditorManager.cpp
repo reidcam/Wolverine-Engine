@@ -41,9 +41,6 @@ void EditorManager::Init()
     // Set up platfomr/renderer backends
     ImGui_ImplSDL2_InitForSDLRenderer(GUIRenderer::GetWindow(), GUIRenderer::GetRenderer());
     ImGui_ImplSDLRenderer2_Init(GUIRenderer::GetRenderer());
-
-    // Set up viewport docking
-    ImGui::DockSpaceOverViewport(0U, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
 }
 
 /**
@@ -64,6 +61,9 @@ void EditorManager::RenderEditor()
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
     
+    // viewport docking
+    ImGui::DockSpaceOverViewport(0U, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
+
     // Create all of the ImGui windows
     MainMenuBar();
     HierarchyView();
@@ -368,84 +368,88 @@ void EditorManager::ModeSwitchButtons()
  */
 void EditorManager::HierarchyView()
 {
-    bool* display_window = NULL;
+    if (hierarchy) {
+        // window flags
+        ImGuiWindowFlags window_flags = 0;
+        //window_flags |= ImGuiWindowFlags_NoMove;
+        //window_flags |= ImGuiWindowFlags_NoResize;
 
-    // window flags
-    ImGuiWindowFlags window_flags = 0;
-    //window_flags |= ImGuiWindowFlags_NoMove;
-    //window_flags |= ImGuiWindowFlags_NoResize;
-    
-    // Window Size
-    int window_w = 0;
-    int window_h = 0;
-    SDL_GetWindowSize(GUIRenderer::GetWindow(), &window_w, &window_h);
+        // Window Size
+        int window_w = 0;
+        int window_h = 0;
+        SDL_GetWindowSize(GUIRenderer::GetWindow(), &window_w, &window_h);
 
-    int imgui_window_w = 300.0f;
-    int imgui_window_h = window_h;
-    ImGui::SetNextWindowSize(ImVec2(imgui_window_w, imgui_window_h));
-    
-    // Window Position
-    int imgui_window_x = 0.0f;
-    int imgui_window_y = ImGui::GetFrameHeightWithSpacing();
-    ImGui::SetNextWindowPos(ImVec2(imgui_window_x, imgui_window_y), ImGuiCond_FirstUseEver);
-    
-    // Alows developers to click on specifc actors and components to change values
-    ImGui::Begin("Hierarchy View", display_window, window_flags);
-    
-    // Find the selected actor
-    for (int actor_id : Scene::GetAllActorsInScene())
-    {
-        std::string actor_name = Actors::GetName(actor_id);
-        const char* const_name = &actor_name[0];
-        
-        bool actor_enabled = Actors::GetActorEnabled(actor_id);
-        
-        // If the checkbox is clicked toggle the actor's 'enabled' status
-        // The ## hides the id for the item
-        std::string checkbox_id = "##" + actor_name;
-        const char* const_checkbox_id = &checkbox_id[0];
-        if (ImGui::Checkbox(const_checkbox_id, &actor_enabled)) { Actors::SetActorEnabled(actor_id, actor_enabled); }
-            
-        ImGui::SameLine();
-        
-        // If an actor is clicked display its components
-        if (ImGui::Button(const_name)) { selected_actor_id = actor_id; };
-    }
-    
-    // Display the components of the selected actor
-    int number_of_components = Actors::GetNumberOfComponents(selected_actor_id);
-    for (int i = 0; i < number_of_components; i++)
-    {
-        sol::table component = Actors::GetComponentByIndex(selected_actor_id, i);
-        
-        if (component.valid())
+        int imgui_window_w = 300.0f;
+        int imgui_window_h = window_h;
+        ImGui::SetNextWindowSize(ImVec2(imgui_window_w, imgui_window_h));
+
+        // Window Position
+        int imgui_window_x = 0.0f;
+        int imgui_window_y = ImGui::GetFrameHeightWithSpacing();
+        ImGui::SetNextWindowPos(ImVec2(imgui_window_x, imgui_window_y), ImGuiCond_FirstUseEver);
+
+        // Docking
+        ImGuiViewport* viewport = ImGui::GetMainViewport();
+        ImGuiID dockspace_id = viewport->ID;
+        ImGui::SetNextWindowDockID(dockspace_id, ImGuiCond_Once);
+
+        // Alows developers to click on specifc actors and components to change values
+        ImGui::Begin("Hierarchy View", &hierarchy, window_flags);
+
+        // Find the selected actor
+        for (int actor_id : Scene::GetAllActorsInScene())
         {
-            std::string component_type = component["type"];
-            const char* const_type = &component_type[0];
-            
-            // If a component is clicked display its properties
-            if (ImGui::CollapsingHeader(const_type)) 
+            std::string actor_name = Actors::GetName(actor_id);
+            const char* const_name = &actor_name[0];
+
+            bool actor_enabled = Actors::GetActorEnabled(actor_id);
+
+            // If the checkbox is clicked toggle the actor's 'enabled' status
+            // The ## hides the id for the item
+            std::string checkbox_id = "##" + actor_name;
+            const char* const_checkbox_id = &checkbox_id[0];
+            if (ImGui::Checkbox(const_checkbox_id, &actor_enabled)) { Actors::SetActorEnabled(actor_id, actor_enabled); }
+
+            ImGui::SameLine();
+
+            // If an actor is clicked display its components
+            if (ImGui::Button(const_name)) { selected_actor_id = actor_id; };
+        }
+
+        // Display the components of the selected actor
+        int number_of_components = Actors::GetNumberOfComponents(selected_actor_id);
+        for (int i = 0; i < number_of_components; i++)
+        {
+            sol::table component = Actors::GetComponentByIndex(selected_actor_id, i);
+
+            if (component.valid())
             {
-                sol::table metatable = component[sol::metatable_key];
-                
-                // If component is native, metatable needs to be indexed at __index
-                if (!ComponentManager::IsComponentTypeNative(component_type)) { metatable = metatable["__index"]; }
-                
-                // Table allows us to cleanly format our variables
-                ImGui::BeginTable(const_type, 2);
-                for (auto& variable : metatable)
+                std::string component_type = component["type"];
+                const char* const_type = &component_type[0];
+
+                // If a component is clicked display its properties
+                if (ImGui::CollapsingHeader(const_type))
                 {
-                    sol::lua_value key = variable.first;
-                    // Sets this row of the table to be the variable with the given key
-                    VariableView(&component, key);
+                    sol::table metatable = component[sol::metatable_key];
+
+                    // If component is native, metatable needs to be indexed at __index
+                    if (!ComponentManager::IsComponentTypeNative(component_type)) { metatable = metatable["__index"]; }
+
+                    // Table allows us to cleanly format our variables
+                    ImGui::BeginTable(const_type, 2);
+                    for (auto& variable : metatable)
+                    {
+                        sol::lua_value key = variable.first;
+                        // Sets this row of the table to be the variable with the given key
+                        VariableView(&component, key);
+                    }
+                    ImGui::EndTable();
                 }
-                ImGui::EndTable();
             }
         }
+
+        ImGui::End();
     }
-    
-    ImGui::End();
-    delete display_window;
 }
 
 /**
@@ -454,14 +458,12 @@ void EditorManager::HierarchyView()
 void EditorManager::MainMenuBar()
 {
     if (ImGui::BeginMainMenuBar()) {
-        if (ImGui::BeginMenu("File")) {
-            ImGui::MenuItem("Open", "Ctrl+O");
+        if (ImGui::BeginMenu("Window")) {
+            if (ImGui::MenuItem("Hierarchy", NULL, hierarchy)) {
+                hierarchy = !hierarchy;
+                int t = 0;
+            }
             ImGui::MenuItem("Save", "Ctrl+S");
-            ImGui::EndMenu();
-        }
-        if (ImGui::BeginMenu("Edit")) {
-            ImGui::MenuItem("Undo", "Ctrl+Z");
-            ImGui::MenuItem("Redo", "Ctrl+Y");
             ImGui::EndMenu();
         }
         ImGui::EndMainMenuBar();
