@@ -118,9 +118,9 @@ public:
     static void MainMenuBar();
 
     /**
-    * Initializes the state variables of windows and adds them to window_states
+    * Checks to see if editor shortcuts were pressed
     */
-    static void InitWindowStates();
+    static void CheckEditorShortcuts();
 };
 
 #endif /* EditorManager.h */

@@ -64,6 +64,9 @@ void EditorManager::RenderEditor()
     // viewport docking
     ImGui::DockSpaceOverViewport(0U, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
 
+    // check to see if any windows should be opened/closed this frame
+    CheckEditorShortcuts();
+
     // Create all of the ImGui windows
     MainMenuBar();
     HierarchyView();
@@ -459,13 +462,21 @@ void EditorManager::MainMenuBar()
 {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("Window")) {
-            if (ImGui::MenuItem("Hierarchy", NULL, hierarchy)) {
+            if (ImGui::MenuItem("Hierarchy", "Crtl+H", hierarchy)) {
                 hierarchy = !hierarchy;
-                int t = 0;
             }
-            ImGui::MenuItem("Save", "Ctrl+S");
             ImGui::EndMenu();
         }
         ImGui::EndMainMenuBar();
+    }
+}
+
+/**
+* Checks to see if editor shortcuts were pressed
+*/
+void EditorManager::CheckEditorShortcuts()
+{
+    if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_H)) && ImGui::GetIO().KeyCtrl) {
+        hierarchy = !hierarchy;
     }
 }
