@@ -39,8 +39,8 @@ void EditorManager::Init()
     ImGui::StyleColorsDark();
     
     // Set up platfomr/renderer backends
-    ImGui_ImplSDL2_InitForSDLRenderer(RendererData::GetWindow(), RendererData::GetRenderer());
-    ImGui_ImplSDLRenderer2_Init(RendererData::GetRenderer());
+    ImGui_ImplSDL2_InitForSDLRenderer(GUIRenderer::GetWindow(), GUIRenderer::GetRenderer());
+    ImGui_ImplSDLRenderer2_Init(GUIRenderer::GetRenderer());
 }
 
 /**
@@ -66,7 +66,7 @@ void EditorManager::RenderEditor()
     HierarchyView();
     
     ImGui::Render();
-    ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), RendererData::GetRenderer());
+    ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), GUIRenderer::GetRenderer());
 }
 
 /**
@@ -307,7 +307,7 @@ void EditorManager::ModeSwitchButtons()
     
     int window_w = 0;
     int window_h = 0;
-    SDL_GetWindowSize(RendererData::GetWindow(), &window_w, &window_h);
+    SDL_GetWindowSize(GUIRenderer::GetWindow(), &window_w, &window_h);
     
     // Window Size
     int imgui_window_w = 110.0f;
@@ -372,7 +372,7 @@ void EditorManager::HierarchyView()
     
     int window_w = 0;
     int window_h = 0;
-    SDL_GetWindowSize(RendererData::GetWindow(), &window_w, &window_h);
+    SDL_GetWindowSize(GUIRenderer::GetWindow(), &window_w, &window_h);
     
     // Window Size
     int imgui_window_w = 300.0f;

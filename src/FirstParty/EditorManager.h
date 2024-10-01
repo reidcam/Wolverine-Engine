@@ -13,6 +13,7 @@
 #include <unordered_set>
 #include <string>
 
+#include "GUIRenderer.h"
 #include "Renderer.h"
 #include "ComponentManager.h"
 

@@ -17,8 +17,8 @@ private:
 	inline static SDL_Renderer* renderer_gui = nullptr;
 
 	// initial window size and position
-	inline static glm::vec2 window_position = glm::vec2(700, 30);
-	inline static glm::vec2 window_size = glm::vec2(640, 360);
+	inline static glm::vec2 window_position = glm::vec2(960, 30);
+	inline static glm::vec2 window_size = glm::vec2(960, 540);
 	inline static float zoom_factor = 1;
 
 	inline static glm::vec2 current_cam_pos = glm::vec2(0.0f, 0.0f);
