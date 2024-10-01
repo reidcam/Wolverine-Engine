@@ -42,6 +42,9 @@ void EditorManager::Init()
     // Set up platfomr/renderer backends
     ImGui_ImplSDL2_InitForSDLRenderer(GUIRenderer::GetWindow(), GUIRenderer::GetRenderer());
     ImGui_ImplSDLRenderer2_Init(GUIRenderer::GetRenderer());
+
+    // init file path
+    docking_layout_file_path = std::filesystem::path(FileUtils::GetPath("resources"));
 }
 
 /**
@@ -91,7 +94,8 @@ void EditorManager::EditorUpdate()
 */
 void EditorManager::Cleanup()
 {
-    SaveIniSettingsToDisk(user_docking_layout_file_name); // save the current docking layout before closing
+    std::filesystem::path path = docking_layout_file_path.string() + "/" + user_docking_layout_file_name;
+    SaveIniSettingsToDisk(path.string()); // save the current docking layout before closing
     ImGui_ImplSDLRenderer2_Shutdown();
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
@@ -466,7 +470,8 @@ void EditorManager::MainMenuBar()
                 save_layout_as = !save_layout_as;
             }
             if (ImGui::MenuItem("Default")) {
-                LoadDockingLayout(user_docking_layout_file_name);
+                std::filesystem::path path = docking_layout_file_path.string() + "/" + user_docking_layout_file_name;
+                LoadDockingLayout(path.string());
             }
 
             ImGui::EndMenu();
@@ -479,7 +484,8 @@ void EditorManager::MainMenuBar()
         char inputText[256] = "";
         ImGui::Begin("Save Layout As");
         if (ImGui::InputText("Enter text", inputText, IM_ARRAYSIZE(inputText)) && (ImGui::IsItemEdited() && ImGui::IsItemDeactivated())) {
-            SaveIniSettingsToDisk(inputText);
+            std::filesystem::path path = docking_layout_file_path.string() + "/" + inputText;
+            SaveIniSettingsToDisk(path.string());
             save_layout_as = !save_layout_as;
         }
         ImGui::End();
@@ -506,7 +512,8 @@ void EditorManager::ViewportDocking()
 
     // load the most recent user docking layout
     if (first_frame) {
-        LoadDockingLayout(user_docking_layout_file_name);
+        std::filesystem::path path = docking_layout_file_path.string() + "/" + user_docking_layout_file_name;
+        LoadDockingLayout(path.string());
         first_frame = !first_frame;
     }
 }
