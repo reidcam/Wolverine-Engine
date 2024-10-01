@@ -388,13 +388,13 @@ void EditorManager::HierarchyView()
 
         // Window Position
         int imgui_window_x = 0.0f;
-        int imgui_window_y = ImGui::GetFrameHeightWithSpacing();
-        ImGui::SetNextWindowPos(ImVec2(imgui_window_x, imgui_window_y), ImGuiCond_FirstUseEver);
+        int imgui_window_y = ImGui::GetFrameHeightWithSpacing() - 5.0f;
+        ImGui::SetNextWindowPos(ImVec2(imgui_window_x, imgui_window_y), ImGuiCond_Appearing);
 
         // Docking
         ImGuiViewport* viewport = ImGui::GetMainViewport();
         ImGuiID dockspace_id = viewport->ID;
-        ImGui::SetNextWindowDockID(dockspace_id, ImGuiCond_Once);
+        ImGui::SetNextWindowDockID(dockspace_id, ImGuiCond_Appearing);
 
         // Alows developers to click on specifc actors and components to change values
         ImGui::Begin("Hierarchy View", &hierarchy, window_flags);
