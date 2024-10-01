@@ -62,8 +62,10 @@ void EditorManager::RenderEditor()
     ImGui::NewFrame();
     
     // Create all of the ImGui windows
-    ModeSwitchButtons();
+    ImGui::DockSpaceOverViewport(0U, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
+    MainMenuBar();
     HierarchyView();
+    ModeSwitchButtons();
     
     ImGui::Render();
     ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), GUIRenderer::GetRenderer());
@@ -364,28 +366,29 @@ void EditorManager::ModeSwitchButtons()
  */
 void EditorManager::HierarchyView()
 {
-    // Flags
     bool* display_window = NULL;
-    ImGuiWindowFlags flags = 0;
-    flags |= ImGuiWindowFlags_NoMove;
-    flags |= ImGuiWindowFlags_NoResize;
+
+    // window flags
+    ImGuiWindowFlags window_flags = 0;
+    //window_flags |= ImGuiWindowFlags_NoMove;
+    //window_flags |= ImGuiWindowFlags_NoResize;
     
+    // Window Size
     int window_w = 0;
     int window_h = 0;
     SDL_GetWindowSize(GUIRenderer::GetWindow(), &window_w, &window_h);
-    
-    // Window Size
+
     int imgui_window_w = 300.0f;
     int imgui_window_h = window_h;
     ImGui::SetNextWindowSize(ImVec2(imgui_window_w, imgui_window_h));
     
     // Window Position
     int imgui_window_x = 0.0f;
-    int imgui_window_y = 0.0f;
-    ImGui::SetNextWindowPos(ImVec2(imgui_window_x, imgui_window_y));
+    int imgui_window_y = ImGui::GetFrameHeightWithSpacing();
+    ImGui::SetNextWindowPos(ImVec2(imgui_window_x, imgui_window_y), ImGuiCond_FirstUseEver);
     
     // Alows developers to click on specifc actors and components to change values
-    ImGui::Begin("Hierarchy View", display_window, flags);
+    ImGui::Begin("Hierarchy View", display_window, window_flags);
     
     // Find the selected actor
     for (int actor_id : Scene::GetAllActorsInScene())
@@ -441,4 +444,24 @@ void EditorManager::HierarchyView()
     
     ImGui::End();
     delete display_window;
+}
+
+/**
+* Creates main menu for the editor window
+*/
+void EditorManager::MainMenuBar()
+{
+    if (ImGui::BeginMainMenuBar()) {
+        if (ImGui::BeginMenu("File")) {
+            ImGui::MenuItem("Open", "Ctrl+O");
+            ImGui::MenuItem("Save", "Ctrl+S");
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Edit")) {
+            ImGui::MenuItem("Undo", "Ctrl+Z");
+            ImGui::MenuItem("Redo", "Ctrl+Y");
+            ImGui::EndMenu();
+        }
+        ImGui::EndMainMenuBar();
+    }
 }

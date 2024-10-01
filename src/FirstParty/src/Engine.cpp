@@ -191,6 +191,7 @@ int GameLoop()
     }
     
     SDL_RenderClear(RendererData::GetRenderer()); // clear the renderer with the render clear color
+    SDL_RenderClear(GUIRenderer::GetRenderer());
     
     if (!editor_mode)
     {

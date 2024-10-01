@@ -24,9 +24,9 @@ private:
 	inline static glm::vec2 current_cam_pos = glm::vec2(0.0f, 0.0f);
 
 	// clear color values for the renderer
-	inline static Uint8 clear_color_r = 255;
-	inline static Uint8 clear_color_g = 255;
-	inline static Uint8 clear_color_b = 255;
+	inline static Uint8 clear_color_r = 0;
+	inline static Uint8 clear_color_g = 39;
+	inline static Uint8 clear_color_b = 76;
 	inline static Uint8 clear_color_a = 255;
 
 	/**

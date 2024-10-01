@@ -107,6 +107,11 @@ public:
      * Creates the actor hierarchy view
      */
     static void HierarchyView();
+
+    /**
+    * Creates main menu for the editor window
+    */
+    static void MainMenuBar();
 };
 
 #endif /* EditorManager.h */
