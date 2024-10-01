@@ -461,6 +461,12 @@ void EditorManager::MainMenuBar()
             }
             ImGui::EndMenu();
         }
+        if (ImGui::BeginMenu("Layout")) {
+            if (ImGui::MenuItem("Default")) {
+                LoadDockingLayout(user_docking_layout_file_name);
+            }
+            ImGui::EndMenu();
+        }
         ImGui::EndMainMenuBar();
     }
 }
