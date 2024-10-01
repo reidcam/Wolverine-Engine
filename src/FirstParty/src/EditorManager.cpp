@@ -34,6 +34,7 @@ void EditorManager::Init()
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;   // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;    // Enable Gamepad Controls
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;       // Enable Docking
+    io.IniFilename = NULL; // Disable automatic .ini file handling for docking layouts
     
     // Set up imgui style
     ImGui::StyleColorsDark();
@@ -61,8 +62,7 @@ void EditorManager::RenderEditor()
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
     
-    // viewport docking
-    ImGui::DockSpaceOverViewport(0U, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
+    ViewportDocking();
 
     // check to see if any windows should be opened/closed this frame
     CheckEditorShortcuts();
@@ -91,6 +91,7 @@ void EditorManager::EditorUpdate()
 */
 void EditorManager::Cleanup()
 {
+    SaveIniSettingsToDisk(user_docking_layout_file_name); // save the current docking layout before closing
     ImGui_ImplSDLRenderer2_Shutdown();
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
@@ -327,7 +328,7 @@ void EditorManager::ModeSwitchButtons()
     ImGui::SetNextWindowPos(ImVec2(imgui_window_x, imgui_window_y));
     
     // Alows developers to activate the play modes and editor modes
-    ImGui::Begin("Editor Mode", display_window, flags);
+    ImGui::Begin("Play/Pause", display_window, flags);
     if (!play_mode)
     {
         if (ImGui::Button("Play"))
@@ -374,8 +375,6 @@ void EditorManager::HierarchyView()
     if (hierarchy) {
         // window flags
         ImGuiWindowFlags window_flags = 0;
-        //window_flags |= ImGuiWindowFlags_NoMove;
-        //window_flags |= ImGuiWindowFlags_NoResize;
 
         // Window Size
         int window_w = 0;
@@ -389,12 +388,7 @@ void EditorManager::HierarchyView()
         // Window Position
         int imgui_window_x = 0.0f;
         int imgui_window_y = ImGui::GetFrameHeightWithSpacing() - 5.0f;
-        ImGui::SetNextWindowPos(ImVec2(imgui_window_x, imgui_window_y), ImGuiCond_Appearing);
-
-        // Docking
-        ImGuiViewport* viewport = ImGui::GetMainViewport();
-        ImGuiID dockspace_id = viewport->ID;
-        ImGui::SetNextWindowDockID(dockspace_id, ImGuiCond_Appearing);
+        ImGui::SetNextWindowPos(ImVec2(imgui_window_x, imgui_window_y), ImGuiCond_Once);
 
         // Alows developers to click on specifc actors and components to change values
         ImGui::Begin("Hierarchy View", &hierarchy, window_flags);
@@ -478,5 +472,20 @@ void EditorManager::CheckEditorShortcuts()
 {
     if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_H)) && ImGui::GetIO().KeyCtrl) {
         hierarchy = !hierarchy;
+    }
+}
+
+/**
+* Handles docking for the main viewport
+*/
+void EditorManager::ViewportDocking()
+{
+    // Allows the viewport to be used as a docking space
+    ImGui::DockSpaceOverViewport(0U, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
+
+    // load the most recent user docking layout
+    if (first_frame) {
+        LoadDockingLayout(user_docking_layout_file_name);
+        first_frame = !first_frame;
     }
 }

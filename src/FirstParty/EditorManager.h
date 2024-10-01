@@ -29,6 +29,7 @@ private:
     
     static bool editor_mode; // True when the game is paused.
     static bool play_mode; // True after the play button is pressed until the stop button is pressed. No edits can be made in this mode.
+    inline static bool first_frame = false; // used to tell if the user docking layout should be loaded
     
     static int selected_actor_id; // The actor ID of the selected actor in the hierarchy view.
     
@@ -36,6 +37,8 @@ private:
     {
       "SpriteRenderer",
     };
+
+    inline static std::string user_docking_layout_file_name = "imgui";
 
     // bools to track if a window is shown
     inline static bool hierarchy = true;
@@ -121,6 +124,25 @@ public:
     * Checks to see if editor shortcuts were pressed
     */
     static void CheckEditorShortcuts();
+
+    /**
+    * Saves the current docking layout to a .ini file
+    * 
+    * @param    file_name    the name of the file to save to minus the file extension
+    */
+    inline static void SaveIniSettingsToDisk(const std::string& file_name) { ImGui::SaveIniSettingsToDisk((file_name + ".ini").c_str()); }
+
+    /**
+    * Loads the last used layout from a .ini file
+    * 
+    * @param    file_name    the name of the file to save to minus the file extension 
+    */
+    inline static void LoadDockingLayout(const std::string& file_name) { ImGui::LoadIniSettingsFromDisk((file_name + ".ini").c_str()); }
+
+    /**
+    * Handles docking for the main viewport
+    */
+    static void ViewportDocking();
 };
 
 #endif /* EditorManager.h */
