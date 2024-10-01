@@ -41,6 +41,9 @@ void EditorManager::Init()
     // Set up platfomr/renderer backends
     ImGui_ImplSDL2_InitForSDLRenderer(GUIRenderer::GetWindow(), GUIRenderer::GetRenderer());
     ImGui_ImplSDLRenderer2_Init(GUIRenderer::GetRenderer());
+
+    // Set up viewport docking
+    ImGui::DockSpaceOverViewport(0U, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
 }
 
 /**
@@ -62,7 +65,6 @@ void EditorManager::RenderEditor()
     ImGui::NewFrame();
     
     // Create all of the ImGui windows
-    ImGui::DockSpaceOverViewport(0U, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
     MainMenuBar();
     HierarchyView();
     ModeSwitchButtons();
