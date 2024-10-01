@@ -7,7 +7,7 @@
 */
 void GUIRenderer::Init(const std::string& title)
 {
-    SDL_Window* window = SDL_CreateWindow(title.c_str(), window_position.x, window_position.y, window_size.x, window_size.y, SDL_WINDOW_SHOWN);
+    SDL_Window* window = SDL_CreateWindow(title.c_str(), window_position.x, window_position.y, window_size.x, window_size.y, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
     GUIRenderer::SetWindow(window);
     SDL_Renderer* renderer = SDL_CreateRenderer(GUIRenderer::GetWindow(), -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
     GUIRenderer::SetRenderer(renderer);
