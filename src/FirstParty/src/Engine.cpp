@@ -72,7 +72,11 @@ void Initialize()
         // error with config files
     }
     
+    // initialize both renderers and keep track of them
     RendererData::Init(EngineData::game_title);
+    GUIRenderer::Init(EngineData::game_title);
+    EngineData::window_renderer_map[RendererData::GetWindow()] = RendererData::GetRenderer();
+    EngineData::window_renderer_map[GUIRenderer::GetWindow()] = GUIRenderer::GetRenderer();
     
 #ifndef NDEBUG
     // Initializes imgui and the editor
@@ -162,24 +166,29 @@ int GameLoop()
         // Cleans up the imgui context
         EditorManager::Cleanup();
 #endif
-        // Cleans up the SDL widnow and renderer
-        RendererData::Cleanup();
+        SDL_Quit();
         return 1;
     }
     
     // Process all SDL events
     SDL_Event event;
-    while(SDL_PollEvent(&event))
+    while (SDL_PollEvent(&event))
     {
 #ifndef NDEBUG
         // Pass events to imgui for editor
         EditorManager::ImGuiProcessSDLEvent(&event);
 #endif
-        
+
         Input::ProcessEvent(event);
         if (event.type == SDL_QUIT)
         {
             EngineData::quit = true;
+        }
+        else if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE) {
+            SDL_Window* window = SDL_GetWindowFromID(event.window.windowID);
+            if (window) {
+                EngineData::windows_to_destroy.push_back(window);
+            }
         }
     }
     
@@ -220,6 +229,16 @@ int GameLoop()
     
     // Load the new scene if asked for
     if (Scene::load_new_scene) {Scene::LoadNewScene();}
+
+    // Destroy windows marked for destruction
+    for (auto& window : EngineData::windows_to_destroy) {
+        SDL_DestroyRenderer(EngineData::window_renderer_map[window]);
+        SDL_DestroyWindow(window);
+        EngineData::window_renderer_map.erase(window);
+    }
+    if (EngineData::window_renderer_map.empty()) {
+        EngineData::quit = true;
+    }
     
     return 0;
 } // GameLoop()
