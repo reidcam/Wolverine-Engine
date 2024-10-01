@@ -45,6 +45,9 @@ void EditorManager::Init()
 
     // init file path
     docking_layout_file_path = std::filesystem::path(FileUtils::GetPath(docking_layout_sub_path));
+
+    // get all of the .ini files in resources/editor_layouts
+    editor_layout_files = GetEditorLayouts();
 }
 
 /**
@@ -70,6 +73,7 @@ void EditorManager::RenderEditor()
     // check to see if any windows should be opened/closed this frame
     CheckEditorShortcuts();
 
+    ImGui::ShowDemoWindow();
     // Create all of the ImGui windows
     MainMenuBar();
     HierarchyView();
@@ -392,7 +396,7 @@ void EditorManager::HierarchyView()
         // Window Position
         int imgui_window_x = 0.0f;
         int imgui_window_y = ImGui::GetFrameHeightWithSpacing() - 5.0f;
-        ImGui::SetNextWindowPos(ImVec2(imgui_window_x, imgui_window_y), ImGuiCond_Once);
+        ImGui::SetNextWindowPos(ImVec2(imgui_window_x, imgui_window_y), ImGuiCond_FirstUseEver);
 
         // Alows developers to click on specifc actors and components to change values
         ImGui::Begin("Hierarchy View", &hierarchy, window_flags);
@@ -469,9 +473,24 @@ void EditorManager::MainMenuBar()
             if (ImGui::MenuItem("Save Layout As")) {
                 save_layout_as = !save_layout_as;
             }
-            if (ImGui::MenuItem("Default")) {
+
+            if (ImGui::IsItemHovered()) {
+                ImGui::BeginTooltip();
+                ImGui::Text("Restart the engine for saved layouts to appear");
+                ImGui::EndTooltip();
+            }
+
+            if (ImGui::MenuItem("Default")) { // need to create a defualt layout
                 std::filesystem::path path = docking_layout_file_path.string() + "/" + user_docking_layout_file_name;
                 LoadDockingLayout(path.string());
+            }
+
+            // create menu items for each .ini file that exists in resources/editor_layouts
+            for (const std::string& file : editor_layout_files) {
+                if (file != user_docking_layout_file_name && ImGui::MenuItem(file.c_str())) {
+                    std::filesystem::path path = docking_layout_file_path.string() + "/" + file;
+                    LoadDockingLayout(path.string());
+                }
             }
 
             ImGui::EndMenu();
@@ -516,4 +535,21 @@ void EditorManager::ViewportDocking()
         LoadDockingLayout(path.string());
         first_frame = !first_frame;
     }
+}
+
+/**
+* Gets all of the editor layout file names from resources/editor_layouts
+*
+* @return    a vector containing strings of the file names of the editor layout files
+*/
+std::vector<std::string> EditorManager::GetEditorLayouts()
+{
+    std::vector<std::string> iniFiles;
+    for (const auto& entry : std::filesystem::directory_iterator(docking_layout_file_path)) {
+        if (entry.path().extension() == ".ini") {
+            std::string file_name = FileUtils::removeExtension(entry.path().filename().string());
+            iniFiles.push_back(file_name);
+        }
+    }
+    return iniFiles;
 }
