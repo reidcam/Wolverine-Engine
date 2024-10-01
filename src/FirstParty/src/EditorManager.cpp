@@ -44,7 +44,7 @@ void EditorManager::Init()
     ImGui_ImplSDLRenderer2_Init(GUIRenderer::GetRenderer());
 
     // init file path
-    docking_layout_file_path = std::filesystem::path(FileUtils::GetPath("resources"));
+    docking_layout_file_path = std::filesystem::path(FileUtils::GetPath(docking_layout_sub_path));
 }
 
 /**
