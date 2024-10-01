@@ -462,12 +462,27 @@ void EditorManager::MainMenuBar()
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Layout")) {
+            if (ImGui::MenuItem("Save Layout As")) {
+                save_layout_as = !save_layout_as;
+            }
             if (ImGui::MenuItem("Default")) {
                 LoadDockingLayout(user_docking_layout_file_name);
             }
+
             ImGui::EndMenu();
         }
         ImGui::EndMainMenuBar();
+    }
+
+    // input text window for saving a docking layout
+    if (save_layout_as) {
+        char inputText[256] = "";
+        ImGui::Begin("Save Layout As");
+        if (ImGui::InputText("Enter text", inputText, IM_ARRAYSIZE(inputText)) && (ImGui::IsItemEdited() && ImGui::IsItemDeactivated())) {
+            SaveIniSettingsToDisk(inputText);
+            save_layout_as = !save_layout_as;
+        }
+        ImGui::End();
     }
 }
 

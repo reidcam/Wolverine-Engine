@@ -30,6 +30,7 @@ private:
     static bool editor_mode; // True when the game is paused.
     static bool play_mode; // True after the play button is pressed until the stop button is pressed. No edits can be made in this mode.
     inline static bool first_frame = false; // used to tell if the user docking layout should be loaded
+    inline static bool save_layout_as = false; // check to see if the input box for the layout should be shown
     
     static int selected_actor_id; // The actor ID of the selected actor in the hierarchy view.
     
