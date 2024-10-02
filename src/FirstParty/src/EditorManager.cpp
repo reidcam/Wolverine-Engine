@@ -495,6 +495,39 @@ void EditorManager::MainMenuBar()
 
             ImGui::EndMenu();
         }
+        if (ImGui::BeginMenu("Theme")) {
+            if (ImGui::MenuItem("Default")) {
+                ImGui::StyleColorsDark();
+            }
+            if (ImGui::MenuItem("Visual Studio")) {
+                EditorStyle::VisualStudioStyle();
+            }
+            if (ImGui::MenuItem("Cherry")) {
+                EditorStyle::CherryStyle();
+            }
+            if (ImGui::MenuItem("Soft Cherry")) {
+                EditorStyle::SoftCherryStyle();
+            }
+            if (ImGui::MenuItem("Green Leaf")) {
+                EditorStyle::GreenLeafStyle();
+            }
+            if (ImGui::MenuItem("Gold")) {
+                EditorStyle::GoldStyle();
+            }
+            if (ImGui::MenuItem("Unreal Engine")) {
+                EditorStyle::UnrealEngineStyle();
+            }
+            if (ImGui::MenuItem("Purple Comfy")) {
+                EditorStyle::PurpleComfyStyle();
+            }
+            if (ImGui::MenuItem("Black Devil")) {
+                EditorStyle::BlackDevilStyle();
+            }
+            if (ImGui::MenuItem("Light")) {
+                EditorStyle::LightStyle();
+            }
+            ImGui::EndMenu();
+        }
         ImGui::EndMainMenuBar();
     }
 
