@@ -68,13 +68,13 @@ void EngineUtils::CombineJsonDocuments(rapidjson::Document& d1, rapidjson::Docum
     {
         std::string member_name = itr->name.GetString();
         rapidjson::Value json_member_name(member_name.c_str(), (int)member_name.size(), out_document.GetAllocator());
-        // If the value is an array check to combine the arrays, otherwise just copy the values.
+        // If the value is an object check to combine the object, otherwise just copy the values.
         if (itr->value.IsObject())
         {
-            // If d1 also has this array, combine the values
+            // If d1 also has this object, combine the values
             if (d1.HasMember(member_name.c_str()))
             {
-                // Double check to make sure the member is actually an array, then recursively combine the arrays
+                // Double check to make sure the member is actually an object, then recursively combine the object
                 if (d1[member_name.c_str()].IsObject())
                 {
                     rapidjson::Document array;
@@ -138,6 +138,10 @@ void EngineUtils::CombineJsonDocuments(rapidjson::Document& d1, rapidjson::Docum
             {
                 out_document.AddMember(json_member_name, num, out_document.GetAllocator());
             }
+        }
+        else if (itr->value.IsArray())
+        {
+            // TODO: COMBINE ARRAYS
         }
     }
     
@@ -211,7 +215,7 @@ void EngineUtils::JsonToLuaObject(sol::lua_value& value, const rapidjson::Value&
         _table[0] = sol::object(*LuaAPI::GetLuaState());
         
         // Gets the key_value type pairs for this table
-        auto key_value_type_pairs = data["__type_pairs"].GetArray();
+        auto key_value_type_pairs = data.GetObject()["__type_pairs"].GetArray();
         
         // Add all of the values in the data to our new table.
         int i = 0;
@@ -221,11 +225,20 @@ void EngineUtils::JsonToLuaObject(sol::lua_value& value, const rapidjson::Value&
             
             sol::lua_value _value = "";
             
-            std::string pair = key_value_type_pairs[i].GetString();
+            std::string pair = "";
+            int j = 0;
+            for (auto& p : key_value_type_pairs)
+            {
+                if (j == i)
+                {
+                    pair = p.GetString();
+                    break;
+                }
+            }
             std::size_t splitter = pair.find('_');
             
             // Error output if the key_value pair was formatted incorrectly
-            if (splitter == std::string::npos) { std::cout << "error: Incorrect key_value pair formatting in json"; }
+            if (splitter >= pair.size()) { std::cout << "error: Incorrect key_value pair formatting in json"; }
             else
             {
                 std::string property_type = pair.substr(splitter + 1);

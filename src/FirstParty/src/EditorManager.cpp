@@ -133,11 +133,6 @@ void EditorManager::UpdateSceneLocal()
                 rapidjson::Value key_value_type_pairs(rapidjson::kArrayType);
                 
                 std::string component_type = component["type"];
-                rapidjson::Value type;
-                type.SetString(component_type.c_str(), allocator);
-                
-                // Add the 'type' value to the component
-                json_comp.AddMember("type", type, allocator);
                 
                 sol::table metatable = component[sol::metatable_key];
                 
@@ -150,7 +145,7 @@ void EditorManager::UpdateSceneLocal()
                     std::string var_name = variable.first.as<std::string>();
                     
                     // Skip the variables that exist for engine use: key, actor, type, or any native component values added by Lua
-                    if (var_name == "key" || var_name == "type" || var_name == "actor" ||
+                    if (var_name == "key" || var_name == "actor" ||
                         var_name == "class_cast" || var_name == "REMOVED_FROM_ACTOR" || var_name == "class_check" ||
                         var_name == "__type" || var_name == "__name") { continue; }
                     
