@@ -7,8 +7,6 @@
 
 #include "LuaAPI.h"
 
-#include "Engine.h"
-
 /**
 * Exposes all of the API functions to Sol to be used in Lua
 */
@@ -250,7 +248,6 @@ void LuaAPI::ExposeLuaAPI()
     (*GetLuaState())["Actors"] = GetLuaState()->create_table();
     (*GetLuaState())["Actors"]["GetName"] = &Actors::GetName;
     (*GetLuaState())["Actors"]["GetActorEnabled"] = &Actors::GetActorEnabled;
-    (*GetLuaState())["Actors"]["SetActorEnabled"] = &Actors::SetActorEnabled;
     (*GetLuaState())["Actors"]["RemoveComponent"] = &Actors::RemoveComponentFromActor;
     (*GetLuaState())["Actors"]["GetComponentByType"] = &Actors::GetComponentByType;
     (*GetLuaState())["Actors"]["GetComponentsByType"] = &Actors::GetComponentsByType;
@@ -258,6 +255,7 @@ void LuaAPI::ExposeLuaAPI()
     (*GetLuaState())["Actors"]["Instantiate"] = &Scene::Instantiate;
     (*GetLuaState())["Actors"]["Destroy"] = &Scene::Destroy;
 }
+
 
 void deny_write() { std::cout << "error: attempt to modify a dead lua table" << std::endl; }
 
@@ -297,9 +295,7 @@ void LuaAPI::DeleteLuaTable(std::shared_ptr<sol::table> table)
 */
 void LuaAPI::Log(const std::string& message)
 {
-#ifndef NDEBUG
 	std::cout << message + "\n";
-#endif
 }
 
 /**
@@ -318,7 +314,7 @@ void LuaAPI::LogError(const std::string& message)
 */
 void LuaAPI::Quit()
 {
-    EngineData::quit = true;
+	exit(0);
 }
 
 /**

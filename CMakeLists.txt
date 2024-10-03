@@ -88,19 +88,6 @@ target_include_directories("${PROJECT_NAME}_box2d"
         "src/ThirdParty/box2d-2.4.1/src/dynamics"
 )
 
-# Add imgui library
-file(GLOB IMGUI_SOURCES
-        "src/ThirdParty/imgui-1.91.2-docking/*.cpp"
-        "src/ThirdParty/imgui-1.91.2-docking/backends/imgui_impl_sdl2.cpp"
-        "src/ThirdParty/imgui-1.91.2-docking/backends/imgui_impl_sdlrenderer2.cpp"
-)
-add_library("${PROJECT_NAME}_imgui" ${IMGUI_SOURCES})
-target_include_directories("${PROJECT_NAME}_imgui"
-        PUBLIC
-        "src/ThirdParty/imgui-1.91.2-docking"
-        "src/ThirdParty/imgui-1.91.2-docking/backends"
-)
-
 if(APPLE)
         # Add all of the game resources to the mac bundle
         foreach(FILE ${ALL_RESOURCES})
@@ -130,7 +117,6 @@ endif()
 target_compile_features("${PROJECT_NAME}" PRIVATE cxx_std_20 c_std_17)
 target_compile_features("${PROJECT_NAME}_lua" PRIVATE cxx_std_20 c_std_17)
 target_compile_features("${PROJECT_NAME}_box2d" PRIVATE cxx_std_20 c_std_17)
-target_compile_features("${PROJECT_NAME}_imgui" PRIVATE cxx_std_20 c_std_17)
 
 # Add third party libraries
 add_subdirectory("src/ThirdParty/glm")
@@ -139,22 +125,11 @@ add_subdirectory("src/ThirdParty/SDL2_image-2.8.2")
 add_subdirectory("src/ThirdParty/SDL2_ttf-2.22.0")
 add_subdirectory("src/ThirdParty/SDL2_mixer-2.8.0")
 
-# Link SDL2 to imgui so it can use it
-target_link_libraries("${PROJECT_NAME}_imgui"
-        PRIVATE
-        SDL2::SDL2-static
-        SDL2_image::SDL2_image-static
-        SDL2_ttf::SDL2_ttf-static
-        SDL2_mixer::SDL2_mixer-static
-	SDL2main
-)
-
 # Link everything together
 target_link_libraries("${PROJECT_NAME}"
         PRIVATE
         "${PROJECT_NAME}_box2d"
         "${PROJECT_NAME}_lua"
-        "${PROJECT_NAME}_imgui"
         glm
         SDL2::SDL2-static
         SDL2_image::SDL2_image-static
