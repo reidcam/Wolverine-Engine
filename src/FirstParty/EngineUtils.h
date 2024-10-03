@@ -50,7 +50,7 @@ public:
      * @param   data     the JSON that will be processed into the table
      * @param   type     the intended type of the lua value
     */
-    static void JsonToLuaObject(sol::lua_value& value, const rapidjson::Value& data, sol::type type);
+    static void JsonToLuaObject(sol::lua_value& value, const rapidjson::Value& data, std::string type);
     
     /**
      * Loads the data from the Lua value and puts it into a json object

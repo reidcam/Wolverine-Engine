@@ -250,6 +250,9 @@ void LoadComponentTypes()
                     // Attaches the script to a lua table for easier member access
                     sol::table component_table = (*LuaAPI::GetLuaState())[type_name.c_str()];
                     
+                    // Adds the type to this component so we don't have to re-add it later
+                    component_table["type"] = type_name;
+                    
                     // Load the component type into our database
                     loaded_component_types.insert(
                           {

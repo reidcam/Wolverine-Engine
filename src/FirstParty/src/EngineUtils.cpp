@@ -68,13 +68,13 @@ void EngineUtils::CombineJsonDocuments(rapidjson::Document& d1, rapidjson::Docum
     {
         std::string member_name = itr->name.GetString();
         rapidjson::Value json_member_name(member_name.c_str(), (int)member_name.size(), out_document.GetAllocator());
-        // If the value is an array check to combine the arrays, otherwise just copy the values.
+        // If the value is an object check to combine the object, otherwise just copy the values.
         if (itr->value.IsObject())
         {
-            // If d1 also has this array, combine the values
+            // If d1 also has this object, combine the values
             if (d1.HasMember(member_name.c_str()))
             {
-                // Double check to make sure the member is actually an array, then recursively combine the arrays
+                // Double check to make sure the member is actually an object, then recursively combine the object
                 if (d1[member_name.c_str()].IsObject())
                 {
                     rapidjson::Document array;
@@ -139,6 +139,10 @@ void EngineUtils::CombineJsonDocuments(rapidjson::Document& d1, rapidjson::Docum
                 out_document.AddMember(json_member_name, num, out_document.GetAllocator());
             }
         }
+        else if (itr->value.IsArray())
+        {
+            // TODO: COMBINE ARRAYS
+        }
     }
     
     // Parse and copy the values from d1 to out_document:
@@ -197,53 +201,94 @@ void EngineUtils::CombineJsonDocuments(rapidjson::Document& d1, rapidjson::Docum
  * @param   data     the JSON that will be processed into the table
  * @param   type     the intended type of the lua value
 */
-void EngineUtils::JsonToLuaObject(sol::lua_value& value, const rapidjson::Value& data, sol::type type)
+void EngineUtils::JsonToLuaObject(sol::lua_value& value, const rapidjson::Value& data, std::string type)
 {
     // Adds the property to the component
-    if (type == sol::type::string) { value = data.GetString(); }
-    else if (type == sol::type::boolean) { value = data.GetBool(); }
-    else if (type == sol::type::number)
-    {
-        if (data.IsDouble()) { value = data.GetDouble(); }
-        else { value = data.GetInt(); }
-    }
-    else if (type == sol::type::table)
+    if (type == "string") { value = data.GetString(); }
+    else if (type == "bool") { value = data.GetBool(); }
+    else if (type == "int") { value = data.GetInt(); }
+    else if (type == "float") { value = data.GetFloat(); }
+    else if (type == "double") { value = data.GetDouble(); }
+    else if (type == "table")
     {
         sol::table _table = LuaAPI::GetLuaState()->create_table();
-        _table[0] = sol::object(*LuaAPI::GetLuaState());
+        
+        // Gets the key_value type pairs for this object
+        const rapidjson::Value& key_value_type_pairs = data.GetObject()["__type_pairs"];
         
         // Add all of the values in the data to our new table.
-        int i = 1;
+        int i = 0;
         for (rapidjson::Value::ConstMemberIterator itr = data.MemberBegin(); itr != data.MemberEnd(); itr++)
         {
             const rapidjson::Value& _data = itr->value;
             
-            sol::lua_value _value = "";
+            // Skip this loop if we're looking at the __type_pairs object since it doesn't need to be translated into Lua.
+            std::string _name = itr->name.GetString();
+            if (_name == "__type_pairs") { continue; }
             
-            // Determine the type of value that is being added to the table
-            sol::type _type = sol::type::none;
-            if (itr->value.IsString()) { _type = sol::type::string; }
-            else if (itr->value.IsBool()) { _type = sol::type::boolean; }
-            else if (itr->value.IsInt() || itr->value.IsDouble()) { _type = sol::type::number; }
-            else if (itr->value.IsObject()) { _type = sol::type::table; }
+            std::string pair = key_value_type_pairs.FindMember(to_string(i).c_str())->value.GetString();
+            std::size_t splitter = pair.find('_');
             
-            JsonToLuaObject(_value, _data, _type);
+            // The key type is before the _
+            std::string key_type = pair.substr(0, splitter);
+            // The value type is after the _
+            std::string property_type = pair.substr(splitter + 1);
             
-            // Add the value to the new table
-            _table[i] = _value;
+            // Set the key based on the value type its supposed to be
+            sol::lua_value item_key = "";
+            
+            // Converts the key from a string to its lua_type for use as a lua object key
+            // ONLY SUPPORTED KEY TYPES: Strings, Booleans, and Numbers
+            if (key_type == "string")
+            {
+                item_key = _name;
+            }
+            else if (key_type == "bool")
+            {
+                item_key = _name == "true" ? true : false;
+            }
+            else if (key_type == "int")
+            {
+                item_key = std::stoi(_name.c_str());
+            }
+            else if (key_type == "float")
+            {
+                item_key = std::stof(_name.c_str());
+            }
+            else if (key_type == "double")
+            {
+                item_key = std::stod(_name.c_str());
+            }
+            else
+            {
+                // Skip any keys that aren't of one of the supported values
+                item_key = sol::lua_nil;
+            }
+            
+            // Error output if the key_value pair was formatted incorrectly
+            if (splitter >= pair.size()) { std::cout << "error: Incorrect key_value pair formatting in json, pair: " << pair << endl; }
+            else if (!item_key.value().valid()) {std::cout << "error: Unrecognized key type given: " << key_type << endl; }
+            else
+            {
+                sol::lua_value _value = "";
+                
+                JsonToLuaObject(_value, _data, property_type);
+                
+                // Add the value to the new table
+                if (_value.value().valid())
+                {
+                    _table[item_key] = _value;
+                }
+            }
             i++;
         }
         value = _table;
     }
     else
     {
-        // If the sol type is not any of the above, determine the object type based off of the json
-        sol::type second_type;
-        if (data.IsString()) { second_type = sol::type::string; }
-        else if (data.IsBool()) { second_type = sol::type::boolean; }
-        else if (data.IsNumber()) { second_type = sol::type::number; }
-        else if (data.IsObject()) { second_type = sol::type::table; }
-        JsonToLuaObject(value, data, second_type);
+        // If the given type is not recognized, display an error and return lua_nil
+        std::cout << "error: Unrecognized value type given: " << type << endl;
+        value = sol::lua_nil;
     }
 }
 
@@ -275,7 +320,7 @@ std::string EngineUtils::LuaObjectToJson(rapidjson::Value& value, const sol::lua
         value.SetInt(data.as<int>());
         return "int";
     }
-    else if (data.is<float>()) 
+    else if (data.is<float>() || data.is<double>())
     {
         value.SetFloat(data.as<float>());
         return "float";
@@ -293,7 +338,7 @@ std::string EngineUtils::LuaObjectToJson(rapidjson::Value& value, const sol::lua
          Used to store the types of the keys and values for the variables in this table
          so that the engine can properly translate the values back from json into lua
          */
-        rapidjson::Value key_value_type_pairs(rapidjson::kArrayType);
+        rapidjson::Value key_value_type_pairs(rapidjson::kObjectType);
         
         // If the table is an instance then we need to iterate through that to get access to all of the values, since Lua doesnt show us metatable values unless they have been accessed recently, which we can't assume.
         sol::table table = data.as<sol::table>();
@@ -303,6 +348,7 @@ std::string EngineUtils::LuaObjectToJson(rapidjson::Value& value, const sol::lua
             metatable = data.as<sol::table>()[sol::metatable_key]["__index"];
         }
         
+        int i = 0;
         for (auto& itr : metatable)
         {
             // The key that corresponds to the itr in the table
@@ -357,10 +403,14 @@ std::string EngineUtils::LuaObjectToJson(rapidjson::Value& value, const sol::lua
             
             value.AddMember(json_key, json_value, allocator);
             
-            // Adds the key_value_pair to the 'key_value_type_pairs' array
+            // Adds the key_value_pair to the 'key_value_type_pairs' object
             rapidjson::Value pair;
             pair.SetString(key_value_pair.c_str(), allocator);
-            key_value_type_pairs.PushBack(pair, allocator);
+            rapidjson::Value keykey; // The key to the key, idk man...
+            keykey.SetString(to_string(i).c_str(), allocator);
+            key_value_type_pairs.AddMember(keykey, pair, allocator);
+            
+            i++;
         }
         
         // Adds the 'key_value_type_pairs' array to the table

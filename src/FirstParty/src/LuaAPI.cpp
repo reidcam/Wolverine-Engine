@@ -259,7 +259,6 @@ void LuaAPI::ExposeLuaAPI()
     (*GetLuaState())["Actors"]["Destroy"] = &Scene::Destroy;
 }
 
-
 void deny_write() { std::cout << "error: attempt to modify a dead lua table" << std::endl; }
 
 /**
