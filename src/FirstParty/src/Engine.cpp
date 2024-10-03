@@ -21,6 +21,10 @@
 #include "Engine.h"
 #include "EngineUtils.h"
 
+#ifndef NDEBUG
+#include "EditorManager.h"
+#endif
+
 bool EngineData::quit = false;   // True if the game should be quit out of.
 
 //-------------------------------------------------------
@@ -70,6 +74,11 @@ void Initialize()
     
     RendererData::Init(EngineData::game_title);
     
+#ifndef NDEBUG
+    // Initializes imgui and the editor
+    EditorManager::Init();
+#endif
+    
     // Load Assets
     // Do this here because the renderer needs to be initialized before these assets can be loaded.
     LoadImages();
@@ -107,6 +116,7 @@ bool CheckGameConfig()
     }
     if(game_config.HasMember("initial_scene")){
         std::string initial_scene = game_config["initial_scene"].GetString();
+        Scene::initial_scene_name = initial_scene;
         Scene::new_scene_name = initial_scene;
         Scene::LoadNewScene();
     }
@@ -126,10 +136,34 @@ bool CheckGameConfig()
 */
 int GameLoop()
 {
-    LuaAPI::IncrementFrameCounter();
+#ifndef NDEBUG
+    // Esures that modes are only switched at the start of any given frame
+    if (EditorManager::trigger_editor_mode_toggle)
+    {
+        EditorManager::ToggleEditorMode();
+        EditorManager::trigger_editor_mode_toggle = false;
+    }
+#endif
+    
+    // Used to pause certain engine functions if editor mode is active
+    bool editor_mode = false;
+#ifndef NDEBUG
+    editor_mode = EditorManager::GetEditorMode();
+#endif
+    
+    if (!editor_mode)
+    {
+        LuaAPI::IncrementFrameCounter();
+    }
 
     if (EngineData::quit)
     {
+#ifndef NDEBUG
+        // Cleans up the imgui context
+        EditorManager::Cleanup();
+#endif
+        // Cleans up the SDL widnow and renderer
+        RendererData::Cleanup();
         return 1;
     }
     
@@ -137,6 +171,11 @@ int GameLoop()
     SDL_Event event;
     while(SDL_PollEvent(&event))
     {
+#ifndef NDEBUG
+        // Pass events to imgui for editor
+        EditorManager::ImGuiProcessSDLEvent(&event);
+#endif
+        
         Input::ProcessEvent(event);
         if (event.type == SDL_QUIT)
         {
@@ -146,15 +185,23 @@ int GameLoop()
     
     SDL_RenderClear(RendererData::GetRenderer()); // clear the renderer with the render clear color
     
-    Scene::UpdateActors();
-    
-    // Box2D Physics
-
-    if (PhysicsWorld::world_initialized) {
-        InitializeCollisions();
-        PhysicsWorld::AdvanceWorld();
-        PhysicsWorld::world->DebugDraw();
+    if (!editor_mode)
+    {
+        Scene::UpdateActors();
+        
+        // Box2D Physics
+        if (PhysicsWorld::world_initialized) {
+            InitializeCollisions();
+            PhysicsWorld::AdvanceWorld();
+            PhysicsWorld::world->DebugDraw();
+        }
     }
+#ifndef NDEBUG
+    else
+    {
+        EditorManager::EditorUpdate();
+    }
+#endif
 
     // RENDER STUFF HERE
     RendererData::RenderAndClearAllImageRequests();
@@ -163,7 +210,9 @@ int GameLoop()
     RendererData::RenderAndClearAllLines();
     RendererData::RenderAndClearAllUI();
     
-    PhysicsWorld::AdvanceWorld();
+#ifndef NDEBUG
+    EditorManager::RenderEditor();
+#endif
     
     SDL_RenderPresent(RendererData::GetRenderer()); // present the frame into the window
     

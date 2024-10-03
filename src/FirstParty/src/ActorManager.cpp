@@ -68,7 +68,7 @@ void Actors::ProcessAddedComponents()
         int actor_index = GetIndex((*component)["actor"]["ID"]);
         
         // If this component has been removed, skip it
-        if ((*component)["REMOVED_FROM_ACTOR"] == true)
+        if ((*component)["REMOVED_FROM_ACTOR"] == true || (*component)["actor"] == sol::lua_nil)
         {
             continue;
         }
@@ -118,10 +118,11 @@ void Actors::Update()
 {
     std::vector<std::shared_ptr<sol::table>> living_components; // The "Update" list without any of the dead components
     
+    int i = 0;
     for (auto& component : components_to_update)
     {
         // If this component is dead, skip it
-        if ((*component)["REMOVED_FROM_ACTOR"] == true)
+        if ((*component)["REMOVED_FROM_ACTOR"] == true || (*component)["actor"] == sol::lua_nil)
         {
             continue;
         }
@@ -154,6 +155,7 @@ void Actors::Update()
 #endif
             std::cout << "\033[31m" << names[actor_index] << " : " << errorMessage << "\033[0m" << std::endl;
         }
+        i++;
     }
     
     components_to_update.clear();
@@ -170,7 +172,7 @@ void Actors::LateUpdate()
     for (auto& component : components_to_update_late)
     {
         // If this component is dead, skip it
-        if ((*component)["REMOVED_FROM_ACTOR"] == true)
+        if ((*component)["REMOVED_FROM_ACTOR"] == true || (*component)["actor"] == sol::lua_nil)
         {
             continue;
         }
@@ -283,6 +285,37 @@ int Actors::GetID(int actor_id)
     return IDs[actor_index];
 }
 
+/**
+* Gets wether or not an actor is enabled
+*
+* @param     actor_id    the id of the actor that this function is acting on
+* @return    a bool for whether or not the actor is enabled
+*/
+bool Actors::GetActorEnabled(int actor_id)
+{
+    int actor_index = GetIndex(actor_id);
+    if (actor_index == -1) { return false; }
+    
+    return actor_enabled[actor_index];
+}
+
+/**
+* Sets wether or not an actor is enabled
+*
+* @param     actor_id    the id of the actor that this function is acting on
+* @param    is_enabled  the new enabled status of the actor
+*/
+void Actors::SetActorEnabled(int actor_id, bool is_enabled)
+{
+    int actor_index = GetIndex(actor_id);
+    if (actor_index == -1) { return; }
+    
+    actor_enabled[actor_index] = is_enabled;
+    
+    // TODO: Enable or disable the Rigidbody Component to stop the collider from moving even while disabled
+    // Same for when the rigidbody component is manually disabled.
+}
+
 //-------------------------------------------------------
 // Misc.
 
@@ -337,6 +370,10 @@ int Actors::LoadActorWithJSON(const rapidjson::Value& actor_data)
             // Creates and gets a reference to a new table on the Lua stack
             sol::table new_component = LuaAPI::GetLuaState()->create_table();
             
+            // Gets the key_value type pairs for this component
+            const rapidjson::Value& holder = itr->value;
+            const rapidjson::Value& key_value_type_pairs = holder["__type_pairs"];
+            
             // The key of this component
             std::string key = itr->name.GetString();
             
@@ -355,8 +392,6 @@ int Actors::LoadActorWithJSON(const rapidjson::Value& actor_data)
                     ComponentManager::EstablishInheritance(new_component, *GetComponentType(type));
                 }
                 
-                // Allows the component to know its own type
-                new_component["type"] = type;
                 // Gives the component its key
                 new_component["key"] = key;
                 // Sets the component to be enabled by default
@@ -373,16 +408,32 @@ int Actors::LoadActorWithJSON(const rapidjson::Value& actor_data)
             // Preform required overrides on component properties
             // Sets component properties to specified values
             const rapidjson::Value& component_properties = itr->value;
+            int i = 0;
             for (rapidjson::Value::ConstMemberIterator itr2 = component_properties.MemberBegin(); itr2 != component_properties.MemberEnd(); itr2++)
             {
                 std::string property_name = itr2->name.GetString();
-                sol::type property_type = new_component[property_name].get_type();
-
-                sol::lua_value property = "";
                 
-                JsonToLuaObject(property, itr2->value, property_type);
+                // Skip this loop if we're looking at the __type_pairs object since it doesn't need to be translated into Lua.
+                if (property_name == "__type_pairs") { continue; }
                 
-                new_component[property_name] = property;
+                std::string pair = key_value_type_pairs.FindMember(to_string(i).c_str())->value.GetString();
+                std::size_t splitter = pair.find('_');
+                
+                // Error output if the key_value pair was formatted incorrectly
+                if (splitter >= pair.size()) { std::cout << "error: Incorrect key_value pair formatting in json"; }
+                else
+                {
+                    std::string property_type = pair.substr(splitter + 1);
+                    sol::lua_value property = "";
+                    
+                    EngineUtils::JsonToLuaObject(property, itr2->value, property_type);
+                    
+                    if (property.value().valid())
+                    {
+                        new_component[property_name] = property;
+                    }
+                }
+                i++;
             }
 
             //-------------------------------------------------------
@@ -404,64 +455,6 @@ int Actors::LoadActorWithJSON(const rapidjson::Value& actor_data)
     num_total_actors++;
     
     return num_total_actors - 1;
-}
-
-/**
- * Loads the data from JSON into an existing lua value
- * DO NOT USE: This function is for use inside of the scene and actor managers only.
- *
- * @param   value    the lua value that will store the given data
- * @param   data     the JSON that will be processed into the table
- * @param   type     the intended type of the lua value
-*/
-void Actors::JsonToLuaObject(sol::lua_value& value, const rapidjson::Value& data, sol::type type)
-{
-    // Adds the property to the component
-    if (type == sol::type::string) { value = data.GetString(); }
-    else if (type == sol::type::boolean) { value = data.GetBool(); }
-    else if (type == sol::type::number)
-    {
-        if (data.IsDouble()) { value = data.GetDouble(); }
-        else { value = data.GetInt(); }
-    }
-    else if (type == sol::type::table)
-    {
-        sol::table _table = LuaAPI::GetLuaState()->create_table();
-        _table[0] = sol::object(*LuaAPI::GetLuaState());
-        
-        // Add all of the values in the data to our new table.
-        int i = 1;
-        for (rapidjson::Value::ConstMemberIterator itr = data.MemberBegin(); itr != data.MemberEnd(); itr++)
-        {
-            const rapidjson::Value& _data = itr->value;
-            
-            sol::lua_value _value = "";
-            
-            // Determine the type of value that is being added to the table
-            sol::type _type = sol::type::none;
-            if (itr->value.IsString()) { _type = sol::type::string; }
-            else if (itr->value.IsBool()) { _type = sol::type::boolean; }
-            else if (itr->value.IsInt() || itr->value.IsDouble()) { _type = sol::type::number; }
-            else if (itr->value.IsObject()) { _type = sol::type::table; }
-            
-            JsonToLuaObject(_value, _data, _type);
-            
-            // Add the value to the new table
-            _table[i] = _value;
-            i++;
-        }
-        value = _table;
-    }
-    else
-    {
-        // If the sol type is not any of the above, determine the object type based off of the json
-        sol::type second_type;
-        if (data.IsString()) { second_type = sol::type::string; }
-        else if (data.IsBool()) { second_type = sol::type::boolean; }
-        else if (data.IsNumber()) { second_type = sol::type::number; }
-        else if (data.IsObject()) { second_type = sol::type::table; }
-        JsonToLuaObject(value, data, second_type);
-    }
 }
 
 /**
@@ -589,7 +582,10 @@ sol::table Actors::GetComponentByType(int actor_id, std::string type)
 */
 int Actors::GetNumberOfComponents(int actor_id)
 {
-    return components[GetIndex(actor_id)].size();
+    int actor_index = GetIndex(actor_id);
+    if (actor_index == -1) { return 0; }
+    
+    return components[actor_index].size();
 }
 
 /**
@@ -601,18 +597,13 @@ int Actors::GetNumberOfComponents(int actor_id)
 */
 sol::table Actors::GetComponentByIndex(int actor_id, int component_index)
 {
-    return *components[GetIndex(actor_id)][component_index];
-}
-
-/**
-* Gets where or not an actor is enabled
-*
-* @param     actor_id    the id of the actor that this function is acting on
-* @return    a bool for whether or not the actor is enabled
-*/
-bool Actors::GetActorEnabled(int actor_id)
-{
-    return actor_enabled[GetIndex(actor_id)];
+    sol::table null; // An empty table, to be returned if the component(s) cannot be found
+    
+    int actor_index = GetIndex(actor_id);
+    if (actor_index == -1) { return null; }
+    if (component_index < 0 || component_index >= GetNumberOfComponents(actor_id)) { return null; }
+    
+    return *components[actor_index][component_index];
 }
 
 /**
@@ -668,4 +659,156 @@ sol::table Actors::GetComponentByKey(int actor_id, std::string key)
     
     // Return null if the component cannot be found.
     return null;
+}
+
+//-------------------------------------------------------
+// Editor Tools
+
+/**
+ * Clears all of the components and actors from this manager
+ * Used to do a hard reset of invincible actors and components before loading a new scene
+ * NOTE: DO NOT EXPOSE TO LUA! This function is primarily meant to reset the game for the editor
+*/
+void Actors::ResetManager()
+{
+    num_total_actors = 0;
+    num_loaded_actors = 0;
+    
+    id_to_index.clear();
+
+    names.clear();
+    IDs.clear();
+    actor_enabled.clear();
+    
+    components.clear();
+    components_to_init.clear();
+    components_to_delete = {};
+    components_to_update.clear();
+    components_to_update_late.clear();
+}
+
+/**
+ * Loops through all the components and ONLY runs onupdate if its type is needed for the editor.
+ * This is primarily used to trigger SpriteRenderers and other visual components for the EDITOR in editor mode.
+ *
+ * Not very DRY I know...
+ *
+ * @param    editor_components   a list of all the components that are needed for editor mode to function
+ */
+void Actors::EditorUpdateComponents(std::unordered_set<std::string> editor_components)
+{
+    std::vector<std::shared_ptr<sol::table>> living_components; // The "Update" list without any of the dead components
+    
+    for (auto& component : components_to_update)
+    {
+        // If this component is dead, skip it
+        if ((*component)["REMOVED_FROM_ACTOR"] == true)
+        {
+            continue;
+        }
+        
+        int actor_index = GetIndex((*component)["actor"]["ID"]);
+        
+        // The component is alive! add it to living components
+        living_components.push_back(component);
+        
+        // Skip this component if it isn't needed in editor mode
+        if (editor_components.find((*component)["type"]) == editor_components.end()) { continue; }
+    
+        // Skip this component if the actor or component aren't enabled
+        if (!actor_enabled[actor_index] || (*component)["enabled"] == false)
+        {
+            continue;
+        }
+        
+        // Call "OnUpdate"
+        try
+        {
+            sol::function OnUpdate = (*component)["OnUpdate"];
+            if (OnUpdate.valid())
+            {
+                OnUpdate(*component);
+            }
+        }
+        catch(const std::exception& e)
+        {
+            std::string errorMessage = e.what();
+#ifdef _WIN32
+            std::replace(errorMessage.begin(), errorMessage.end(), '\\', '/');
+#endif
+            std::cout << "\033[31m" << names[actor_index] << " : " << errorMessage << "\033[0m" << std::endl;
+        }
+    }
+    
+    components_to_update.clear();
+    components_to_update = living_components;
+}
+
+/**
+ * Loops through all the components and ONLY runs onstart if its type is needed for the editor.
+ * This is primarily used to prepare SpriteRenderers and other visual components for the EDITOR in editor mode.
+ *
+ * Not very DRY I know...
+ *
+ * @param    editor_components   a list of all the components that are needed for editor mode to function
+ */
+void Actors::EditorStartComponents(std::unordered_set<std::string> editor_components)
+{
+    // Stores the components that didn't get processed this frame, so we can re-add
+    // them to "components_to_init" when we've finished processing the others
+    std::vector<std::shared_ptr<sol::table>> not_processed;
+    
+    for (auto& component : components_to_init)
+    {
+        int actor_index = GetIndex((*component)["actor"]["ID"]);
+        
+        // If this component has been removed, skip it
+        if ((*component)["REMOVED_FROM_ACTOR"] == true)
+        {
+            continue;
+        }
+        
+        // Skip this component if the actor or component aren't enabled
+        if (!actor_enabled[actor_index] || (*component)["enabled"] == false)
+        {
+            not_processed.push_back(component);
+            continue;
+        }
+
+        // Skip this component if it isn't needed in editor mode
+        if (editor_components.find((*component)["type"]) == editor_components.end())
+        {
+            not_processed.push_back(component);
+            continue;
+        }
+        
+        // Add to the appropriate lifecycle functions list so that they will start being called by the engine.
+        sol::function OnUpdate = (*component)["OnUpdate"];
+        if (OnUpdate.valid()) { components_to_update.push_back(component); }
+        sol::function OnLateUpdate = (*component)["OnLateUpdate"];
+        if (OnLateUpdate.valid()) { components_to_update_late.push_back(component); }
+        
+        // Call "OnStart" if it exists for this component
+        try
+        {
+            // OnStart is called for each component the frame they are loaded into the game
+            sol::function OnStart = (*component)["OnStart"];
+            if (OnStart.valid())
+            {
+                OnStart(*component);
+            }
+        }
+        catch(const std::exception& e)
+        {
+            std::string errorMessage = e.what();
+#ifdef _WIN32
+            std::replace(errorMessage.begin(), errorMessage.end(), '\\', '/');
+#endif
+            std::cout << "\033[31m" << names[actor_index] << " : " << errorMessage << "\033[0m" << std::endl;
+        }
+    }
+    
+    // Remove all the processed components from the list
+    components_to_init.clear();
+    components_to_init = not_processed;
 }
