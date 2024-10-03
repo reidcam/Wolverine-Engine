@@ -12,7 +12,6 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
-#include <unordered_set>
 #include <queue>
 
 #include "TemplateDB.h"
@@ -115,22 +114,6 @@ public:
     */
     static int GetID(int actor_id);
     
-    /**
-    * Gets wether or not an actor is enabled
-    *
-    * @param     actor_id    the id of the actor that this function is acting on
-    * @return                a bool for whether or not the actor is enabled
-    */
-    static bool GetActorEnabled(int actor_id);
-    
-    /**
-    * Sets wether or not an actor is enabled
-    *
-    * @param     actor_id    the id of the actor that this function is acting on
-    * @param    is_enabled  the new enabled status of the actor
-    */
-    static void SetActorEnabled(int actor_id, bool is_enabled);
-    
     //-------------------------------------------------------
     // Misc.
     
@@ -143,6 +126,16 @@ public:
      * @return                returns the id of the newly created actor
     */
     static int LoadActorWithJSON(const rapidjson::Value& actor_data);
+    
+    /**
+     * Loads the data from JSON into an existing lua value
+     * DO NOT USE: This function is for use inside of the scene and actor managers only.
+     *
+     * @param   value    the lua value that will store the given data
+     * @param   data     the JSON that will be processed into the table
+     * @param   type     the intended type of the lua value
+    */
+    static void JsonToLuaObject(sol::lua_value& value, const rapidjson::Value& data, sol::type type);
     
     /**
      * Prepares an actor for destruction later this frame
@@ -163,7 +156,7 @@ public:
     static void DestroyActor(int actor_id);
     
     //-------------------------------------------------------
-    // Components
+    // Components.
     
     /**
      * Removes a component from an actor and marks it for deletion
@@ -200,6 +193,14 @@ public:
     static sol::table GetComponentByIndex(int actor_id, int component_index);
 
     /**
+    * Gets where or not an actor is enabled
+    * 
+    * @param     actor_id    the id of the actor that this function is acting on
+    * @return                a bool for whether or not the actor is enabled
+    */
+    static bool GetActorEnabled(int actor_id);
+
+    /**
      * Gets all of the components on the given actor with the given type if they exist.
      *
      * @param   actor_id    the id of the actor that this function is acting on
@@ -216,35 +217,6 @@ public:
      * @return              the component on the given actor with the given key, if none are found returns null
     */
     static sol::table GetComponentByKey(int actor_id, std::string key);
-    
-    //-------------------------------------------------------
-    // Editor Tools
-    
-    /**
-     * Clears all of the components and actors from this manager
-     * Used to do a hard reset of invincible actors and components before loading a new scene
-    */
-    static void ResetManager();
-    
-    /**
-     * Loops through all the components and ONLY runs onupdate if its type is needed for the editor.
-     * This is primarily used to trigger SpriteRenderers and other visual components for the EDITOR in editor mode.
-     *
-     * Not very DRY I know...
-     *
-     * @param    editor_components   a list of all the components that are needed for editor mode to function
-     */
-    static void EditorUpdateComponents(std::unordered_set<std::string> editor_components);
-    
-    /**
-     * Loops through all the components and ONLY runs onstart if its type is needed for the editor.
-     * This is primarily used to prepare SpriteRenderers and other visual components for the EDITOR in editor mode.
-     *
-     * Not very DRY I know...
-     *
-     * @param    editor_components   a list of all the components that are needed for editor mode to function
-     */
-    static void EditorStartComponents(std::unordered_set<std::string> editor_components);
     
 }; // Actors
 

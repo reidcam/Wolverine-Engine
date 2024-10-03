@@ -290,11 +290,6 @@ public:
 	* @returns	  the current zoom factor of the camera
 	*/
 	static float GetCameraZoom();
-    
-    /**
-     * Cleans up the SDL renderer and window
-     */
-    static void Cleanup();
 };
 
 /**

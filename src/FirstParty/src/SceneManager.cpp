@@ -12,7 +12,6 @@
 
 #include "LuaAPI.h"
 
-std::string Scene::initial_scene_name = ""; // The name of the first scene to be loaded in the game
 std::string Scene::current_scene_name = ""; // The name of this scene
 int Scene::current_scene_lifetime = 0; // The number of frames this scene has been active for
 
@@ -256,30 +255,4 @@ Actor Scene::FindActorByID(int ID)
     found_actor.ID = ID;
     
     return found_actor;
-}
-
-/**
- * Clears all of the data from this manager
- * NOTE: DO NOT EXPOSE TO LUA! This function is primarily meant to reset the game for the editor
- * Could cause unintended behavior if used improperly
-*/
-void Scene::ResetManager()
-{
-    Actors::ResetManager();
-    
-    actors.clear();
-    dead_actors.clear();
-    
-    new_scene_name = initial_scene_name;
-    LoadNewScene();
-}
-
-/**
- * Returns a copy of the 'actors' vector
- * NOTE: DO NOT EXPOSE TO LUA! This function is primarily meant to pass actor data to the editor
- * Could cause unintended behavior if used improperly
-*/
-std::vector<int> Scene::GetAllActorsInScene()
-{
-    return actors;
 }

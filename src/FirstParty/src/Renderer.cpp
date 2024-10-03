@@ -500,13 +500,3 @@ float RendererData::GetCameraZoom()
 {
 	return zoom_factor;
 }
-
-/**
- * Cleans up the SDL renderer and window
- */
-void RendererData::Cleanup()
-{
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
-}
