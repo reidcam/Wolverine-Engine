@@ -130,7 +130,7 @@ void EditorManager::UpdateSceneLocal()
                  Used to store the types of the keys and values for the variables in this component
                  so that the engine can properly translate the values back from json into lua when the scene is loaded
                  */
-                rapidjson::Value key_value_type_pairs(rapidjson::kArrayType);
+                rapidjson::Value key_value_type_pairs(rapidjson::kObjectType);
                 
                 std::string component_type = component["type"];
                 
@@ -140,6 +140,7 @@ void EditorManager::UpdateSceneLocal()
                 if (!ComponentManager::IsComponentTypeNative(component_type)) { metatable = metatable["__index"]; }
                 
                 // Loop through the varaiables and add them to our json component
+                int j = 0;
                 for (auto& variable : metatable)
                 {
                     std::string var_name = variable.first.as<std::string>();
@@ -152,12 +153,12 @@ void EditorManager::UpdateSceneLocal()
                     // Skip functions
                     if (component[variable.first].get_type() == sol::type::function) { continue; }
                     
-                    // Skip if the value is the same as it is in the metatable
-                    if (component[variable.first] == variable.second) { continue; }
+                    // Skip if the value is the same as it is in the metatable (except for type, which needs to always be displayed in the json)
+                    if (component[variable.first] == variable.second && var_name != "type") { continue; }
                     
-                    // Skip if the value is a table and its empty
                     if (variable.second.get_type() == sol::type::table)
                     {
+                        // Skip if the value is a table and its empty
                         if (variable.second.as<sol::table>().empty()) { continue; }
                     }
                     
@@ -166,10 +167,12 @@ void EditorManager::UpdateSceneLocal()
                     std::string key_value_pair = "string_";
                     key_value_pair += EngineUtils::LuaObjectToJson(json_var, component[variable.first], allocator);
                     
-                    // Adds the key_value_pair to the 'key_value_type_pairs' array
+                    // Adds the key_value_pair to the 'key_value_type_pairs' object
                     rapidjson::Value pair;
                     pair.SetString(key_value_pair.c_str(), allocator);
-                    key_value_type_pairs.PushBack(pair, allocator);
+                    rapidjson::Value keykey; // The key to the key, idk man...
+                    keykey.SetString(to_string(j).c_str(), allocator);
+                    key_value_type_pairs.AddMember(keykey, pair, allocator);
                     
                     // Gets the name of this variable as a string
                     rapidjson::Value variable_name;
@@ -177,9 +180,11 @@ void EditorManager::UpdateSceneLocal()
                     
                     // Adds the variable to the current component
                     json_comp.AddMember(variable_name, json_var, allocator);
+                    
+                    j++;
                 }
                 
-                // Adds the 'key_value_type_pairs' array to the component
+                // Adds the 'key_value_type_pairs' object to the component
                 json_comp.AddMember("__type_pairs", key_value_type_pairs, allocator);
                 
                 // Add this component to the 'components' list
@@ -199,7 +204,7 @@ void EditorManager::UpdateSceneLocal()
     
     updated_scene.AddMember("actors", actors, allocator);
     
-    EngineUtils::WriteJsonFile(GetScenePath("writing_test"), updated_scene);
+    EngineUtils::WriteJsonFile(GetScenePath(Scene::GetSceneName()), updated_scene);
 }
 
 //-------------------------------------------------------
@@ -270,7 +275,7 @@ void EditorManager::VariableView(sol::table* table, sol::lua_value key)
     {
         std::string variable_value = value.as<std::string>();
         char* const_var_value = &variable_value[0];
-        if (ImGui::InputText(const_invisible_id, const_var_value, variable_value.size()) && (ImGui::IsItemEdited() && ImGui::IsItemDeactivated()))
+        if (ImGui::InputText(const_invisible_id, const_var_value, 100) && (ImGui::IsItemEdited() && ImGui::IsItemDeactivated()))
         {
             (*table)[key] = const_var_value;
         }

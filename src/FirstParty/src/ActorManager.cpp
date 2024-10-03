@@ -371,7 +371,8 @@ int Actors::LoadActorWithJSON(const rapidjson::Value& actor_data)
             sol::table new_component = LuaAPI::GetLuaState()->create_table();
             
             // Gets the key_value type pairs for this component
-            auto key_value_type_pairs = itr->value.GetObject()["__type_pairs"].GetArray();
+            const rapidjson::Value& holder = itr->value;
+            const rapidjson::Value& key_value_type_pairs = holder["__type_pairs"];
             
             // The key of this component
             std::string key = itr->name.GetString();
@@ -391,8 +392,6 @@ int Actors::LoadActorWithJSON(const rapidjson::Value& actor_data)
                     ComponentManager::EstablishInheritance(new_component, *GetComponentType(type));
                 }
                 
-                // Allows the component to know its own type
-                new_component["type"] = type;
                 // Gives the component its key
                 new_component["key"] = key;
                 // Sets the component to be enabled by default
@@ -413,19 +412,12 @@ int Actors::LoadActorWithJSON(const rapidjson::Value& actor_data)
             for (rapidjson::Value::ConstMemberIterator itr2 = component_properties.MemberBegin(); itr2 != component_properties.MemberEnd(); itr2++)
             {
                 std::string property_name = itr2->name.GetString();
-                std::string pair = "";
-                int j = 0;
-                for (auto& p : key_value_type_pairs)
-                {
-                    if (j == i)
-                    {
-                        pair = p.GetString();
-                        break;
-                    }
-                }
-                std::size_t splitter = pair.find('_');
                 
-                std::cout << splitter << " " << pair.size();
+                // Skip this loop if we're looking at the __type_pairs object since it doesn't need to be translated into Lua.
+                if (property_name == "__type_pairs") { continue; }
+                
+                std::string pair = key_value_type_pairs.FindMember(to_string(i).c_str())->value.GetString();
+                std::size_t splitter = pair.find('_');
                 
                 // Error output if the key_value pair was formatted incorrectly
                 if (splitter >= pair.size()) { std::cout << "error: Incorrect key_value pair formatting in json"; }
@@ -436,10 +428,12 @@ int Actors::LoadActorWithJSON(const rapidjson::Value& actor_data)
                     
                     EngineUtils::JsonToLuaObject(property, itr2->value, property_type);
                     
-                    new_component[property_name] = property;
-                    
-                    i++;
+                    if (property.value().valid())
+                    {
+                        new_component[property_name] = property;
+                    }
                 }
+                i++;
             }
 
             //-------------------------------------------------------

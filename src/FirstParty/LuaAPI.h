@@ -45,15 +45,6 @@ public:
 	* Exposes all of the API functions to Sol to be used in Lua
 	*/
 	static void ExposeLuaAPI();
-    
-    /**
-     *  Looks at a lua value and returns its type
-     *
-     * @param   value   the lua value who's type we're evaluating
-     *
-     * @returns the type of the lua object as a string
-     */
-    static std::string GetLuaValueType(sol::lua_value& value);
 
 	/**
 	* Get the Lua state

@@ -259,43 +259,6 @@ void LuaAPI::ExposeLuaAPI()
     (*GetLuaState())["Actors"]["Destroy"] = &Scene::Destroy;
 }
 
-/**
- *  Looks at a lua value and returns its type
- *
- * @param   value   the lua value who's type we're evaluating
- *
- * @returns the type of the lua object as a string
- */
-std::string LuaAPI::GetLuaValueType(sol::lua_value& value)
-{
-    if (value.is<std::string>())
-    {
-        return "string";
-    }
-    else if (value.is<bool>())
-    {
-        return "bool";
-    }
-    else if (value.is<int>())
-    {
-        return "int";
-    }
-    else if (value.is<float>())
-    {
-        return "float";
-    }
-    else if (value.is<double>())
-    {
-        return "double";
-    }
-    else if (value.is<sol::table>())
-    {
-        return "table";
-    }
-    
-    return "UNKNOWN_TYPE";
-}
-
 void deny_write() { std::cout << "error: attempt to modify a dead lua table" << std::endl; }
 
 /**
