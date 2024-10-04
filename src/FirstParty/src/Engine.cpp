@@ -72,7 +72,11 @@ void Initialize()
         // error with config files
     }
     
+    // initialize both renderers and keep track of them
     RendererData::Init(EngineData::game_title);
+    GUIRenderer::Init(EngineData::game_title);
+    EngineData::window_renderer_map[RendererData::GetWindow()] = RendererData::GetRenderer();
+    EngineData::window_renderer_map[GUIRenderer::GetWindow()] = GUIRenderer::GetRenderer();
     
 #ifndef NDEBUG
     // Initializes imgui and the editor
@@ -162,28 +166,32 @@ int GameLoop()
         // Cleans up the imgui context
         EditorManager::Cleanup();
 #endif
-        // Cleans up the SDL widnow and renderer
         RendererData::Cleanup();
+        GUIRenderer::Cleanup();
         return 1;
     }
     
     // Process all SDL events
     SDL_Event event;
-    while(SDL_PollEvent(&event))
+    while (SDL_PollEvent(&event))
     {
 #ifndef NDEBUG
         // Pass events to imgui for editor
         EditorManager::ImGuiProcessSDLEvent(&event);
 #endif
-        
+
         Input::ProcessEvent(event);
         if (event.type == SDL_QUIT)
         {
             EngineData::quit = true;
         }
+        else if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE) {
+            EngineData::quit = true;
+        }
     }
     
     SDL_RenderClear(RendererData::GetRenderer()); // clear the renderer with the render clear color
+    SDL_RenderClear(GUIRenderer::GetRenderer());
     
     if (!editor_mode)
     {
@@ -215,6 +223,7 @@ int GameLoop()
 #endif
     
     SDL_RenderPresent(RendererData::GetRenderer()); // present the frame into the window
+    SDL_RenderPresent(GUIRenderer::GetRenderer()); // present the frame into the window
     
     Input::LateUpdate();
     

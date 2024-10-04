@@ -34,13 +34,20 @@ void EditorManager::Init()
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;   // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;    // Enable Gamepad Controls
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;       // Enable Docking
+    io.IniFilename = NULL; // Disable automatic .ini file handling for docking layouts
     
     // Set up imgui style
     ImGui::StyleColorsDark();
     
     // Set up platfomr/renderer backends
-    ImGui_ImplSDL2_InitForSDLRenderer(RendererData::GetWindow(), RendererData::GetRenderer());
-    ImGui_ImplSDLRenderer2_Init(RendererData::GetRenderer());
+    ImGui_ImplSDL2_InitForSDLRenderer(GUIRenderer::GetWindow(), GUIRenderer::GetRenderer());
+    ImGui_ImplSDLRenderer2_Init(GUIRenderer::GetRenderer());
+
+    // init file path
+    docking_layout_file_path = std::filesystem::path(FileUtils::GetPath(docking_layout_sub_path));
+
+    // get all of the .ini files in resources/editor_layouts
+    editor_layout_files = GetEditorLayouts();
 }
 
 /**
@@ -61,12 +68,19 @@ void EditorManager::RenderEditor()
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
     
+    ViewportDocking();
+
+    // check to see if any windows should be opened/closed this frame
+    CheckEditorShortcuts();
+
+    ImGui::ShowDemoWindow();
     // Create all of the ImGui windows
-    ModeSwitchButtons();
+    MainMenuBar();
     HierarchyView();
+    ModeSwitchButtons();
     
     ImGui::Render();
-    ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), RendererData::GetRenderer());
+    ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), GUIRenderer::GetRenderer());
 }
 
 /**
@@ -84,6 +98,8 @@ void EditorManager::EditorUpdate()
 */
 void EditorManager::Cleanup()
 {
+    std::filesystem::path path = docking_layout_file_path.string() + "/" + user_docking_layout_file_name;
+    SaveIniSettingsToDisk(path.string()); // save the current docking layout before closing
     ImGui_ImplSDLRenderer2_Shutdown();
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
@@ -387,7 +403,7 @@ void EditorManager::ModeSwitchButtons()
     
     int window_w = 0;
     int window_h = 0;
-    SDL_GetWindowSize(RendererData::GetWindow(), &window_w, &window_h);
+    SDL_GetWindowSize(GUIRenderer::GetWindow(), &window_w, &window_h);
     
     // Window Size
     int imgui_window_w = 110.0f;
@@ -400,7 +416,7 @@ void EditorManager::ModeSwitchButtons()
     ImGui::SetNextWindowPos(ImVec2(imgui_window_x, imgui_window_y));
     
     // Alows developers to activate the play modes and editor modes
-    ImGui::Begin("Editor Mode", display_window, flags);
+    ImGui::Begin("Play/Pause", display_window, flags);
     if (!play_mode)
     {
         if (ImGui::Button("Play"))
@@ -444,81 +460,212 @@ void EditorManager::ModeSwitchButtons()
  */
 void EditorManager::HierarchyView()
 {
-    // Flags
-    bool* display_window = NULL;
-    ImGuiWindowFlags flags = 0;
-    flags |= ImGuiWindowFlags_NoMove;
-    flags |= ImGuiWindowFlags_NoResize;
-    
-    int window_w = 0;
-    int window_h = 0;
-    SDL_GetWindowSize(RendererData::GetWindow(), &window_w, &window_h);
-    
-    // Window Size
-    int imgui_window_w = 300.0f;
-    int imgui_window_h = window_h;
-    ImGui::SetNextWindowSize(ImVec2(imgui_window_w, imgui_window_h));
-    
-    // Window Position
-    int imgui_window_x = 0.0f;
-    int imgui_window_y = 0.0f;
-    ImGui::SetNextWindowPos(ImVec2(imgui_window_x, imgui_window_y));
-    
-    // Alows developers to click on specifc actors and components to change values
-    ImGui::Begin("Hierarchy View", display_window, flags);
-    
-    // Find the selected actor
-    for (int actor_id : Scene::GetAllActorsInScene())
-    {
-        std::string actor_name = Actors::GetName(actor_id);
-        const char* const_name = &actor_name[0];
-        
-        bool actor_enabled = Actors::GetActorEnabled(actor_id);
-        
-        // If the checkbox is clicked toggle the actor's 'enabled' status
-        // The ## hides the id for the item
-        std::string checkbox_id = "##" + actor_name;
-        const char* const_checkbox_id = &checkbox_id[0];
-        if (ImGui::Checkbox(const_checkbox_id, &actor_enabled)) { Actors::SetActorEnabled(actor_id, actor_enabled); }
-            
-        ImGui::SameLine();
-        
-        // If an actor is clicked display its components
-        if (ImGui::Button(const_name)) { selected_actor_id = actor_id; };
-    }
-    
-    // Display the components of the selected actor
-    int number_of_components = Actors::GetNumberOfComponents(selected_actor_id);
-    for (int i = 0; i < number_of_components; i++)
-    {
-        sol::table component = Actors::GetComponentByIndex(selected_actor_id, i);
-        
-        if (component.valid())
+    if (hierarchy) {
+        // window flags
+        ImGuiWindowFlags window_flags = 0;
+
+        // Window Size
+        int window_w = 0;
+        int window_h = 0;
+        SDL_GetWindowSize(GUIRenderer::GetWindow(), &window_w, &window_h);
+
+        int imgui_window_w = 300.0f;
+        int imgui_window_h = window_h;
+        ImGui::SetNextWindowSize(ImVec2(imgui_window_w, imgui_window_h));
+
+        // Window Position
+        int imgui_window_x = 0.0f;
+        int imgui_window_y = ImGui::GetFrameHeightWithSpacing() - 5.0f;
+        ImGui::SetNextWindowPos(ImVec2(imgui_window_x, imgui_window_y), ImGuiCond_FirstUseEver);
+
+        // Alows developers to click on specifc actors and components to change values
+        ImGui::Begin("Hierarchy View", &hierarchy, window_flags);
+
+        // Find the selected actor
+        for (int actor_id : Scene::GetAllActorsInScene())
         {
-            std::string component_type = component["type"];
-            const char* const_type = &component_type[0];
-            
-            // If a component is clicked display its properties
-            if (ImGui::CollapsingHeader(const_type)) 
+            std::string actor_name = Actors::GetName(actor_id);
+            const char* const_name = &actor_name[0];
+
+            bool actor_enabled = Actors::GetActorEnabled(actor_id);
+
+            // If the checkbox is clicked toggle the actor's 'enabled' status
+            // The ## hides the id for the item
+            std::string checkbox_id = "##" + actor_name;
+            const char* const_checkbox_id = &checkbox_id[0];
+            if (ImGui::Checkbox(const_checkbox_id, &actor_enabled)) { Actors::SetActorEnabled(actor_id, actor_enabled); }
+
+            ImGui::SameLine();
+
+            // If an actor is clicked display its components
+            if (ImGui::Button(const_name)) { selected_actor_id = actor_id; };
+        }
+
+        // Display the components of the selected actor
+        int number_of_components = Actors::GetNumberOfComponents(selected_actor_id);
+        for (int i = 0; i < number_of_components; i++)
+        {
+            sol::table component = Actors::GetComponentByIndex(selected_actor_id, i);
+
+            if (component.valid())
             {
-                sol::table metatable = component[sol::metatable_key];
-                
-                // If component is not native, metatable needs to be indexed at __index
-                if (!ComponentManager::IsComponentTypeNative(component_type)) { metatable = metatable["__index"]; }
-                
-                // Table allows us to cleanly format our variables
-                ImGui::BeginTable(const_type, 2);
-                for (auto& variable : metatable)
+                std::string component_type = component["type"];
+                const char* const_type = &component_type[0];
+
+                // If a component is clicked display its properties
+                if (ImGui::CollapsingHeader(const_type))
                 {
-                    sol::lua_value key = variable.first;
-                    // Sets this row of the table to be the variable with the given key
-                    VariableView(&component, key);
+                    sol::table metatable = component[sol::metatable_key];
+
+                    // If component is native, metatable needs to be indexed at __index
+                    if (!ComponentManager::IsComponentTypeNative(component_type)) { metatable = metatable["__index"]; }
+
+                    // Table allows us to cleanly format our variables
+                    ImGui::BeginTable(const_type, 2);
+                    for (auto& variable : metatable)
+                    {
+                        sol::lua_value key = variable.first;
+                        // Sets this row of the table to be the variable with the given key
+                        VariableView(&component, key);
+                    }
+                    ImGui::EndTable();
                 }
-                ImGui::EndTable();
+            }
+        }
+
+        ImGui::End();
+    }
+}
+
+/**
+* Creates main menu for the editor window
+*/
+void EditorManager::MainMenuBar()
+{
+    if (ImGui::BeginMainMenuBar()) {
+        if (ImGui::BeginMenu("Window")) {
+            if (ImGui::MenuItem("Hierarchy", "Crtl+H", hierarchy)) {
+                hierarchy = !hierarchy;
+            }
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Layout")) {
+            if (ImGui::MenuItem("Save Layout As")) {
+                save_layout_as = !save_layout_as;
+            }
+
+            if (ImGui::IsItemHovered()) {
+                ImGui::BeginTooltip();
+                ImGui::Text("Restart the engine for saved layouts to appear");
+                ImGui::EndTooltip();
+            }
+
+            if (ImGui::MenuItem("Default")) { // need to create a defualt layout
+                std::filesystem::path path = docking_layout_file_path.string() + "/" + user_docking_layout_file_name;
+                LoadDockingLayout(path.string());
+            }
+
+            // create menu items for each .ini file that exists in resources/editor_layouts
+            for (const std::string& file : editor_layout_files) {
+                if (file != user_docking_layout_file_name && ImGui::MenuItem(file.c_str())) {
+                    std::filesystem::path path = docking_layout_file_path.string() + "/" + file;
+                    LoadDockingLayout(path.string());
+                }
+            }
+
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Theme")) {
+            if (ImGui::MenuItem("Default")) {
+                ImGui::StyleColorsDark();
+            }
+            if (ImGui::MenuItem("Visual Studio")) {
+                EditorStyle::VisualStudioStyle();
+            }
+            if (ImGui::MenuItem("Cherry")) {
+                EditorStyle::CherryStyle();
+            }
+            if (ImGui::MenuItem("Soft Cherry")) {
+                EditorStyle::SoftCherryStyle();
+            }
+            if (ImGui::MenuItem("Green Leaf")) {
+                EditorStyle::GreenLeafStyle();
+            }
+            if (ImGui::MenuItem("Gold")) {
+                EditorStyle::GoldStyle();
+            }
+            if (ImGui::MenuItem("Unreal Engine")) {
+                EditorStyle::UnrealEngineStyle();
+            }
+            if (ImGui::MenuItem("Purple Comfy")) {
+                EditorStyle::PurpleComfyStyle();
+            }
+            if (ImGui::MenuItem("Black Devil")) {
+                EditorStyle::BlackDevilStyle();
+            }
+            if (ImGui::MenuItem("Light")) {
+                EditorStyle::LightStyle();
+            }
+            ImGui::EndMenu();
+        }
+        ImGui::EndMainMenuBar();
+    }
+
+    // input text window for saving a docking layout
+    if (save_layout_as) {
+        char inputText[256] = "";
+        ImGui::Begin("Save Layout As");
+        if (ImGui::InputText("Enter text", inputText, IM_ARRAYSIZE(inputText)) && (ImGui::IsItemEdited() && ImGui::IsItemDeactivated())) {
+            std::filesystem::path path = docking_layout_file_path.string() + "/" + inputText;
+            SaveIniSettingsToDisk(path.string());
+            save_layout_as = !save_layout_as;
+        }
+        ImGui::End();
+    }
+}
+
+/**
+* Checks to see if editor shortcuts were pressed
+*/
+void EditorManager::CheckEditorShortcuts()
+{
+    if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_H)) && ImGui::GetIO().KeyCtrl) {
+        hierarchy = !hierarchy;
+    }
+}
+
+/**
+* Handles docking for the main viewport
+*/
+void EditorManager::ViewportDocking()
+{
+    // Allows the viewport to be used as a docking space
+    ImGui::DockSpaceOverViewport(0U, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
+
+    // load the most recent user docking layout
+    if (first_frame) {
+        std::filesystem::path path = docking_layout_file_path.string() + "/" + user_docking_layout_file_name;
+        LoadDockingLayout(path.string());
+        first_frame = !first_frame;
+    }
+}
+
+/**
+* Gets all of the editor layout file names from resources/editor_layouts
+*
+* @return    a vector containing strings of the file names of the editor layout files
+*/
+std::vector<std::string> EditorManager::GetEditorLayouts()
+{
+    std::vector<std::string> iniFiles;
+    if (FileUtils::DirectoryExists(docking_layout_file_path.string())) {
+        for (const auto& entry : std::filesystem::directory_iterator(docking_layout_file_path)) {
+            if (entry.path().extension() == ".ini") {
+                std::string file_name = FileUtils::removeExtension(entry.path().filename().string());
+                iniFiles.push_back(file_name);
             }
         }
     }
-    
-    ImGui::End();
-    delete display_window;
+
+    return iniFiles;
 }
