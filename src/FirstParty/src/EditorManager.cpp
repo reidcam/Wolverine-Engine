@@ -578,11 +578,14 @@ void EditorManager::ViewportDocking()
 std::vector<std::string> EditorManager::GetEditorLayouts()
 {
     std::vector<std::string> iniFiles;
-    for (const auto& entry : std::filesystem::directory_iterator(docking_layout_file_path)) {
-        if (entry.path().extension() == ".ini") {
-            std::string file_name = FileUtils::removeExtension(entry.path().filename().string());
-            iniFiles.push_back(file_name);
+    if (FileUtils::DirectoryExists(docking_layout_file_path.string())) {
+        for (const auto& entry : std::filesystem::directory_iterator(docking_layout_file_path)) {
+            if (entry.path().extension() == ".ini") {
+                std::string file_name = FileUtils::removeExtension(entry.path().filename().string());
+                iniFiles.push_back(file_name);
+            }
         }
     }
+
     return iniFiles;
 }
