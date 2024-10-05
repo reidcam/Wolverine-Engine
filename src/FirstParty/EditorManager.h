@@ -42,7 +42,6 @@ private:
     };
 
     inline static std::string user_docking_layout_file_name = "imgui";
-    inline static std::string docking_layout_sub_path = "editor_resources/editor_layouts"; // path from the working directory
     inline static std::filesystem::path docking_layout_file_path = ""; // actual path object, needs to be initialized
     inline static std::vector<std::string> editor_layout_files;
 

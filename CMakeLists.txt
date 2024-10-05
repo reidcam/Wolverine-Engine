@@ -34,6 +34,7 @@ if (MSVC)
         set_target_properties("${PROJECT_NAME}" PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR})
 endif()
 
+
 # Add Lua library
 file(GLOB LUA_SRC "src/ThirdParty/lua-5.4.6/*.c")
 add_library("${PROJECT_NAME}_lua" ${LUA_SRC})
@@ -101,6 +102,11 @@ else()
         )
 endif()
 
+# Add the cmake dir to the target as an enviroment variable 
+add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E echo 
+                "WAAA"
+)
 
 # Sets the C++ version
 target_compile_features("${PROJECT_NAME}" PRIVATE cxx_std_20 c_std_17)
