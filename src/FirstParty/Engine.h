@@ -16,10 +16,13 @@
 #include "SDL.h"
 #include "SDL_image.h"
 #include "Renderer.h"
-#include "GUIRenderer.h"
 #include "LuaAPI.h"
 #include "CollisionDetector.h"
 #include "PhysicsWorld.h"
+
+#ifndef NDEBUG
+#include "GUIRenderer.h"
+#endif
 
 using namespace std;
 

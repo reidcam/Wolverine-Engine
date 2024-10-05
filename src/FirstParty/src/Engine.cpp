@@ -72,14 +72,14 @@ void Initialize()
         // error with config files
     }
     
-    // initialize both renderers and keep track of them
+    // initialize the renderer and keeps track of it
     RendererData::Init(EngineData::game_title);
-    GUIRenderer::Init(EngineData::game_title);
     EngineData::window_renderer_map[RendererData::GetWindow()] = RendererData::GetRenderer();
-    EngineData::window_renderer_map[GUIRenderer::GetWindow()] = GUIRenderer::GetRenderer();
     
 #ifndef NDEBUG
     // Initializes imgui and the editor
+    GUIRenderer::Init(EngineData::game_title);
+    EngineData::window_renderer_map[GUIRenderer::GetWindow()] = GUIRenderer::GetRenderer();
     EditorManager::Init();
 #endif
     
@@ -165,9 +165,9 @@ int GameLoop()
 #ifndef NDEBUG
         // Cleans up the imgui context
         EditorManager::Cleanup();
+        GUIRenderer::Cleanup();
 #endif
         RendererData::Cleanup();
-        GUIRenderer::Cleanup();
         return 1;
     }
     
@@ -191,7 +191,10 @@ int GameLoop()
     }
     
     SDL_RenderClear(RendererData::GetRenderer()); // clear the renderer with the render clear color
+    
+#ifndef NDEBUG
     SDL_RenderClear(GUIRenderer::GetRenderer());
+#endif
     
     if (!editor_mode)
     {
@@ -223,7 +226,10 @@ int GameLoop()
 #endif
     
     SDL_RenderPresent(RendererData::GetRenderer()); // present the frame into the window
+    
+#ifndef NDEBUG
     SDL_RenderPresent(GUIRenderer::GetRenderer()); // present the frame into the window
+#endif
     
     Input::LateUpdate();
     

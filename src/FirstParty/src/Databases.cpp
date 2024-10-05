@@ -237,10 +237,11 @@ void LoadComponentTypes()
     {
         for (const auto& file : std::filesystem::directory_iterator(FileUtils::GetPath(path)))
         {
-            if (file.path() != path + "/.DS_Store")
+            
+            std::string type_name = file.path().stem().string();
+            
+            if (type_name != ".DS_Store")
             {
-                std::string type_name = file.path().stem().string();
-
                 sol::load_result script = LuaAPI::GetLuaState()->load_file(file.path().string().c_str());
                 if (script.valid())
                 {
