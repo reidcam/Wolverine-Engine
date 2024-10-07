@@ -18,6 +18,7 @@ std::unordered_map<int, int> Actors::id_to_index; // map of an actors id to its 
 
 // The attributes of all the loaded actors
 std::vector<std::string> Actors::names;
+std::vector<std::string> Actors::templates;
 std::vector<int> Actors::IDs;
 std::vector<bool> Actors::actor_enabled;
 
@@ -38,6 +39,7 @@ void Actors::Cleanup()
             // Erase from the vectors
             IDs.erase(IDs.begin() + i);
             names.erase(names.begin() + i);
+            templates.erase(templates.begin() + i);
             actor_enabled.erase(actor_enabled.begin() + i);
             components.erase(components.begin() + i);
         }
@@ -316,6 +318,20 @@ void Actors::SetActorEnabled(int actor_id, bool is_enabled)
     // Same for when the rigidbody component is manually disabled.
 }
 
+/**
+ * Returns this actors template name
+ *
+ * @param   actor_id    the id of the actor that this function is acting on
+ * @returns             the name of the template of the given actor, bank string if it does not have a template
+*/
+std::string Actors::GetTemplateName(int actor_id)
+{
+    int actor_index = GetIndex(actor_id);
+    if (actor_index == -1) {return "";}
+    
+    return templates[actor_index];
+}
+
 //-------------------------------------------------------
 // Misc.
 
@@ -343,6 +359,16 @@ int Actors::LoadActorWithJSON(const rapidjson::Value& actor_data)
     {
         // Gives this actor a default name if none is specified for it
         names.push_back("ActorName");
+    }
+    
+    if (actor_data.HasMember("template"))
+    {
+        templates.push_back(actor_data["template"].GetString());
+    }
+    else
+    {
+        // Gives this actor a blank template if none is specified for it
+        names.push_back("");
     }
     
     if (actor_data.HasMember("enabled"))
@@ -677,6 +703,7 @@ void Actors::ResetManager()
     id_to_index.clear();
 
     names.clear();
+    templates.clear();
     IDs.clear();
     actor_enabled.clear();
     

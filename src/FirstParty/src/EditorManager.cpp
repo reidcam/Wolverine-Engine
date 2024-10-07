@@ -131,89 +131,100 @@ void EditorManager::UpdateSceneLocal()
         // Add the 'name' value to the actor
         actor.AddMember("name", actor_name, allocator);
         
-        // Get the 'components' value
-        rapidjson::Value components(rapidjson::kObjectType);
-        
-        // Add all of the components to the 'components' value
-        int number_of_components = Actors::GetNumberOfComponents(actor_id);
-        for (int i = 0; i < number_of_components; i++)
+        // Get the template of the actor
+        std::string template_name = Actors::GetTemplateName(actor_id);
+        if (template_name != "")
         {
-            sol::table component = Actors::GetComponentByIndex(actor_id, i);
+            rapidjson::Value actor_template_name;
+            actor_template_name.SetString(template_name.c_str(), allocator);
+            actor.AddMember("template", actor_template_name, allocator);
+        }
+        else
+        {
+            // Get the 'components' value
+            rapidjson::Value components(rapidjson::kObjectType);
             
-            if (component.valid())
+            // Add all of the components to the 'components' value
+            int number_of_components = Actors::GetNumberOfComponents(actor_id);
+            for (int i = 0; i < number_of_components; i++)
             {
-                rapidjson::Value json_comp(rapidjson::kObjectType); // Init the component as an object
+                sol::table component = Actors::GetComponentByIndex(actor_id, i);
                 
-                /* 
-                 Used to store the types of the keys and values for the variables in this component
-                 so that the engine can properly translate the values back from json into lua when the scene is loaded
-                 */
-                rapidjson::Value key_value_type_pairs(rapidjson::kObjectType);
-                
-                std::string component_type = component["type"];
-                
-                sol::table metatable = component[sol::metatable_key];
-                
-                // If component is not native, metatable needs to be indexed at __index
-                if (!ComponentManager::IsComponentTypeNative(component_type)) { metatable = metatable["__index"]; }
-                
-                // Loop through the varaiables and add them to our json component
-                int j = 0;
-                for (auto& variable : metatable)
+                if (component.valid())
                 {
-                    std::string var_name = variable.first.as<std::string>();
+                    rapidjson::Value json_comp(rapidjson::kObjectType); // Init the component as an object
                     
-                    // Skip the variables that exist for engine use: key, actor, type, or any native component values added by Lua
-                    if (var_name == "key" || var_name == "actor" ||
-                        var_name == "class_cast" || var_name == "REMOVED_FROM_ACTOR" || var_name == "class_check" ||
-                        var_name == "__type" || var_name == "__name") { continue; }
+                    /* 
+                     Used to store the types of the keys and values for the variables in this component
+                     so that the engine can properly translate the values back from json into lua when the scene is loaded
+                     */
+                    rapidjson::Value key_value_type_pairs(rapidjson::kObjectType);
                     
-                    // Skip functions
-                    if (component[variable.first].get_type() == sol::type::function) { continue; }
+                    std::string component_type = component["type"];
                     
-                    // Skip if the value is the same as it is in the metatable (except for type, which needs to always be displayed in the json)
-                    if (component[variable.first] == variable.second && var_name != "type") { continue; }
+                    sol::table metatable = component[sol::metatable_key];
                     
-                    if (variable.second.get_type() == sol::type::table)
+                    // If component is not native, metatable needs to be indexed at __index
+                    if (!ComponentManager::IsComponentTypeNative(component_type)) { metatable = metatable["__index"]; }
+                    
+                    // Loop through the varaiables and add them to our json component
+                    int j = 0;
+                    for (auto& variable : metatable)
                     {
-                        // Skip if the value is a table and its empty
-                        if (variable.second.as<sol::table>().empty()) { continue; }
+                        std::string var_name = variable.first.as<std::string>();
+                        
+                        // Skip the variables that exist for engine use: key, actor, type, or any native component values added by Lua
+                        if (var_name == "key" || var_name == "actor" ||
+                            var_name == "class_cast" || var_name == "REMOVED_FROM_ACTOR" || var_name == "class_check" ||
+                            var_name == "__type" || var_name == "__name") { continue; }
+                        
+                        // Skip functions
+                        if (component[variable.first].get_type() == sol::type::function) { continue; }
+                        
+                        // Skip if the value is the same as it is in the metatable (except for type, which needs to always be displayed in the json)
+                        if (component[variable.first] == variable.second && var_name != "type") { continue; }
+                        
+                        if (variable.second.get_type() == sol::type::table)
+                        {
+                            // Skip if the value is a table and its empty
+                            if (variable.second.as<sol::table>().empty()) { continue; }
+                        }
+                        
+                        rapidjson::Value json_var;
+                        // Gets the value of the lua value and stores it in a json value.
+                        std::string key_value_pair = "string_";
+                        key_value_pair += EngineUtils::LuaObjectToJson(json_var, component[variable.first], allocator);
+                        
+                        // Adds the key_value_pair to the 'key_value_type_pairs' object
+                        rapidjson::Value pair;
+                        pair.SetString(key_value_pair.c_str(), allocator);
+                        rapidjson::Value keykey; // The key to the key, idk man...
+                        keykey.SetString(to_string(j).c_str(), allocator);
+                        key_value_type_pairs.AddMember(keykey, pair, allocator);
+                        
+                        // Gets the name of this variable as a string
+                        rapidjson::Value variable_name;
+                        variable_name.SetString(var_name.c_str(), allocator);
+                        
+                        // Adds the variable to the current component
+                        json_comp.AddMember(variable_name, json_var, allocator);
+                        
+                        j++;
                     }
                     
-                    rapidjson::Value json_var;
-                    // Gets the value of the lua value and stores it in a json value.
-                    std::string key_value_pair = "string_";
-                    key_value_pair += EngineUtils::LuaObjectToJson(json_var, component[variable.first], allocator);
+                    // Adds the 'key_value_type_pairs' object to the component
+                    json_comp.AddMember("__type_pairs", key_value_type_pairs, allocator);
                     
-                    // Adds the key_value_pair to the 'key_value_type_pairs' object
-                    rapidjson::Value pair;
-                    pair.SetString(key_value_pair.c_str(), allocator);
-                    rapidjson::Value keykey; // The key to the key, idk man...
-                    keykey.SetString(to_string(j).c_str(), allocator);
-                    key_value_type_pairs.AddMember(keykey, pair, allocator);
-                    
-                    // Gets the name of this variable as a string
-                    rapidjson::Value variable_name;
-                    variable_name.SetString(var_name.c_str(), allocator);
-                    
-                    // Adds the variable to the current component
-                    json_comp.AddMember(variable_name, json_var, allocator);
-                    
-                    j++;
+                    // Add this component to the 'components' list
+                    rapidjson::Value component_id;
+                    component_id.SetString(to_string(i).c_str(), allocator);
+                    components.AddMember(component_id, json_comp, allocator);
                 }
-                
-                // Adds the 'key_value_type_pairs' object to the component
-                json_comp.AddMember("__type_pairs", key_value_type_pairs, allocator);
-                
-                // Add this component to the 'components' list
-                rapidjson::Value component_id;
-                component_id.SetString(to_string(i).c_str(), allocator);
-                components.AddMember(component_id, json_comp, allocator);
             }
+            
+            // Add the 'components' value to the actor
+            actor.AddMember("components", components, allocator);
         }
-        
-        // Add the 'components' value to the actor
-        actor.AddMember("components", components, allocator);
         
         // Adds the actor to the 'actors' array
         actors.PushBack(actor, allocator);

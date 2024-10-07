@@ -49,6 +49,7 @@ private:
     
     // The attributes of all the loaded actors
     static std::vector<std::string> names;
+    static std::vector<std::string> templates;
     static std::vector<int> IDs;
     static std::vector<bool> actor_enabled;
     
@@ -130,6 +131,15 @@ public:
     * @param    is_enabled  the new enabled status of the actor
     */
     static void SetActorEnabled(int actor_id, bool is_enabled);
+    
+    /**
+     * Returns this actors template name
+     *
+     * @param   actor_id    the id of the actor that this function is acting on
+     * @returns             the name of the template of the given actor, bank string if it does not have a template
+    */
+    static std::string GetTemplateName(int actor_id);
+
     
     //-------------------------------------------------------
     // Misc.
