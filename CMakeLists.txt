@@ -102,10 +102,9 @@ else()
         )
 endif()
 
-# Add the cmake dir to the target as an enviroment variable 
-add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
-        COMMAND ${CMAKE_COMMAND} -E echo 
-                "WAAA"
+# Adds the path to the cmake directory as a compile definition
+target_compile_definitions( "${PROJECT_NAME}" PRIVATE
+        $<$<CONFIG:Debug>:REAL_DIR_PATH="${CMAKE_SOURCE_DIR}">
 )
 
 # Sets the C++ version

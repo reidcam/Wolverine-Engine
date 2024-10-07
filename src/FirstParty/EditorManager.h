@@ -86,6 +86,11 @@ public:
      */
     static void UpdateSceneLocal();
     
+    /**
+     * Saves all of the changes made in the editor to the engine directory
+     */
+    static void SaveChanges();
+    
     //-------------------------------------------------------
     // Getters/Setters
     

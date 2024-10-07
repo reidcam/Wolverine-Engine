@@ -225,6 +225,34 @@ void EditorManager::UpdateSceneLocal()
     EngineUtils::WriteJsonFile(GetScenePath(Scene::GetSceneName()), updated_scene);
 }
 
+/**
+ * Saves all of the changes made in the editor to the engine directory
+ */
+void EditorManager::SaveChanges()
+{
+    // Changes cannot be saved in play mode
+    if (play_mode) { return; }
+    
+    // All changes should be locally saved before being saved to the disk
+    UpdateSceneLocal();
+    
+    std::string save_to_path = "";
+#ifndef NDEBUG
+    save_to_path = REAL_DIR_PATH;
+    save_to_path += "/resources";
+#endif
+    
+    const auto copy_options = std::filesystem::copy_options::recursive
+                            | std::filesystem::copy_options::update_existing
+    ;
+
+    // Save Scenes
+    std::filesystem::copy(FileUtils::GetPath("resources/scenes"), save_to_path + "/scenes", copy_options);
+    
+    // Save Actor_Templates
+    std::filesystem::copy(FileUtils::GetPath("resources/actor_templates"), save_to_path + "/actor_templates", copy_options);
+}
+
 //-------------------------------------------------------
 // Getters/Setters
 
@@ -424,7 +452,7 @@ void EditorManager::ModeSwitchButtons()
         if (ImGui::Button("Play"))
         {
             // TOOD: Hot reload all modified scenes and scripts
-            UpdateSceneLocal();
+            SaveChanges();
             editor_mode = false;
             play_mode = true;
             PhysicsWorld::ResetWorld();
@@ -547,7 +575,7 @@ void EditorManager::MainMenuBar()
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("File")) {
             if (ImGui::MenuItem("Save", "Crtl+S")) {
-                
+                SaveChanges();
             }
             ImGui::EndMenu();
         }
@@ -639,6 +667,9 @@ void EditorManager::CheckEditorShortcuts()
 {
     if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_H)) && ImGui::GetIO().KeyCtrl) {
         hierarchy = !hierarchy;
+    }    
+    if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_S)) && ImGui::GetIO().KeyCtrl) {
+        SaveChanges();
     }
 }
 
