@@ -45,8 +45,12 @@ private:
     inline static std::filesystem::path docking_layout_file_path = ""; // actual path object, needs to be initialized
     inline static std::vector<std::string> editor_layout_files;
 
+    inline static std::filesystem::path selected_file;
+    inline static std::filesystem::path current_path;
+
     // bools to track if a window is shown
     inline static bool hierarchy = true;
+    inline static bool show_file_selector = false;
 public:
     static bool trigger_editor_mode_toggle;
     
@@ -155,6 +159,12 @@ public:
     * @return    a vector containing strings of the file names of the editor layout files
     */
     static std::vector<std::string> GetEditorLayouts();
+
+    /**
+    * Creates a imgui widgit for selecting files from the resources folder and stores the selected
+    * file in the selected_file variable in EditorManager.h
+    */
+    static void ShowFileSelector();
 };
 
 #endif /* EditorManager.h */

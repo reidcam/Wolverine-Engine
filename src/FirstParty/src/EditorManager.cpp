@@ -45,6 +45,9 @@ void EditorManager::Init()
 
     // init file path
     docking_layout_file_path = std::filesystem::path(FileUtils::GetPath("editor_resources/editor_layouts"));
+    
+    // set path for file viewer
+    current_path = std::filesystem::path(FileUtils::GetPath("resources"));
 
     // get all of the .ini files in resources/editor_layouts
     editor_layout_files = GetEditorLayouts();
@@ -80,6 +83,9 @@ void EditorManager::RenderEditor()
     MainMenuBar();
     HierarchyView();
     ModeSwitchButtons();
+
+    if (show_file_selector)
+        ShowFileSelector();
     
     ImGui::Render();
     ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), GUIRenderer::GetRenderer());
@@ -555,6 +561,9 @@ void EditorManager::MainMenuBar()
             if (ImGui::MenuItem("Hierarchy", "Crtl+H", hierarchy)) {
                 hierarchy = !hierarchy;
             }
+            if (ImGui::MenuItem("File Selector", "Crtl+F", show_file_selector)) {
+                show_file_selector = !show_file_selector;
+            }
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Layout")) {
@@ -640,6 +649,9 @@ void EditorManager::CheckEditorShortcuts()
     if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_H)) && ImGui::GetIO().KeyCtrl) {
         hierarchy = !hierarchy;
     }
+    if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_F)) && ImGui::GetIO().KeyCtrl) {
+        show_file_selector = !show_file_selector;
+    }
 }
 
 /**
@@ -676,4 +688,67 @@ std::vector<std::string> EditorManager::GetEditorLayouts()
     }
 
     return iniFiles;
+}
+
+/**
+* Creates a imgui widgit for selecting files from the resources folder and stores the selected
+* file in the selected_file variable in EditorManager.h
+*/
+void EditorManager::ShowFileSelector() {
+    ImGui::SetNextWindowSize(ImVec2(400, 300), ImGuiCond_FirstUseEver);
+
+    ImGui::Begin("File Selector");
+    
+    // Display current path
+    ImGui::Text("Current Path: %s", current_path.string().c_str());
+
+    // Button to go to parent directory
+    if (std::filesystem::path(current_path).has_parent_path()) {
+        if (ImGui::Button("Go to Parent Directory")) {
+            current_path = std::filesystem::path(current_path).parent_path();
+        }
+    }
+
+    // Display list of files and directories
+    for (const auto& entry : std::filesystem::directory_iterator(current_path)) {
+        if (entry.is_directory()) {
+            if (ImGui::Button((entry.path().filename().string() + "/").c_str())) {
+                current_path = entry.path();
+            }
+        }
+        else {
+            if (ImGui::Selectable(entry.path().filename().string().c_str())) {
+                selected_file = entry.path();
+            }
+        }
+    }
+
+    // Calculate the required width for the text box and button
+    float textWidth = ImGui::CalcTextSize(selected_file.filename().string().c_str()).x;
+    float buttonWidth = ImGui::CalcTextSize("Confirm").x + ImGui::GetStyle().FramePadding.x * 2;
+    constexpr float WINDOW_PADDING = 120;
+    constexpr float TEXT_BOX_MIN_WIDTH = 200.0f;
+    float totalWidth = TEXT_BOX_MIN_WIDTH + buttonWidth + WINDOW_PADDING;
+
+    // Set a maximum width for the text box
+    if (textWidth < TEXT_BOX_MIN_WIDTH) {
+        ImGui::PushItemWidth(TEXT_BOX_MIN_WIDTH);
+    }
+    else {
+        ImGui::PushItemWidth(textWidth);
+    }
+
+    if (ImGui::GetWindowWidth() < totalWidth) {
+        ImGui::SetWindowSize(ImVec2(totalWidth, ImGui::GetWindowHeight()));
+    }
+
+    ImGui::Text("Selected File:");
+    ImGui::SameLine();
+    ImGui::InputText("##SelectedFile", (char*)selected_file.filename().string().c_str(), selected_file.filename().string().size() + 1, ImGuiInputTextFlags_ReadOnly);
+    ImGui::SameLine();
+    if (ImGui::Button("Confirm") && !selected_file.empty()) {
+        show_file_selector = false; // Close the file selector window
+    }
+
+    ImGui::End();
 }
