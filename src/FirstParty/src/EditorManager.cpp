@@ -71,6 +71,7 @@ void EditorManager::RenderEditor()
 {
     ImGui_ImplSDLRenderer2_NewFrame();
     ImGui_ImplSDL2_NewFrame();
+    //LoadFontsImGUI(); // NOTE: Must be called before ImGui::NewFrame() and after ImGui::Render()
     ImGui::NewFrame();
     
     ViewportDocking();
@@ -87,6 +88,8 @@ void EditorManager::RenderEditor()
     if (show_file_selector)
         ShowFileSelector();
     
+    ViewportWidget();
+
     ImGui::Render();
     ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), GUIRenderer::GetRenderer());
 }
@@ -751,4 +754,247 @@ void EditorManager::ShowFileSelector() {
     }
 
     ImGui::End();
+}
+* Creates the widget for the viewport and handles rendering
+*/
+void EditorManager::ViewportWidget()
+{
+    ImGui::Begin("Viewport");
+    ImageToImGUI();
+    TextToImGUI();
+    UIToImGUI();
+    PixelToImGUI();
+    ImGui::End();
+
+    ImGui::Begin("test");
+    ImGui::Text("Hello World!");
+    ImGui::End();
+
+
+    ImGui::Begin("My Window");
+
+    ImVec2 window_pos = ImGui::GetWindowPos();
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
+    // Adjust coordinates by adding window position
+    ImVec2 start_pos = ImVec2(10 + window_pos.x, 10 + window_pos.y);
+    ImVec2 end_pos = ImVec2(100 + window_pos.x, 100 + window_pos.y);
+    draw_list->AddLine(start_pos, end_pos, IM_COL32(255, 0, 0, 255), 2.0f);
+
+    ImGui::End();
+}
+
+/**
+* Renders all image draw requests in the image_draw_request_queue to a ImGui widget
+*/
+void EditorManager::ImageToImGUI()
+{
+    std::stable_sort(RendererData::GetImageDrawRequestQueue()->begin(), RendererData::GetImageDrawRequestQueue()->end(), CompareImageRequests());
+
+    for (auto& request : *RendererData::GetImageDrawRequestQueue()) {
+        glm::vec2 final_rendering_position = glm::vec2(request.x, request.y) - RendererData::GetCameraPosition();
+
+        SDL_Texture* tex = GetImage(request.image_name);
+        int tex_w = 0; 
+        int tex_h = 0;
+        SDL_QueryTexture(tex, NULL, NULL, &tex_w, &tex_h);
+
+        // Apply scale
+        float x_scale = std::abs(request.scale_x);
+        float y_scale = std::abs(request.scale_y);
+
+        ImVec2 tex_size = ImVec2(tex_w * x_scale, tex_h * y_scale);
+
+        // Calculate pivot point
+        ImVec2 pivot_point = ImVec2(request.pivot_x * tex_size.x, request.pivot_y * tex_size.y);
+
+        //ImVec2 window_size = ImGui::GetContentRegionAvail();
+        ImVec2 window_size = ImGui::GetWindowSize();
+
+        // center the image
+        float center_offset = 0.5f;
+
+        // account for current zoom factor
+        float zoom = (1.0f / RendererData::GetCameraZoom());
+
+        // Calculate final rendering position
+        ImVec2 final_pos = ImVec2(final_rendering_position.x * RendererData::PIXELS_PER_METER + window_size.x * center_offset * zoom - pivot_point.x,
+                                  final_rendering_position.y * RendererData::PIXELS_PER_METER + window_size.y * center_offset * zoom - pivot_point.y);
+
+        // Apply tint / alpha to texture
+        SDL_SetTextureColorMod(tex, request.r, request.g, request.b);
+        SDL_SetTextureAlphaMod(tex, request.a);
+
+        // Render using ImGui
+        ImGui::SetCursorPos(final_pos);
+        ImGui::Image((void*)tex, tex_size);
+
+        // Remove tint / alpha from texture
+        SDL_SetTextureColorMod(tex, 255, 255, 255);
+        SDL_SetTextureAlphaMod(tex, 255);
+    }
+
+    RendererData::GetImageDrawRequestQueue()->clear();
+}
+
+/**
+* Renders all text draw requests in the to to imgui
+* 
+* TODO: Currently Broken. Text doesn't render
+*/
+void EditorManager::TextToImGUI()
+{
+    std::deque<TextRenderRequest>* text_requests = RendererData::GetTextDrawRequestQueue();
+    for (auto& request : *text_requests) {
+        /*ImFont* font = GetImGuiFont(request.font, request.size);*/
+        ImFont* font = nullptr;
+        if (font) {
+            ImGui::PushFont(font);
+        }
+
+        ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
+        // set position
+        ImVec2 position;
+        position.x = request.x;
+        position.y = request.y;
+
+        // color
+        ImU32 col = IM_COL32(request.r, request.g, request.b, request.a);
+
+        draw_list->AddText(position, col, request.text.c_str());
+
+        // return to the previous font, if used
+        if (font)
+            ImGui::PopFont();
+    }
+
+    text_requests->clear();
+}
+
+/**
+* Renders all ui draw requests in the to to imgui
+*/
+void EditorManager::UIToImGUI()
+{
+    std::stable_sort(RendererData::GetUIDrawRequestQueue()->begin(), RendererData::GetUIDrawRequestQueue()->end(), CompareUIRequests());
+
+    for (auto& request : *RendererData::GetUIDrawRequestQueue()) {
+        // Assuming GetImage returns an ImGui-compatible texture ID
+        SDL_Texture* tex = GetImage(request.image_name);
+ 
+        int tex_w = 0;
+        int tex_h = 0;
+        SDL_QueryTexture(tex, NULL, NULL, &tex_w, &tex_h);
+
+        ImVec2 tex_size;
+        tex_size.x = tex_w;
+        tex_size.y = tex_h;
+
+        ImVec2 tex_pos = ImVec2(request.x, request.y);
+
+        // Apply tint / alpha to texture
+        ImVec4 tint_color = ImVec4(request.r / 255.0f, request.g / 255.0f, request.b / 255.0f, request.a / 255.0f);
+
+        // Render the image
+        ImGui::SetCursorPos(tex_pos);
+        ImTextureID tex_id = (ImTextureID)(intptr_t)tex;
+        if (tex_id) {
+            ImGui::Image(tex_id, tex_size, ImVec2(0, 0), ImVec2(1, 1), tint_color);
+        }
+        else {
+            printf("texture is null\n");
+        }
+
+        // Remove tint / alpha from texture (reset to default)
+        tint_color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+    }
+
+    RendererData::GetUIDrawRequestQueue()->clear();
+}
+
+/**
+* Renders all pixel draw requests in the pixel_draw_request_queue to imgui
+* 
+* TODO: Pixels render on the SDL renderer and not the imgui widget even though there is no call to sdl...
+*/
+void EditorManager::PixelToImGUI()
+{
+    ImDrawList* draw_list = ImGui::GetBackgroundDrawList();
+
+    for (auto& request : *RendererData::GetPixelDrawRequestQueue()) {
+        draw_list->AddRectFilled(ImVec2(request.x, request.y), ImVec2(request.x + 10, request.y + 10), IM_COL32(request.r, request.g, request.b, request.a));
+    }
+
+    RendererData::GetPixelDrawRequestQueue()->clear();
+}
+
+/**
+* Loads the fonts that are needed for text requests this frame, if not already loaded
+* 
+* NOTE: Must be called before ImGui::NewFrame() and after ImGui::Render()
+*/
+void EditorManager::LoadFontsImGUI()
+{
+    std::deque<TextRenderRequest>* text_requests = RendererData::GetTextDrawRequestQueue();
+    for (auto& request : *text_requests) {
+        bool font_found = false;
+        
+        // check for the font needed and that it is the correct size
+        for (auto& font : imgui_fonts[request.font]) {
+            if (font->FontSize == request.size) {
+                font_found = true;
+                break;
+            }
+        }
+
+        // the font was not found with the size needed, load it
+        if (!font_found) {
+            const std::string path = "resources/fonts/" + request.font + ".ttf";
+
+            if (FileUtils::DirectoryExists(path))
+            {
+                ImGuiIO& io = ImGui::GetIO();
+                ImFontConfig fontConfig;
+                fontConfig.FontDataOwnedByAtlas = false; // Set to false if loading from memory
+                ImFont* font = io.Fonts->AddFontFromFileTTF(path.c_str(), request.size, &fontConfig);
+
+                if (font == nullptr) {
+                    std::cerr << "Failed to load font!" << std::endl;
+                }
+
+                io.Fonts->Build();
+
+                imgui_fonts[request.font].push_back(font); // save the font for later
+            }
+            else {
+                // output an error and move to the next request
+                std::cout << "font " + request.font + "does not exist at " + path << std::endl;
+                continue;
+            }
+        }
+    }
+}
+
+/**
+* Gets a specified font for ImGui
+*
+* @returns    A ImFont* to the specified font if it exists, nullptr otherwise
+*/
+ImFont* EditorManager::GetImGuiFont(const std::string& name, const float size)
+{
+    ImFont* return_font = nullptr;
+
+    for (auto& font : imgui_fonts.at(name)) {
+        if (font->FontSize == size) {
+            return_font = font;
+            break;
+        }
+    }
+
+    if (!return_font) {
+        std::cout << "font " + name + "not found at size " << size << std::endl;
+    }
+
+    return return_font;
 }

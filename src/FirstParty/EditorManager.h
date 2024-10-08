@@ -51,6 +51,7 @@ private:
     // bools to track if a window is shown
     inline static bool hierarchy = true;
     inline static bool show_file_selector = false;
+    static inline std::unordered_map<std::string, std::vector<ImFont*>> imgui_fonts = {}; // stores fonts needed for text draw requests for the editor
 public:
     static bool trigger_editor_mode_toggle;
     
@@ -165,6 +166,43 @@ public:
     * file in the selected_file variable in EditorManager.h
     */
     static void ShowFileSelector();
+    * Creates the widget for the viewport and handles rendering
+    */
+    static void ViewportWidget();
+
+    /**
+    * Renders all image draw requests in the image_draw_request_queue to imgui
+    */
+    static void ImageToImGUI();
+
+    /**
+    * Renders all text draw requests in the text_draw_request_queue to imgui
+    */
+    static void TextToImGUI();
+
+    /**
+    * Renders all ui draw requests in the ui_draw_request_queue to imgui
+    */
+    static void UIToImGUI();
+
+    /**
+    * Renders all pixel draw requests in the pixel_draw_request_queue to imgui
+    */
+    static void PixelToImGUI();
+
+    /**
+    * Loads the fonts that are needed for text requests this frame, if not already loaded
+    *
+    * NOTE: Must be called before ImGui::NewFrame() and after ImGui::Render()
+    */
+    static void LoadFontsImGUI();
+
+    /**
+    * Gets a specified font for ImGui
+    * 
+    * @returns    A ImFont* to the specified font if it exists, nullptr otherwise
+    */
+    static ImFont* GetImGuiFont(const std::string& name, const float size);
 };
 
 #endif /* EditorManager.h */

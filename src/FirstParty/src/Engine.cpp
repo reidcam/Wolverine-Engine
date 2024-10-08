@@ -214,15 +214,15 @@ int GameLoop()
     }
 #endif
 
-    // RENDER STUFF HERE
+    // RENDER STUFF HERE    
+#ifndef NDEBUG
+    EditorManager::RenderEditor();
+#else
     RendererData::RenderAndClearAllImageRequests();
     RendererData::RenderAndClearAllTextRequests();
     RendererData::RenderAndClearAllPixels();
     RendererData::RenderAndClearAllLines();
     RendererData::RenderAndClearAllUI();
-    
-#ifndef NDEBUG
-    EditorManager::RenderEditor();
 #endif
     
     SDL_RenderPresent(RendererData::GetRenderer()); // present the frame into the window
