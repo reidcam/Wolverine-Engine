@@ -166,6 +166,8 @@ public:
     * file in the selected_file variable in EditorManager.h
     */
     static void ShowFileSelector();
+
+    /**
     * Creates the widget for the viewport and handles rendering
     */
     static void ViewportWidget();

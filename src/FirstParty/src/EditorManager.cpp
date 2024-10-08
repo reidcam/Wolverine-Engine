@@ -755,6 +755,8 @@ void EditorManager::ShowFileSelector() {
 
     ImGui::End();
 }
+
+/**
 * Creates the widget for the viewport and handles rendering
 */
 void EditorManager::ViewportWidget()
