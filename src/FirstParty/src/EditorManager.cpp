@@ -40,8 +40,8 @@ void EditorManager::Init()
     ImGui::StyleColorsDark();
     
     // Set up platfomr/renderer backends
-    ImGui_ImplSDL2_InitForSDLRenderer(GUIRenderer::GetWindow(), GUIRenderer::GetRenderer());
-    ImGui_ImplSDLRenderer2_Init(GUIRenderer::GetRenderer());
+    ImGui_ImplSDL2_InitForSDLRenderer(RendererData::GetWindow(), RendererData::GetRenderer());
+    ImGui_ImplSDLRenderer2_Init(RendererData::GetRenderer());
 
     // init file path
     docking_layout_file_path = std::filesystem::path(FileUtils::GetPath("editor_resources/editor_layouts"));
@@ -91,7 +91,7 @@ void EditorManager::RenderEditor()
     ViewportWidget();
 
     ImGui::Render();
-    ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), GUIRenderer::GetRenderer());
+    ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), RendererData::GetRenderer());
 }
 
 /**
