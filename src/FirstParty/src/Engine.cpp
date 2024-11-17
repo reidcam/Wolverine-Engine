@@ -78,8 +78,8 @@ void Initialize()
     
 #ifndef NDEBUG
     // Initializes imgui and the editor
-    GUIRenderer::Init(EngineData::game_title);
-    EngineData::window_renderer_map[GUIRenderer::GetWindow()] = GUIRenderer::GetRenderer();
+    // GUIRenderer::Init(EngineData::game_title);
+    // EngineData::window_renderer_map[GUIRenderer::GetWindow()] = GUIRenderer::GetRenderer();
     EditorManager::Init();
 #endif
     
@@ -193,7 +193,7 @@ int GameLoop()
     SDL_RenderClear(RendererData::GetRenderer()); // clear the renderer with the render clear color
     
 #ifndef NDEBUG
-    SDL_RenderClear(GUIRenderer::GetRenderer());
+    // SDL_RenderClear(GUIRenderer::GetRenderer());
 #endif
     
     if (!editor_mode)
@@ -228,7 +228,7 @@ int GameLoop()
     SDL_RenderPresent(RendererData::GetRenderer()); // present the frame into the window
     
 #ifndef NDEBUG
-    SDL_RenderPresent(GUIRenderer::GetRenderer()); // present the frame into the window
+    // SDL_RenderPresent(GUIRenderer::GetRenderer()); // present the frame into the window
 #endif
     
     Input::LateUpdate();

@@ -412,9 +412,10 @@ void EditorManager::ModeSwitchButtons()
     flags |= ImGuiWindowFlags_NoResize;
     flags |= ImGuiWindowFlags_NoTitleBar;
     
+    // variables to store the window size
     int window_w = 0;
     int window_h = 0;
-    SDL_GetWindowSize(GUIRenderer::GetWindow(), &window_w, &window_h);
+    SDL_GetWindowSize(RendererData::GetWindow(), &window_w, &window_h);
     
     // Window Size
     int imgui_window_w = 110.0f;
@@ -478,7 +479,7 @@ void EditorManager::HierarchyView()
         // Window Size
         int window_w = 0;
         int window_h = 0;
-        SDL_GetWindowSize(GUIRenderer::GetWindow(), &window_w, &window_h);
+        SDL_GetWindowSize(RendererData::GetWindow(), &window_w, &window_h);
 
         int imgui_window_w = 300.0f;
         int imgui_window_h = window_h;
