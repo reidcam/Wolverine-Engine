@@ -842,8 +842,6 @@ void EditorManager::ImageToImGUI()
 
 /**
 * Renders all text draw requests in the to to imgui
-* 
-* TODO: Currently Broken. Text doesn't render
 */
 void EditorManager::TextToImGUI()
 {
@@ -858,14 +856,19 @@ void EditorManager::TextToImGUI()
         ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
         // set position
-        ImVec2 position;
-        position.x = request.x;
-        position.y = request.y;
+        ImVec2 current_window_pos = ImGui::GetWindowPos();
+        ImVec2 request_position;
+        request_position.x = request.x;
+        request_position.y = request.y;
+
+        ImVec2 final_position;
+        final_position.x = request_position.x + current_window_pos.x;
+        final_position.y = request_position.y + current_window_pos.y;
 
         // color
         ImU32 col = IM_COL32(request.r, request.g, request.b, request.a);
 
-        draw_list->AddText(position, col, request.text.c_str());
+        draw_list->AddText(final_position, col, request.text.c_str());
 
         // return to the previous font, if used
         if (font)
