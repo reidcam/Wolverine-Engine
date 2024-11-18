@@ -926,10 +926,18 @@ void EditorManager::UIToImGUI()
 */
 void EditorManager::PixelToImGUI()
 {
-    ImDrawList* draw_list = ImGui::GetBackgroundDrawList();
+    const int PIXEL_DRAW_SIZE = 1;
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+    ImVec2 current_window_pos = ImGui::GetWindowPos();
+    
 
     for (auto& request : *RendererData::GetPixelDrawRequestQueue()) {
-        draw_list->AddRectFilled(ImVec2(request.x, request.y), ImVec2(request.x + 10, request.y + 10), IM_COL32(request.r, request.g, request.b, request.a));
+        ImVec2 final_draw_position;
+        final_draw_position.x = current_window_pos.x + request.x;
+        final_draw_position.y = current_window_pos.y + request.y;
+
+        draw_list->AddRectFilled(final_draw_position, ImVec2(final_draw_position.x + PIXEL_DRAW_SIZE, final_draw_position.y + PIXEL_DRAW_SIZE),
+            IM_COL32(request.r, request.g, request.b, request.a));
     }
 
     RendererData::GetPixelDrawRequestQueue()->clear();
