@@ -969,8 +969,6 @@ void EditorManager::LoadFontsImGUI()
             if (FileUtils::DirectoryExists(path))
             {
                 ImGuiIO& io = ImGui::GetIO();
-                //ImFontConfig fontConfig;
-                //fontConfig.FontDataOwnedByAtlas = false; // Set to false if loading from memory
                 ImFont* font = io.Fonts->AddFontFromFileTTF(path.c_str(), request.size);
 
                 if (font == nullptr) {
