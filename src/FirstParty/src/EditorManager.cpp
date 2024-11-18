@@ -849,8 +849,8 @@ void EditorManager::TextToImGUI()
 {
     std::deque<TextRenderRequest>* text_requests = RendererData::GetTextDrawRequestQueue();
     for (auto& request : *text_requests) {
-        /*ImFont* font = GetImGuiFont(request.font, request.size);*/
-        ImFont* font = nullptr;
+        ImFont* font = GetImGuiFont(request.font, request.size);
+
         if (font) {
             ImGui::PushFont(font);
         }
@@ -945,7 +945,7 @@ void EditorManager::LoadFontsImGUI()
         
         // check for the font needed and that it is the correct size
         for (auto& font : imgui_fonts[request.font]) {
-            if (font->FontSize == request.size) {
+            if (font != nullptr && font->FontSize == request.size) {
                 font_found = true;
                 break;
             }
@@ -958,17 +958,22 @@ void EditorManager::LoadFontsImGUI()
             if (FileUtils::DirectoryExists(path))
             {
                 ImGuiIO& io = ImGui::GetIO();
-                ImFontConfig fontConfig;
-                fontConfig.FontDataOwnedByAtlas = false; // Set to false if loading from memory
-                ImFont* font = io.Fonts->AddFontFromFileTTF(path.c_str(), request.size, &fontConfig);
+                //ImFontConfig fontConfig;
+                //fontConfig.FontDataOwnedByAtlas = false; // Set to false if loading from memory
+                ImFont* font = io.Fonts->AddFontFromFileTTF(path.c_str(), request.size);
 
                 if (font == nullptr) {
                     std::cerr << "Failed to load font!" << std::endl;
                 }
+                else {
+                    io.Fonts->Build();
 
-                io.Fonts->Build();
+                    imgui_fonts[request.font].push_back(font); // save the font for later
 
-                imgui_fonts[request.font].push_back(font); // save the font for later
+                    // these two lines must be called whenever loading fonts between frames
+                    ImGui_ImplSDLRenderer2_DestroyDeviceObjects();
+                    ImGui_ImplSDLRenderer2_CreateDeviceObjects();
+                }
             }
             else {
                 // output an error and move to the next request
