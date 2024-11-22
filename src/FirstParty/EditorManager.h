@@ -51,6 +51,8 @@ private:
     // bools to track if a window is shown
     inline static bool hierarchy = true;
     inline static bool show_file_selector = false;
+    inline static bool windowed_full_screen = false;
+    inline static bool exlusive_full_screen = false;
     static inline std::unordered_map<std::string, std::vector<ImFont*>> imgui_fonts = {}; // stores fonts needed for text draw requests for the editor
 public:
     static bool trigger_editor_mode_toggle;
@@ -205,6 +207,12 @@ public:
     * @returns    A ImFont* to the specified font if it exists, nullptr otherwise
     */
     static ImFont* GetImGuiFont(const std::string& name, const float size);
+
+    /**
+    * Updates the current SDL window fullscreen flag to be consistent with the
+    * windowed_fullscreen and exclusive_fullscreen variables
+    */
+    static void UpdateWindowFullScreenState();
 };
 
 #endif /* EditorManager.h */

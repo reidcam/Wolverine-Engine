@@ -571,12 +571,20 @@ void EditorManager::MainMenuBar()
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Layout")) {
-            if (ImGui::MenuItem("Bordered Full Screen")) {
-                RendererData::SetWindowFullscreen(SDL_WINDOW_FULLSCREEN);
+            if (ImGui::MenuItem("Windowed Full Screen", "F11", windowed_full_screen)) {
+                Uint32 window_flags = SDL_GetWindowFlags(RendererData::GetWindow());
+                windowed_full_screen = !windowed_full_screen;
+                exlusive_full_screen = false;
+
+                UpdateWindowFullScreenState();
             }
 
-            if (ImGui::MenuItem("ordered Full Screen")) {
+            if (ImGui::MenuItem("Exclusive Full Screen", "Crtl+F11", exlusive_full_screen)) {
+                Uint32 window_flags = SDL_GetWindowFlags(RendererData::GetWindow());
+                exlusive_full_screen = !exlusive_full_screen;
+                windowed_full_screen = false;
 
+                UpdateWindowFullScreenState();
             }
 
             if (ImGui::MenuItem("Save Layout As")) {
@@ -663,6 +671,21 @@ void EditorManager::CheckEditorShortcuts()
     }
     if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_F)) && ImGui::GetIO().KeyCtrl) {
         show_file_selector = !show_file_selector;
+    }
+    if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_F11)) && !ImGui::GetIO().KeyCtrl) {
+        windowed_full_screen = !windowed_full_screen;
+        exlusive_full_screen = false;
+        UpdateWindowFullScreenState();
+    }
+    if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_F11)) && ImGui::GetIO().KeyCtrl) {
+        exlusive_full_screen = !exlusive_full_screen;
+        windowed_full_screen = false;
+        UpdateWindowFullScreenState();
+    }
+    if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Escape))) {
+        windowed_full_screen = false;
+        exlusive_full_screen = false;
+        UpdateWindowFullScreenState();
     }
 }
 
@@ -912,8 +935,6 @@ void EditorManager::UIToImGUI()
 
 /**
 * Renders all pixel draw requests in the pixel_draw_request_queue to imgui
-* 
-* TODO: Pixels render on the SDL renderer and not the imgui widget even though there is no call to sdl...
 */
 void EditorManager::PixelToImGUI()
 {
@@ -1005,4 +1026,25 @@ ImFont* EditorManager::GetImGuiFont(const std::string& name, const float size)
     }
 
     return return_font;
+}
+
+/**
+* Updates the current SDL window fullscreen flag to be consistent with the
+* windowed_fullscreen and exclusive_fullscreen variables
+*/
+void EditorManager::UpdateWindowFullScreenState()
+{
+    if (windowed_full_screen) {
+        RendererData::SetWindowFullscreen(SDL_WINDOW_FULLSCREEN_DESKTOP);
+        exlusive_full_screen = false;
+    }
+    else if (exlusive_full_screen) {
+        RendererData::SetWindowFullscreen(SDL_WINDOW_FULLSCREEN);
+        windowed_full_screen = false;
+    }
+    else {
+        RendererData::SetWindowFullscreen(0);
+        exlusive_full_screen = false;
+        windowed_full_screen = false;
+    }
 }
