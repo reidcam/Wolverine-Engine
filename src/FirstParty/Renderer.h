@@ -61,7 +61,9 @@ private:
 	* @param	new_window    A SDL_Window* to the new window
 	*/
 	inline static void SetWindow(SDL_Window* new_window) { RendererData::window = new_window; } // SetWindow()
-
+public:
+    inline static const int PIXELS_PER_METER = 100;
+    
 	/**
 	* Turns a string into an SDL_Texture using the specified font perameters
 	*
@@ -73,10 +75,6 @@ private:
 	* @returns	    A SDL_Texture* to a SDL_Texture
 	*/
 	static SDL_Texture* ConvertTextToTexture(SDL_Renderer* renderer, const std::string& text, const SDL_Color& font_color, const std::string font_name, const int font_size);
-
-public:
-	friend class GUIRenderer;
-    inline static const int PIXELS_PER_METER = 100;
     
 	/**
 	* Returns a pointer to the SDL_Window
@@ -296,6 +294,41 @@ public:
      * Cleans up the SDL renderer and window
      */
     static void Cleanup();
+
+	/**
+	* Gets a pointer to the image_draw_request_queue
+	* 
+	* @returns    a pointer to the image_draw_request_queue
+	*/
+	static inline std::deque<ImageDrawRequest>* GetImageDrawRequestQueue() { return &image_draw_request_queue; };
+
+	/**
+	* Gets a pointer to the image_draw_request_queue
+	*
+	* @returns    a pointer to the text_draw_request_queue
+	*/
+	static inline std::deque<TextRenderRequest>* GetTextDrawRequestQueue() { return &text_draw_request_queue; };
+
+	/**
+	* Gets a pointer to the image_draw_request_queue
+	*
+	* @returns    a pointer to the ui_draw_request_queue
+	*/
+	static inline std::deque<UIRenderRequest>* GetUIDrawRequestQueue() { return &ui_draw_request_queue; };
+
+	/**
+	* Gets a pointer to the image_draw_request_queue
+	*
+	* @returns    a pointer to the pixel_draw_request_queue
+	*/
+	static inline std::deque<PixelDrawRequest>* GetPixelDrawRequestQueue() { return &pixel_draw_request_queue; };
+
+	/**
+	* Gets a pointer to the image_draw_request_queue
+	*
+	* @returns    a pointer to the line_draw_request_queue
+	*/
+	static inline std::deque<LineDrawRequest>* GetLineDrawRequestQueue() { return &line_draw_request_queue; };
 };
 
 /**

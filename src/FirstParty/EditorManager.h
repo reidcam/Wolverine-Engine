@@ -45,8 +45,15 @@ private:
     inline static std::filesystem::path docking_layout_file_path = ""; // actual path object, needs to be initialized
     inline static std::vector<std::string> editor_layout_files;
 
+    inline static std::filesystem::path selected_file;
+    inline static std::filesystem::path current_path;
+
     // bools to track if a window is shown
     inline static bool hierarchy = true;
+    inline static bool show_file_selector = false;
+    inline static bool windowed_full_screen = false;
+    inline static bool exlusive_full_screen = false;
+    static inline std::unordered_map<std::string, std::vector<ImFont*>> imgui_fonts = {}; // stores fonts needed for text draw requests for the editor
 public:
     static bool trigger_editor_mode_toggle;
     
@@ -160,6 +167,57 @@ public:
     * @return    a vector containing strings of the file names of the editor layout files
     */
     static std::vector<std::string> GetEditorLayouts();
+
+    /**
+    * Creates a imgui widgit for selecting files from the resources folder and stores the selected
+    * file in the selected_file variable in EditorManager.h
+    */
+    static void ShowFileSelector();
+
+    /**
+    * Creates the widget for the viewport and handles rendering
+    */
+    static void ViewportWidget();
+
+    /**
+    * Renders all image draw requests in the image_draw_request_queue to imgui
+    */
+    static void ImageToImGUI();
+
+    /**
+    * Renders all text draw requests in the text_draw_request_queue to imgui
+    */
+    static void TextToImGUI();
+
+    /**
+    * Renders all ui draw requests in the ui_draw_request_queue to imgui
+    */
+    static void UIToImGUI();
+
+    /**
+    * Renders all pixel draw requests in the pixel_draw_request_queue to imgui
+    */
+    static void PixelToImGUI();
+
+    /**
+    * Loads the fonts that are needed for text requests this frame, if not already loaded
+    *
+    * NOTE: Must be called before ImGui::NewFrame() and after ImGui::Render()
+    */
+    static void LoadFontsImGUI();
+
+    /**
+    * Gets a specified font for ImGui
+    * 
+    * @returns    A ImFont* to the specified font if it exists, nullptr otherwise
+    */
+    static ImFont* GetImGuiFont(const std::string& name, const float size);
+
+    /**
+    * Updates the current SDL window fullscreen flag to be consistent with the
+    * windowed_fullscreen and exclusive_fullscreen variables
+    */
+    static void UpdateWindowFullScreenState();
 };
 
 #endif /* EditorManager.h */
