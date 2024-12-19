@@ -368,7 +368,7 @@ int Actors::LoadActorWithJSON(const rapidjson::Value& actor_data)
     else
     {
         // Gives this actor a blank template if none is specified for it
-        names.push_back("");
+        templates.push_back("");
     }
     
     if (actor_data.HasMember("enabled"))
