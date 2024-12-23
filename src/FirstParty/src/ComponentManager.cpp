@@ -99,3 +99,22 @@ sol::table ComponentManager::NewNativeComponent(std::string component_type)
     sol::table null;
     return null;
 }
+
+/**
+ * Returns true if the value for the given variable on the given NATIVE component is the default value
+ *
+ *  @param    component_type    the component type to check the defaults of
+ *  @param    variable_key      the key of the variable to check the defaults of
+ *  @returns                    true if the variable is default, false otherwise
+ */
+bool ComponentManager::IsDefaultValue(std::string component_type, sol::object variable_key, sol::object value)
+{
+    sol::table default_component = NewNativeComponent(component_type);
+
+    if (default_component[variable_key] == value)
+    {
+        return true;
+    }
+
+    return false;
+}

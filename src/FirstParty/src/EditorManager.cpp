@@ -192,6 +192,15 @@ void EditorManager::UpdateSceneLocal()
                         
                         // Skip if the value is the same as it is in the metatable (except for type, which needs to always be displayed in the json)
                         if (component[variable.first] == variable.second && var_name != "type") { continue; }
+
+                        // If the component is native, default values need to be checked in a special way
+                        if (ComponentManager::IsComponentTypeNative(component_type) && var_name != "type")
+                        {
+                            if (ComponentManager::IsDefaultValue(component_type, variable.first, component[variable.first]))
+                            {
+                                continue;
+                            }
+                        }
                         
                         if (variable.second.get_type() == sol::type::table)
                         {
