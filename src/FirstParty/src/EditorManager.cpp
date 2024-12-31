@@ -417,11 +417,18 @@ void EditorManager::VariableView(sol::table* table, sol::lua_value key)
                 if (ImGui::MenuItem("bool")) {
                     variable_value.add(false);
                 }
+                if (ImGui::MenuItem("table")) {
+                    variable_value.add(LuaAPI::GetLuaState()->create_table());
+                }
                 ImGui::EndMenu();
             }
 
             // Table allows us to cleanly format our variables
             ImGui::BeginTable(const_invisible_id, 3);
+
+            ImGui::TableSetupColumn("one", ImGuiTableColumnFlags_WidthFixed, 10.0f); // Default to 10.0f
+            ImGui::TableSetupColumn("two", ImGuiTableColumnFlags_WidthFixed, 10.0f);
+            ImGui::TableSetupColumn("three", ImGuiTableColumnFlags_WidthStretch);
 
             // Keeps track of the table element we're on while iterating, used to create unique display IDs for the
             // delete button of each element.
@@ -619,6 +626,10 @@ void EditorManager::HierarchyView()
 
                     // Table allows us to cleanly format our variables
                     ImGui::BeginTable(const_type, 2);
+
+                    ImGui::TableSetupColumn("one", ImGuiTableColumnFlags_WidthFixed, 100.0f); // Default to 100.0f
+                    ImGui::TableSetupColumn("two", ImGuiTableColumnFlags_WidthStretch);
+
                     for (auto& variable : metatable)
                     {
                         sol::lua_value key = variable.first;
