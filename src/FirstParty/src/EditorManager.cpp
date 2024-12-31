@@ -148,7 +148,7 @@ void EditorManager::UpdateSceneLocal()
             actor_template_name.SetString(template_name.c_str(), allocator);
             actor.AddMember("template", actor_template_name, allocator);
         }
-        else
+        if (true)
         {
             // Get the 'components' value
             rapidjson::Value components(rapidjson::kObjectType);
@@ -230,8 +230,11 @@ void EditorManager::UpdateSceneLocal()
                         j++;
                     }
                     
-                    // Adds the 'key_value_type_pairs' object to the component
-                    json_comp.AddMember("__type_pairs", key_value_type_pairs, allocator);
+                    if (template_name == "")
+                    {
+                        // Adds the 'key_value_type_pairs' object to the component
+                        json_comp.AddMember("__type_pairs", key_value_type_pairs, allocator);
+                    }
                     
                     // Add this component to the 'components' list
                     rapidjson::Value component_id;
@@ -481,7 +484,7 @@ void EditorManager::ModeSwitchButtons()
     {
         if (ImGui::Button("Play"))
         {
-            // TOOD: Hot reload all modified scenes and scripts
+            // TOOD: Hot reload all modified scripts
             SaveChanges();
             editor_mode = false;
             play_mode = true;

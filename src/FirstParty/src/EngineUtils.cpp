@@ -80,13 +80,13 @@ void EngineUtils::CombineJsonDocuments(rapidjson::Document& d1, rapidjson::Docum
                     rapidjson::Document array;
                     
                     rapidjson::Document lhs;
-                    lhs.CopyFrom(d1[member_name.c_str()], d1.GetAllocator());
+                    lhs.CopyFrom(d1[member_name.c_str()], lhs.GetAllocator());
                     rapidjson::Document rhs;
-                    rhs.CopyFrom(d2[member_name.c_str()], d2.GetAllocator());
+                    rhs.CopyFrom(d2[member_name.c_str()], rhs.GetAllocator());
                     
                     CombineJsonDocuments(lhs, rhs, array);
                     
-                    out_document.AddMember(json_member_name, array, array.GetAllocator());
+                    out_document.AddMember(json_member_name, rapidjson::Value(array, out_document.GetAllocator()).Move(), out_document.GetAllocator());
                 }
             }
             else
@@ -94,7 +94,7 @@ void EngineUtils::CombineJsonDocuments(rapidjson::Document& d1, rapidjson::Docum
                 // Otherwise, just add the d2 array
                 rapidjson::Document array;
                 array.CopyFrom(d2[member_name.c_str()], d2.GetAllocator());
-                out_document.AddMember(json_member_name, array, array.GetAllocator());
+                out_document.AddMember(json_member_name, rapidjson::Value(array, out_document.GetAllocator()).Move(), out_document.GetAllocator());
             }
         }
         else if (itr->value.IsBool())
@@ -143,6 +143,11 @@ void EngineUtils::CombineJsonDocuments(rapidjson::Document& d1, rapidjson::Docum
         {
             // TODO: COMBINE ARRAYS
         }
+        else if (itr->value.IsNull())
+        {
+            rapidjson::Value null_value(rapidjson::kNullType);
+            out_document.AddMember(json_member_name, null_value, out_document.GetAllocator());
+        }
     }
     
     // Parse and copy the values from d1 to out_document:
@@ -163,7 +168,7 @@ void EngineUtils::CombineJsonDocuments(rapidjson::Document& d1, rapidjson::Docum
         {
             rapidjson::Document array;
             array.CopyFrom(d1[member_name.c_str()], d1.GetAllocator());
-            out_document.AddMember(json_member_name, array, array.GetAllocator());
+            out_document.AddMember(json_member_name, rapidjson::Value(array, out_document.GetAllocator()).Move(), out_document.GetAllocator());
         }
         else if (itr->value.IsBool())
         {
@@ -189,6 +194,15 @@ void EngineUtils::CombineJsonDocuments(rapidjson::Document& d1, rapidjson::Docum
             {
                 out_document.AddMember(json_member_name, num, out_document.GetAllocator());
             }
+        }
+        else if (itr->value.IsArray())
+        {
+            // TODO: COMBINE ARRAYS
+        }
+        else if (itr->value.IsNull())
+        {
+            rapidjson::Value null_value(rapidjson::kNullType);
+            out_document.AddMember(json_member_name, null_value, out_document.GetAllocator());
         }
     }
 }
@@ -419,6 +433,7 @@ std::string EngineUtils::LuaObjectToJson(rapidjson::Value& value, const sol::lua
         return "table";
     }
     
+    value.SetNull();
     return "UNKNOWN_TYPE";
 }
 

@@ -129,11 +129,11 @@ void Scene::LoadNewScene()
 
                 EngineUtils::CombineJsonDocuments(lhs, rhs, combined_actor);
                 
-                // FOR TESTS: Output the combined JSON as a string
-                // rapidjson::StringBuffer buffer;
-                // rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-                // combined_actor.Accept(writer);
-                // std::cout << buffer.GetString() << std::endl;
+                 // FOR TESTS: Output the combined JSON as a string
+                 rapidjson::StringBuffer buffer;
+                 rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+                 combined_actor.Accept(writer);
+                 std::cout << buffer.GetString() << std::endl;
                 
                 actors.push_back(Actors::LoadActorWithJSON(combined_actor));
             }
