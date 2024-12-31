@@ -403,9 +403,30 @@ void EditorManager::VariableView(sol::table* table, sol::lua_value key)
             // by storing the ones that the metatable contains.
             sol::table found_items = LuaAPI::GetLuaState()->create_table();
             
+            // Add a value to the table
+            if (ImGui::BeginMenu("Add Item")) {
+                if (ImGui::MenuItem("Int")) {
+                    variable_value.add(0);
+                }
+                if (ImGui::MenuItem("float")) {
+                    variable_value.add(0.0f);
+                }
+                if (ImGui::MenuItem("string")) {
+                    variable_value.add("string");
+                }
+                if (ImGui::MenuItem("bool")) {
+                    variable_value.add(false);
+                }
+                ImGui::EndMenu();
+            }
+
             // Table allows us to cleanly format our variables
-            ImGui::BeginTable(const_invisible_id, 2);
-        
+            ImGui::BeginTable(const_invisible_id, 3);
+
+            // Keeps track of the table element we're on while iterating, used to create unique display IDs for the
+            // delete button of each element.
+            int i = 0;
+
             // Displays all of the items in the table that exist before its initialized, IFF this table is an instance at all
             if (variable_value[sol::metatable_key].valid())
             {
@@ -416,6 +437,8 @@ void EditorManager::VariableView(sol::table* table, sol::lua_value key)
                     found_items[item_key] = 0;
                     // Sets this row of the table to be the variable with the given key
                     VariableView(&variable_value, item_key);
+
+                    i++;
                 }
             }
             // Displays all of the items in the table that are created during runtime
@@ -424,8 +447,19 @@ void EditorManager::VariableView(sol::table* table, sol::lua_value key)
                 sol::lua_value item_key = item.first;
                 if (!found_items[item_key].valid())
                 {
+                    ImGui::TableNextColumn();
+
+                    std::string table_element_id = std::string(const_invisible_id) + std::to_string(i);
+                    if (ImGui::Button(std::string("-" + table_element_id).c_str()))
+                    {
+                        std::cout << table_element_id << std::endl;
+                        variable_value[item_key] = sol::nil;
+                    }
+                
                     // Sets this row of the table to be the variable with the given key
                     VariableView(&variable_value, item_key);
+
+                    i++;
                 }
             }
             ImGui::EndTable();
