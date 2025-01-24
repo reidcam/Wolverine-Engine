@@ -684,6 +684,9 @@ void EditorManager::MainMenuBar()
             if (ImGui::MenuItem("File Selector", "Crtl+F", show_file_selector)) {
                 show_file_selector = !show_file_selector;
             }
+            if (ImGui::MenuItem("Viewport", "Crtl+V", viewport)) {
+                viewport = !viewport;
+            }
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Layout")) {
@@ -790,6 +793,9 @@ void EditorManager::CheckEditorShortcuts()
     }
     if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_F)) && ImGui::GetIO().KeyCtrl) {
         show_file_selector = !show_file_selector;
+    }
+    if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_V)) && ImGui::GetIO().KeyCtrl) {
+        viewport = !viewport;
     }
     if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_F11)) && !ImGui::GetIO().KeyCtrl) {
         windowed_full_screen = !windowed_full_screen;
@@ -912,29 +918,32 @@ void EditorManager::ShowFileSelector() {
 */
 void EditorManager::ViewportWidget()
 {
-    const int DRAG_SENSE = 100;
-    ImGui::Begin("Viewport", NULL, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar);
-    if (ImGui::IsMouseDown(ImGuiMouseButton_Right) && editor_mode)
-    {
-        float x = RendererData::GetCameraPosition().x + (-ImGui::GetMouseDragDelta(ImGuiMouseButton_Right).x / DRAG_SENSE);
-        float y = RendererData::GetCameraPosition().y + (-ImGui::GetMouseDragDelta(ImGuiMouseButton_Right).y / DRAG_SENSE);
-        ImGui::ResetMouseDragDelta(ImGuiMouseButton_Right);
-        RendererData::SetCameraPosition(x, y);
+    if (viewport) {
+        const int DRAG_SENSE = 100;
+        ImGui::Begin("Viewport", NULL, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar);
+        if (ImGui::IsMouseDown(ImGuiMouseButton_Right) && editor_mode)
+        {
+            float x = RendererData::GetCameraPosition().x + (-ImGui::GetMouseDragDelta(ImGuiMouseButton_Right).x / DRAG_SENSE);
+            float y = RendererData::GetCameraPosition().y + (-ImGui::GetMouseDragDelta(ImGuiMouseButton_Right).y / DRAG_SENSE);
+            ImGui::ResetMouseDragDelta(ImGuiMouseButton_Right);
+            RendererData::SetCameraPosition(x, y);
+        }
+
+        float scroll_wheel = ImGui::GetIO().MouseWheel;
+        if (scroll_wheel != 0)
+        {
+            float old_zoom = RendererData::GetCameraZoom();
+            RendererData::SetCameraZoom(old_zoom + (scroll_wheel / 10));
+            std::cout << RendererData::GetCameraZoom() << std::endl;
+        }
+
+        ImageToImGUI();
+        TextToImGUI();
+        UIToImGUI();
+        PixelToImGUI();
+        LineToImGUI();
+        ImGui::End();
     }
-    
-    float scroll_wheel = ImGui::GetIO().MouseWheel;
-    if (scroll_wheel != 0)
-    {
-        float old_zoom = RendererData::GetCameraZoom();
-        RendererData::SetCameraZoom(old_zoom + (scroll_wheel / 10));
-        std::cout << RendererData::GetCameraZoom() << std::endl;
-    }
-    ImageToImGUI();
-    TextToImGUI();
-    UIToImGUI();
-    PixelToImGUI();
-    LineToImGUI();
-    ImGui::End();
 }
 
 /**
@@ -943,10 +952,11 @@ void EditorManager::ViewportWidget()
 void EditorManager::ImageToImGUI()
 {
     std::stable_sort(RendererData::GetImageDrawRequestQueue()->begin(), RendererData::GetImageDrawRequestQueue()->end(), CompareImageRequests());
+    SDL_RenderSetScale(RendererData::GetRenderer(), RendererData::GetCameraZoom(), RendererData::GetCameraZoom());
 
     for (auto& request : *RendererData::GetImageDrawRequestQueue()) {
         glm::vec2 final_rendering_position = glm::vec2(request.x, request.y) - RendererData::GetCameraPosition();
-
+        
         SDL_Texture* tex = GetImage(request.image_name);
         int tex_w = 0; 
         int tex_h = 0;
@@ -964,8 +974,7 @@ void EditorManager::ImageToImGUI()
         // Calculate pivot point
         ImVec2 pivot_point = ImVec2(static_cast<int>(request.pivot_x * tex_size.x), static_cast<int>(request.pivot_y * tex_size.y));
 
-        //ImVec2 window_size = ImGui::GetContentRegionAvail();
-        glm::vec2 window_size = RendererData::GetWindowSize();
+        ImVec2 window_size = ImGui::GetWindowSize();
 
         // center the image
         float center_offset = 0.5f;
@@ -978,15 +987,25 @@ void EditorManager::ImageToImGUI()
         SDL_SetTextureColorMod(tex, request.r, request.g, request.b);
         SDL_SetTextureAlphaMod(tex, request.a);
 
+        // calculate texture coordinates based no rotation
+        float rotation_angle = static_cast<float>(request.rotation_degrees) * (M_PI / 180.0f);
+        ImVec2 center = ImVec2(0.5f, 0.5f); // Center of the image
+        ImVec2 uv0 = ImVec2(0, 0);
+        ImVec2 uv1 = ImVec2(1, 1);
+
+        uv0 = RotateUV(uv0, rotation_angle, center); // originally (0, 0)
+        uv1 = RotateUV(uv1, rotation_angle, center); // originally (1, 1)
+
         // Render using ImGui
         ImGui::SetCursorPos(final_pos);
-        ImGui::Image((void*)tex, tex_size);
+        ImGui::Image((void*)tex, tex_size, uv0 = uv0, uv1 = uv1);
 
         // Remove tint / alpha from texture
         SDL_SetTextureColorMod(tex, 255, 255, 255);
         SDL_SetTextureAlphaMod(tex, 255);
     }
 
+    SDL_RenderSetScale(RendererData::GetRenderer(), 1, 1);
     RendererData::GetImageDrawRequestQueue()->clear();
 }
 
@@ -1212,4 +1231,25 @@ void EditorManager::UpdateWindowFullScreenState()
         exlusive_full_screen = false;
         windowed_full_screen = false;
     }
+}
+
+/**
+* Calculates new texture coordinates based on the original coordinates, the angle of rotation, and the image's center
+*
+* @parameters    uv        The original texture coordinates
+* @parameters    angle     The angle to rotate by
+* @parameters    center    The center of the image
+*
+* @returns       rotated   A ImVec2 containing the new texture coordinates
+*/
+ImVec2 EditorManager::RotateUV(ImVec2& uv, float angle, ImVec2& center) {
+    // will only work for multiples of 90 degrees
+    float cosA = cosf(angle);
+    float sinA = sinf(angle);
+    ImVec2 rotated;
+    
+    rotated.x = roundf(cosA * (uv.x - center.x) - sinA * (uv.y - center.y) + center.x);
+    rotated.y = roundf(sinA * (uv.x - center.x) + cosA * (uv.y - center.y) + center.y);
+
+    return rotated;
 }

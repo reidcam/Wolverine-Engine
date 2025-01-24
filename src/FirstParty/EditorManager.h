@@ -13,6 +13,7 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <string>
+#include <cmath>
 
 #include "GUIRenderer.h"
 #include "Renderer.h"
@@ -23,6 +24,7 @@
 #include "imgui.h"
 #include "backends/imgui_impl_sdl2.h"
 #include "backends/imgui_impl_sdlrenderer2.h"
+
 
 class EditorManager
 {
@@ -49,6 +51,7 @@ private:
     inline static std::filesystem::path current_path;
 
     // bools to track if a window is shown
+    inline static bool viewport = true;
     inline static bool hierarchy = true;
     inline static bool show_file_selector = false;
     inline static bool windowed_full_screen = false;
@@ -223,6 +226,17 @@ public:
     * windowed_fullscreen and exclusive_fullscreen variables
     */
     static void UpdateWindowFullScreenState();
+
+    /**
+    * Calculates new texture coordinates based on the original coordinates, the angle of rotation, and the image's center
+    * 
+    * @parameters    uv        The original texture coordinates
+    * @parameters    angle     The angle to rotate by
+    * @parameters    center    The center of the image
+    * 
+    * @returns       rotated   A ImVec2 containing the new texture coordinates
+    */
+    static ImVec2 RotateUV(ImVec2& uv, float angle, ImVec2& center);
 };
 
 #endif /* EditorManager.h */
