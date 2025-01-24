@@ -649,6 +649,8 @@ void EditorManager::HierarchyView()
             std::vector<std::string> native_list = ComponentManager::ListAllNativeComponentTypes();
             list.insert(list.end(), native_list.begin(), native_list.end());
 
+            std::sort(list.begin(), list.end());
+
             for (std::string name : list)
             {
                 if (ImGui::MenuItem(name.c_str()))
