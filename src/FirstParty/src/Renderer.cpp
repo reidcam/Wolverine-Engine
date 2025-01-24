@@ -512,6 +512,16 @@ float RendererData::GetCameraZoom()
 }
 
 /**
+* Gets the current size of the window
+*
+* @returns	  the current size of the window
+*/
+glm::vec2 RendererData::GetWindowSize()
+{
+	return window_size;
+}
+
+/**
  * Cleans up the SDL renderer and window
  */
 void RendererData::Cleanup()

@@ -892,11 +892,12 @@ void EditorManager::ShowFileSelector() {
 */
 void EditorManager::ViewportWidget()
 {
-    ImGui::Begin("Viewport");
+    ImGui::Begin("Viewport", NULL, 8 | 16);
     ImageToImGUI();
     TextToImGUI();
     UIToImGUI();
     PixelToImGUI();
+    LineToImGUI();
     ImGui::End();
 }
 
@@ -1052,6 +1053,35 @@ void EditorManager::PixelToImGUI()
     }
 
     RendererData::GetPixelDrawRequestQueue()->clear();
+}
+
+/**
+* Renders all of the line draw requests in the line_draw_request_queue to imgui
+*/
+void EditorManager::LineToImGUI()
+{
+    //SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND); // needed to ensure that alpha works
+
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
+    for (auto& request : *RendererData::GetLineDrawRequestQueue()) {
+
+        ImVec2 current_window_pos = ImGui::GetWindowPos();
+        
+        glm::vec2 final_rendering_position1 = (glm::vec2(request.x1, request.y1) - RendererData::GetCameraPosition());
+        glm::vec2 final_rendering_position2 = (glm::vec2(request.x2, request.y2) - RendererData::GetCameraPosition());
+
+        glm::ivec2 cam_dimensions = glm::ivec2(ImGui::GetWindowWidth(), ImGui::GetWindowHeight());
+
+        int x1 = static_cast<int>(final_rendering_position1.x * RendererData::PIXELS_PER_METER + cam_dimensions.x * 0.5f * (1.0f / RendererData::GetCameraZoom()));
+        int y1 = static_cast<int>(final_rendering_position1.y * RendererData::PIXELS_PER_METER + cam_dimensions.y * 0.5f * (1.0f / RendererData::GetCameraZoom()));
+        int x2 = static_cast<int>(final_rendering_position2.x * RendererData::PIXELS_PER_METER + cam_dimensions.x * 0.5f * (1.0f / RendererData::GetCameraZoom()));
+        int y2 = static_cast<int>(final_rendering_position2.y * RendererData::PIXELS_PER_METER + cam_dimensions.y * 0.5f * (1.0f / RendererData::GetCameraZoom()));
+
+        draw_list->AddLine(ImVec2(x1 + current_window_pos.x, y1 + current_window_pos.y), ImVec2(x2 + current_window_pos.x, y2 + current_window_pos.y), IM_COL32(request.r, request.g, request.b, request.a));
+    }
+
+    RendererData::GetLineDrawRequestQueue()->clear();
 }
 
 /**
