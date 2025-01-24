@@ -73,7 +73,7 @@ SDL_Texture* GetImage(std::string image_name)
     if (loaded_images.find(image_name) == loaded_images.end())
     {
         std::cout << "error: missing image " << image_name;
-        exit(0);
+        return loaded_images.begin()->second;
     }
     
     return loaded_images[image_name];
@@ -287,6 +287,21 @@ std::shared_ptr<sol::table> GetComponentType(std::string component_name)
     }
     
     return loaded_component_types[component_name];
+}
+
+/**
+ * Get a list of all the names of all the possible components
+ *
+ * @returns                   the list of component names
+*/
+std::vector<std::string> ListAllComponentTypes()
+{
+    std::vector<std::string> list;
+    for (auto& pair : loaded_component_types)
+    {
+        list.push_back(pair.first);
+    }
+    return list;
 }
 
 //-------------------------------------------------------

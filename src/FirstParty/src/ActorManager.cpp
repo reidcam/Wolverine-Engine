@@ -575,6 +575,64 @@ void Actors::RemoveComponentFromActor(int actor_id, sol::table component)
 }
 
 /**
+ * Adds a new component to an actor
+ *
+ * @param   actor_id     the id of the actor that this function is acting on
+ * @param   component_type    the type of component to be added
+*/
+void Actors::AddComponentToActor(int actor_id, std::string component_type)
+{
+    if (Actors::GetTemplateName(actor_id) != "")
+    {
+        std::cout << "TODO: Allow adding components to template instances!" << std::endl;
+        return;
+    }
+    // Creates and gets a reference to a new table on the Lua stack
+    sol::table new_component = LuaAPI::GetLuaState()->create_table();
+
+    // The key of this component
+    std::string key = std::to_string(components[Actors::GetIndex(actor_id)].size());
+
+    // Establishes inheritance between the new component and its type if specified
+    if (!component_type.empty())
+    {
+        std::string type = component_type;
+
+        // Establishes our new component according to its type
+        if (ComponentManager::IsComponentTypeNative(type))
+        {
+            new_component = ComponentManager::NewNativeComponent(type);
+        }
+        else
+        {
+            ComponentManager::EstablishInheritance(new_component, *GetComponentType(type));
+        }
+
+        // Gives the component its key
+        new_component["key"] = key;
+        // Sets the component to be enabled by default
+        new_component["enabled"] = true;
+    }
+    // If the type for this component is not specified anywhere, throw an error
+    else
+    {
+        std::cout << "error: component type unspecified for " << key << " on " << names[Actors::GetIndex(actor_id)];
+        exit(0);
+    }
+
+    //-------------------------------------------------------
+    // Injects the new component with a reference to its actor
+    Actor* _a = new Actor();
+    _a->ID = actor_id;
+    new_component["actor"] = _a;
+
+    // Add the new component to the "components_to_init" and "components" vectors
+    std::shared_ptr<sol::table> ptr = std::make_shared<sol::table>(new_component);
+    components_to_init.push_back(ptr);
+    components[Actors::GetIndex(actor_id)].push_back(ptr);
+}
+
+/**
  * Gets the first component on the given actor with the given type if it exists.
  *
  * @param   actor_id    the id of the actor that this function is acting on

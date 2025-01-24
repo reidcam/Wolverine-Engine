@@ -251,7 +251,8 @@ void LuaAPI::ExposeLuaAPI()
     (*GetLuaState())["Actors"]["GetName"] = &Actors::GetName;
     (*GetLuaState())["Actors"]["GetActorEnabled"] = &Actors::GetActorEnabled;
     (*GetLuaState())["Actors"]["SetActorEnabled"] = &Actors::SetActorEnabled;
-    (*GetLuaState())["Actors"]["RemoveComponent"] = &Actors::RemoveComponentFromActor;
+	(*GetLuaState())["Actors"]["RemoveComponent"] = &Actors::RemoveComponentFromActor;
+	(*GetLuaState())["Actors"]["AddComponent"] = &Actors::AddComponentToActor;
     (*GetLuaState())["Actors"]["GetComponentByType"] = &Actors::GetComponentByType;
     (*GetLuaState())["Actors"]["GetComponentsByType"] = &Actors::GetComponentsByType;
     (*GetLuaState())["Actors"]["GetComponentByKey"] = &Actors::GetComponentByKey;

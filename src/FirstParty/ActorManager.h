@@ -182,6 +182,14 @@ public:
      * @param   component    the component to be removed
     */
     static void RemoveComponentFromActor(int actor_id, sol::table component);
+
+    /**
+     * Adds a new component to an actor
+     *
+     * @param   actor_id     the id of the actor that this function is acting on
+     * @param   component_type    the type of component to be added
+    */
+    static void AddComponentToActor(int actor_id, std::string component_type);
     
     /**
      * Gets the first component on the given actor with the given type if it exists.

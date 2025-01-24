@@ -12,6 +12,7 @@
 #include "EditorManager.h"
 #include "SceneManager.h"
 #include "PhysicsWorld.h"
+#include "ComponentDB.h"
 #include "LuaAPI.h"
 
 bool EditorManager::editor_mode = true; // True when the game is paused and edits can be made
@@ -614,10 +615,11 @@ void EditorManager::HierarchyView()
             if (component.valid())
             {
                 std::string component_type = component["type"];
+                std::string label = component_type + "##" + std::to_string(selected_actor_id) + std::to_string(i);
                 const char* const_type = &component_type[0];
 
                 // If a component is clicked display its properties
-                if (ImGui::CollapsingHeader(const_type))
+                if (ImGui::CollapsingHeader(label.c_str()))
                 {
                     sol::table metatable = component[sol::metatable_key];
 
@@ -639,6 +641,22 @@ void EditorManager::HierarchyView()
                     ImGui::EndTable();
                 }
             }
+        }
+
+        if (ImGui::BeginMenu("Add"))
+        {
+            std::vector<std::string> list = ListAllComponentTypes();
+            std::vector<std::string> native_list = ComponentManager::ListAllNativeComponentTypes();
+            list.insert(list.end(), native_list.begin(), native_list.end());
+
+            for (std::string name : list)
+            {
+                if (ImGui::MenuItem(name.c_str()))
+                {
+                    Actors::AddComponentToActor(selected_actor_id, name);
+                }
+            }
+            ImGui::EndMenu();
         }
 
         ImGui::End();
@@ -901,6 +919,14 @@ void EditorManager::ViewportWidget()
         ImGui::ResetMouseDragDelta(ImGuiMouseButton_Right);
         RendererData::SetCameraPosition(x, y);
     }
+    
+    float scroll_wheel = ImGui::GetIO().MouseWheel;
+    if (scroll_wheel != 0)
+    {
+        float old_zoom = RendererData::GetCameraZoom();
+        RendererData::SetCameraZoom(old_zoom + (scroll_wheel / 10));
+        std::cout << RendererData::GetCameraZoom() << std::endl;
+    }
     ImageToImGUI();
     TextToImGUI();
     UIToImGUI();
@@ -925,22 +951,22 @@ void EditorManager::ImageToImGUI()
         SDL_QueryTexture(tex, NULL, NULL, &tex_w, &tex_h);
 
         // Apply scale
-        float x_scale = std::abs(request.scale_x);
-        float y_scale = std::abs(request.scale_y);
-
-        ImVec2 tex_size = ImVec2(tex_w * x_scale, tex_h * y_scale);
-
-        // Calculate pivot point
-        ImVec2 pivot_point = ImVec2(request.pivot_x * tex_size.x, request.pivot_y * tex_size.y);
-
-        //ImVec2 window_size = ImGui::GetContentRegionAvail();
-        ImVec2 window_size = ImGui::GetWindowSize();
-
-        // center the image
-        float center_offset = 0.5f;
+        float x_scale = request.scale_x;
+        float y_scale = request.scale_y;
 
         // account for current zoom factor
         float zoom = (1.0f / RendererData::GetCameraZoom());
+
+        ImVec2 tex_size = ImVec2(tex_w * x_scale * zoom, tex_h * y_scale * zoom);
+
+        // Calculate pivot point
+        ImVec2 pivot_point = ImVec2(static_cast<int>(request.pivot_x * tex_size.x), static_cast<int>(request.pivot_y * tex_size.y));
+
+        //ImVec2 window_size = ImGui::GetContentRegionAvail();
+        glm::vec2 window_size = RendererData::GetWindowSize();
+
+        // center the image
+        float center_offset = 0.5f;
 
         // Calculate final rendering position
         ImVec2 final_pos = ImVec2(final_rendering_position.x * RendererData::PIXELS_PER_METER + window_size.x * center_offset * zoom - pivot_point.x,

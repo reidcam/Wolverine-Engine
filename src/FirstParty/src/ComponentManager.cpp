@@ -118,3 +118,19 @@ bool ComponentManager::IsDefaultValue(std::string component_type, sol::object va
 
     return false;
 }
+
+/**
+ * Lists all of the native components
+ *
+ *  @returns                    A list of all native components
+ */
+std::vector<std::string> ComponentManager::ListAllNativeComponentTypes()
+{
+    std::vector<std::string> list =
+    {
+        "Rigidbody",
+        "SpriteRenderer",
+        "ParticleSystem"
+    };
+    return list;
+}

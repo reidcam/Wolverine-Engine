@@ -51,6 +51,13 @@ public:
      *  @returns                    true if the variable is default, false otherwise
      */
     static bool IsDefaultValue(std::string component_type, sol::object variable_key, sol::object value);
+
+    /**
+     * Lists all of the native components
+     *
+     *  @returns                    A list of all native components
+     */
+    static std::vector<std::string> ListAllNativeComponentTypes();
 };
 
 #endif /* ComponentManager_h */
