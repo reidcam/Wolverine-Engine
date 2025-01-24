@@ -892,7 +892,15 @@ void EditorManager::ShowFileSelector() {
 */
 void EditorManager::ViewportWidget()
 {
-    ImGui::Begin("Viewport", NULL, 8 | 16);
+    const int DRAG_SENSE = 100;
+    ImGui::Begin("Viewport", NULL, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar);
+    if (ImGui::IsMouseDown(ImGuiMouseButton_Right) && editor_mode)
+    {
+        float x = RendererData::GetCameraPosition().x + (-ImGui::GetMouseDragDelta(ImGuiMouseButton_Right).x / DRAG_SENSE);
+        float y = RendererData::GetCameraPosition().y + (-ImGui::GetMouseDragDelta(ImGuiMouseButton_Right).y / DRAG_SENSE);
+        ImGui::ResetMouseDragDelta(ImGuiMouseButton_Right);
+        RendererData::SetCameraPosition(x, y);
+    }
     ImageToImGUI();
     TextToImGUI();
     UIToImGUI();

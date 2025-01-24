@@ -16,6 +16,8 @@ std::string Scene::initial_scene_name = ""; // The name of the first scene to be
 std::string Scene::current_scene_name = ""; // The name of this scene
 int Scene::current_scene_lifetime = 0; // The number of frames this scene has been active for
 
+glm::vec2 Scene::default_camera_pos = glm::vec2(0.0f, 0.0f); // The default camera position for this scene
+
 bool Scene::load_new_scene = false; // True if we want to load a new scene at the end of this frame
 std::string Scene::new_scene_name = ""; // The name of the new scene we're loading into
 
@@ -108,6 +110,7 @@ void Scene::LoadNewScene()
     load_new_scene = false;
     current_scene_name = new_scene_name;
     current_scene_lifetime = 0;
+    RendererData::SetCameraPosition(default_camera_pos.x, default_camera_pos.y);
     
     rapidjson::Document scene_document;
     EngineUtils::ReadJsonFile(GetScenePath(new_scene_name), scene_document);

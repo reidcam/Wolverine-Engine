@@ -122,6 +122,7 @@ bool CheckGameConfig()
         std::string initial_scene = game_config["initial_scene"].GetString();
         Scene::initial_scene_name = initial_scene;
         Scene::new_scene_name = initial_scene;
+        Scene::default_camera_pos = RendererData::GetCameraPosition();
         Scene::LoadNewScene();
     }
     else {
