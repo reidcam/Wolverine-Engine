@@ -200,6 +200,11 @@ public:
     static void PixelToImGUI();
 
     /**
+    * Renders all of the line draw requests in the line_draw_request_queue to imgui
+    */
+    static void LineToImGUI();
+
+    /**
     * Loads the fonts that are needed for text requests this frame, if not already loaded
     *
     * NOTE: Must be called before ImGui::NewFrame() and after ImGui::Render()

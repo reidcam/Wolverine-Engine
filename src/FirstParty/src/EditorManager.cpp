@@ -148,7 +148,7 @@ void EditorManager::UpdateSceneLocal()
             actor_template_name.SetString(template_name.c_str(), allocator);
             actor.AddMember("template", actor_template_name, allocator);
         }
-        else
+        if (true)
         {
             // Get the 'components' value
             rapidjson::Value components(rapidjson::kObjectType);
@@ -230,8 +230,11 @@ void EditorManager::UpdateSceneLocal()
                         j++;
                     }
                     
-                    // Adds the 'key_value_type_pairs' object to the component
-                    json_comp.AddMember("__type_pairs", key_value_type_pairs, allocator);
+                    if (template_name == "")
+                    {
+                        // Adds the 'key_value_type_pairs' object to the component
+                        json_comp.AddMember("__type_pairs", key_value_type_pairs, allocator);
+                    }
                     
                     // Add this component to the 'components' list
                     rapidjson::Value component_id;
@@ -400,9 +403,37 @@ void EditorManager::VariableView(sol::table* table, sol::lua_value key)
             // by storing the ones that the metatable contains.
             sol::table found_items = LuaAPI::GetLuaState()->create_table();
             
+            // Add a value to the table
+            if (ImGui::BeginMenu("Add Item")) {
+                if (ImGui::MenuItem("Int")) {
+                    variable_value.add(0);
+                }
+                if (ImGui::MenuItem("float")) {
+                    variable_value.add(0.0f);
+                }
+                if (ImGui::MenuItem("string")) {
+                    variable_value.add("string");
+                }
+                if (ImGui::MenuItem("bool")) {
+                    variable_value.add(false);
+                }
+                if (ImGui::MenuItem("table")) {
+                    variable_value.add(LuaAPI::GetLuaState()->create_table());
+                }
+                ImGui::EndMenu();
+            }
+
             // Table allows us to cleanly format our variables
-            ImGui::BeginTable(const_invisible_id, 2);
-        
+            ImGui::BeginTable(const_invisible_id, 3);
+
+            ImGui::TableSetupColumn("one", ImGuiTableColumnFlags_WidthFixed, 10.0f); // Default to 10.0f
+            ImGui::TableSetupColumn("two", ImGuiTableColumnFlags_WidthFixed, 10.0f);
+            ImGui::TableSetupColumn("three", ImGuiTableColumnFlags_WidthStretch);
+
+            // Keeps track of the table element we're on while iterating, used to create unique display IDs for the
+            // delete button of each element.
+            int i = 0;
+
             // Displays all of the items in the table that exist before its initialized, IFF this table is an instance at all
             if (variable_value[sol::metatable_key].valid())
             {
@@ -413,6 +444,8 @@ void EditorManager::VariableView(sol::table* table, sol::lua_value key)
                     found_items[item_key] = 0;
                     // Sets this row of the table to be the variable with the given key
                     VariableView(&variable_value, item_key);
+
+                    i++;
                 }
             }
             // Displays all of the items in the table that are created during runtime
@@ -421,8 +454,19 @@ void EditorManager::VariableView(sol::table* table, sol::lua_value key)
                 sol::lua_value item_key = item.first;
                 if (!found_items[item_key].valid())
                 {
+                    ImGui::TableNextColumn();
+
+                    std::string table_element_id = std::string(const_invisible_id) + std::to_string(i);
+                    if (ImGui::Button(std::string("-" + table_element_id).c_str()))
+                    {
+                        std::cout << table_element_id << std::endl;
+                        variable_value[item_key] = sol::nil;
+                    }
+                
                     // Sets this row of the table to be the variable with the given key
                     VariableView(&variable_value, item_key);
+
+                    i++;
                 }
             }
             ImGui::EndTable();
@@ -481,7 +525,7 @@ void EditorManager::ModeSwitchButtons()
     {
         if (ImGui::Button("Play"))
         {
-            // TOOD: Hot reload all modified scenes and scripts
+            // TOOD: Hot reload all modified scripts
             SaveChanges();
             editor_mode = false;
             play_mode = true;
@@ -582,6 +626,10 @@ void EditorManager::HierarchyView()
 
                     // Table allows us to cleanly format our variables
                     ImGui::BeginTable(const_type, 2);
+
+                    ImGui::TableSetupColumn("one", ImGuiTableColumnFlags_WidthFixed, 100.0f); // Default to 100.0f
+                    ImGui::TableSetupColumn("two", ImGuiTableColumnFlags_WidthStretch);
+
                     for (auto& variable : metatable)
                     {
                         sol::lua_value key = variable.first;
@@ -844,11 +892,20 @@ void EditorManager::ShowFileSelector() {
 */
 void EditorManager::ViewportWidget()
 {
-    ImGui::Begin("Viewport");
+    const int DRAG_SENSE = 100;
+    ImGui::Begin("Viewport", NULL, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar);
+    if (ImGui::IsMouseDown(ImGuiMouseButton_Right) && editor_mode)
+    {
+        float x = RendererData::GetCameraPosition().x + (-ImGui::GetMouseDragDelta(ImGuiMouseButton_Right).x / DRAG_SENSE);
+        float y = RendererData::GetCameraPosition().y + (-ImGui::GetMouseDragDelta(ImGuiMouseButton_Right).y / DRAG_SENSE);
+        ImGui::ResetMouseDragDelta(ImGuiMouseButton_Right);
+        RendererData::SetCameraPosition(x, y);
+    }
     ImageToImGUI();
     TextToImGUI();
     UIToImGUI();
     PixelToImGUI();
+    LineToImGUI();
     ImGui::End();
 }
 
@@ -1004,6 +1061,35 @@ void EditorManager::PixelToImGUI()
     }
 
     RendererData::GetPixelDrawRequestQueue()->clear();
+}
+
+/**
+* Renders all of the line draw requests in the line_draw_request_queue to imgui
+*/
+void EditorManager::LineToImGUI()
+{
+    //SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND); // needed to ensure that alpha works
+
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
+    for (auto& request : *RendererData::GetLineDrawRequestQueue()) {
+
+        ImVec2 current_window_pos = ImGui::GetWindowPos();
+        
+        glm::vec2 final_rendering_position1 = (glm::vec2(request.x1, request.y1) - RendererData::GetCameraPosition());
+        glm::vec2 final_rendering_position2 = (glm::vec2(request.x2, request.y2) - RendererData::GetCameraPosition());
+
+        glm::ivec2 cam_dimensions = glm::ivec2(ImGui::GetWindowWidth(), ImGui::GetWindowHeight());
+
+        int x1 = static_cast<int>(final_rendering_position1.x * RendererData::PIXELS_PER_METER + cam_dimensions.x * 0.5f * (1.0f / RendererData::GetCameraZoom()));
+        int y1 = static_cast<int>(final_rendering_position1.y * RendererData::PIXELS_PER_METER + cam_dimensions.y * 0.5f * (1.0f / RendererData::GetCameraZoom()));
+        int x2 = static_cast<int>(final_rendering_position2.x * RendererData::PIXELS_PER_METER + cam_dimensions.x * 0.5f * (1.0f / RendererData::GetCameraZoom()));
+        int y2 = static_cast<int>(final_rendering_position2.y * RendererData::PIXELS_PER_METER + cam_dimensions.y * 0.5f * (1.0f / RendererData::GetCameraZoom()));
+
+        draw_list->AddLine(ImVec2(x1 + current_window_pos.x, y1 + current_window_pos.y), ImVec2(x2 + current_window_pos.x, y2 + current_window_pos.y), IM_COL32(request.r, request.g, request.b, request.a));
+    }
+
+    RendererData::GetLineDrawRequestQueue()->clear();
 }
 
 /**

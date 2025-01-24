@@ -11,6 +11,7 @@
 
 #include "ActorManager.h"
 #include "SceneDB.h"
+#include "glm/glm.hpp"
 
 class Scene
 {
@@ -24,6 +25,7 @@ public:
     static std::string initial_scene_name; // The name of the first scene to be loaded in the game
     static std::string new_scene_name; // The name of the new scene we're loading into
     static bool load_new_scene; // True if we want to load a new scene at the end of this frame
+    static glm::vec2 default_camera_pos; // The default camera position for this scene
     //-------------------------------------------------------
     // Lifecycle Functions
     

@@ -289,6 +289,13 @@ public:
 	* @returns	  the current zoom factor of the camera
 	*/
 	static float GetCameraZoom();
+
+	/**
+	* Gets the current size of the window
+	*
+	* @returns	  the current size of the window
+	*/
+	static glm::vec2 GetWindowSize();
     
     /**
      * Cleans up the SDL renderer and window
