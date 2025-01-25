@@ -234,6 +234,10 @@ void RendererData::RenderAndClearAllUI()
 		SDL_Texture* tex = GetImage(request.image_name);
 		SDL_Rect tex_rect;
 		SDL_QueryTexture(tex, NULL, NULL, &tex_rect.w, &tex_rect.h);
+		tex_rect.w *= request.scale_x;
+		tex_rect.h *= request.scale_y;
+
+		SDL_Point pivot_point = { static_cast<int>(request.pivot_x * tex_rect.w), static_cast<int>(request.pivot_y * tex_rect.h) };
 
 #ifndef NDEBUG // must be called from inside of an ImGui window
 		ImVec2 window_position = ImGui::GetWindowPos();
@@ -249,8 +253,8 @@ void RendererData::RenderAndClearAllUI()
 		SDL_SetTextureAlphaMod(tex, request.a);
 
 		// Preform draw
-		SDL_RenderCopyEx(GetRenderer(), tex, NULL, &tex_rect, 0,
-			NULL, SDL_FLIP_NONE);
+		SDL_RenderCopyEx(GetRenderer(), tex, NULL, &tex_rect, request.rotation_degrees,
+			&pivot_point, SDL_FLIP_NONE);
 
 		// Remove tint / alpha from texture
 		SDL_SetTextureColorMod(tex, 255, 255, 255);
@@ -340,16 +344,22 @@ void RendererData::DrawUI(const std::string& image_name, const float x, const fl
 * Creates a UI draw request at the specified screen position, with the color {r, g, b, a},
 * and in the given sorting layer
 *
-* @param	image_name		The name of the image to be draw
-* @param	x				The x position to draw the image at
-* @param	y				The y position to draw the image at
-* @param	r				[0, 255] How red the image is
-* @param	g				[0, 255] How green the image is
-* @param	b				[0, 255] How blue the image is
-* @param	a				[0, 255] The alpha value of the image
-* @param	sorting_order	The sorting layer that the image should be drawn in
+* @param	image_name			The name of the image to be draw
+* @param	x					The x position to draw the image at
+* @param	y					The y position to draw the image at
+* @param	r					[0, 255] How red the image is
+* @param	g					[0, 255] How green the image is
+* @param	b					[0, 255] How blue the image is
+* @param	a					[0, 255] The alpha value of the image
+* @param	sorting_order		The sorting layer that the image should be drawn in
+* @param	scale_x				The scale to draw the x-axis. 1 is normal
+* @param	scale_y				The scale to draw the y-axis. 1 is normal
+* @param	pivot_x				[0, 1] Where on the x position of the image should be located. 0 is the left side of the image and 1 is the right.
+* @param	pivot_y				[0, 1] Where on the y position of the image should be located. 0 is the top side of the image and 1 is the bottom.
+* @param	rotation_degrees	The rotation of the image in degrees
 */
-void RendererData::DrawUIEx(const std::string& image_name, const float x, const float y, const float r, const float g, const float b, const float a, const float sorting_order)
+void RendererData::DrawUIEx(const std::string& image_name, const float x, const float y, const float r, const float g, const float b, const float a, const float sorting_order, 
+	const float scale_x, const float scale_y, const float pivot_x, const float pivot_y, const float rotation_degrees)
 {
 	UIRenderRequest obj;
 	obj.image_name = image_name;
@@ -360,6 +370,11 @@ void RendererData::DrawUIEx(const std::string& image_name, const float x, const 
 	obj.b = static_cast<int>(b);
 	obj.a = static_cast<int>(a);
 	obj.sorting_order = static_cast<int>(sorting_order);
+	obj.scale_x = scale_x;
+	obj.scale_y = scale_y;
+	obj.pivot_x = pivot_x;
+	obj.pivot_y = pivot_y;
+	obj.rotation_degrees = static_cast<int>(rotation_degrees);
 
 	ui_draw_request_queue.push_back(obj);
 }

@@ -90,7 +90,7 @@ void EditorManager::RenderEditor()
     // check to see if any windows should be opened/closed this frame
     CheckEditorShortcuts();
 
-    ImGui::ShowDemoWindow();
+    //ImGui::ShowDemoWindow();
     // Create all of the ImGui windows
     MainMenuBar();
     HierarchyView();
@@ -592,7 +592,7 @@ void EditorManager::HierarchyView()
         ImGui::SetNextWindowSize(ImVec2(imgui_window_w, imgui_window_h));
 
         // Window Position
-        int imgui_window_x = 0.0f;
+        int imgui_window_x = window_w - imgui_window_w;
         int imgui_window_y = ImGui::GetFrameHeightWithSpacing() - 5.0f;
         ImGui::SetNextWindowPos(ImVec2(imgui_window_x, imgui_window_y), ImGuiCond_FirstUseEver);
 
