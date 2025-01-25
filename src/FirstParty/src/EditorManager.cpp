@@ -633,7 +633,7 @@ void EditorManager::HierarchyView()
             ImGui::SameLine();
 
             // If an actor is clicked display its components
-            if (ImGui::Button(const_name)) { selected_actor_id = actor_id; };
+            if (ImGui::Button(const_name)) { selected_actor_id = actor_id; }
             
             ImGui::SameLine();
             
