@@ -640,7 +640,8 @@ void EditorManager::HierarchyView()
             // If an actor is clicked display its components
             Actor temp;
             temp.ID = actor_id;
-            const char* const_delete_id = &("-" + checkbox_id)[0];
+            std::string delete_id = "-" + checkbox_id;
+            const char* const_delete_id = &(delete_id)[0];
             if (ImGui::Button(const_delete_id)) { Scene::Destroy(temp); };
         }
         
