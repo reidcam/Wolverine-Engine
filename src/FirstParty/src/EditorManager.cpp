@@ -892,7 +892,7 @@ void EditorManager::ViewportDocking()
 std::vector<std::string> EditorManager::GetEditorLayouts()
 {
     std::vector<std::string> iniFiles;
-    if (FileUtils::DirectoryExists(docking_layout_file_path.string())) {
+    if (std::filesystem::exists(docking_layout_file_path)) {
         for (const auto& entry : std::filesystem::directory_iterator(docking_layout_file_path)) {
             if (entry.path().extension() == ".ini") {
                 std::string file_name = FileUtils::removeExtension(entry.path().filename().string());
