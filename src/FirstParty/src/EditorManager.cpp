@@ -471,7 +471,7 @@ void EditorManager::VariableView(sol::table* table, sol::lua_value key)
                     if (ImGui::Button(std::string("-" + table_element_id).c_str()))
                     {
                         std::cout << table_element_id << std::endl;
-                        variable_value[item_key] = sol::nil;
+                        variable_value[item_key] = sol::lua_nil;
                     }
                 
                     // Sets this row of the table to be the variable with the given key
@@ -931,20 +931,23 @@ void EditorManager::ViewportWidget()
     if (viewport) {
         const int DRAG_SENSE = 100;
         ImGui::Begin("Viewport", NULL, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBackground);
-        if (ImGui::IsMouseDown(ImGuiMouseButton_Right) && editor_mode)
+        if (ImGui::IsWindowHovered())
         {
-            float x = RendererData::GetCameraPosition().x + (-ImGui::GetMouseDragDelta(ImGuiMouseButton_Right).x / DRAG_SENSE);
-            float y = RendererData::GetCameraPosition().y + (-ImGui::GetMouseDragDelta(ImGuiMouseButton_Right).y / DRAG_SENSE);
-            ImGui::ResetMouseDragDelta(ImGuiMouseButton_Right);
-            RendererData::SetCameraPosition(x, y);
-        }
-
-        float scroll_wheel = ImGui::GetIO().MouseWheel;
-        if (scroll_wheel != 0)
-        {
-            float old_zoom = RendererData::GetCameraZoom();
-            RendererData::SetCameraZoom(old_zoom + (scroll_wheel / 10));
-            std::cout << RendererData::GetCameraZoom() << std::endl;
+            if (ImGui::IsMouseDown(ImGuiMouseButton_Right) && editor_mode)
+            {
+                float x = RendererData::GetCameraPosition().x + (-ImGui::GetMouseDragDelta(ImGuiMouseButton_Right).x / DRAG_SENSE);
+                float y = RendererData::GetCameraPosition().y + (-ImGui::GetMouseDragDelta(ImGuiMouseButton_Right).y / DRAG_SENSE);
+                ImGui::ResetMouseDragDelta(ImGuiMouseButton_Right);
+                RendererData::SetCameraPosition(x, y);
+            }
+            
+            float scroll_wheel = ImGui::GetIO().MouseWheel;
+            if (scroll_wheel != 0 && editor_mode)
+            {
+                float old_zoom = RendererData::GetCameraZoom();
+                RendererData::SetCameraZoom(old_zoom + (scroll_wheel / 10));
+                std::cout << RendererData::GetCameraZoom() << std::endl;
+            }
         }
 
         RendererData::RenderAndClearAllImageRequests();
