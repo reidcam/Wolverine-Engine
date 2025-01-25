@@ -53,28 +53,7 @@ void Scene::UpdateActors()
     
     // Processes all of the components removed from actors this frame
     Actors::ProcessRemovedComponents();
-    
-    // Destroys all of the dead actors
-    // TODO: Take another look at how to remove dead actors from a scene, this feels VERY slow
-    for (auto actor : dead_actors)
-    {
-        // Destroy all of the actors that have been prepped for destruction.
-        Actors::DestroyActor(actor);
-        
-        int index_to_remove = -1;
-        // Find the index of the actor within 'actors' and delete it
-        for (int i = 0; i < actors.size(); i++)
-        {
-            if (actor == actors[i])
-            {
-                index_to_remove = i;
-                break;
-            }
-        }
-        // Erase the dead actor
-        if (index_to_remove != -1) { actors.erase(actors.begin() + index_to_remove); }
-    }
-    dead_actors.clear();
+    Scene::DestroyFinalStep();
 }
 
 //-------------------------------------------------------
@@ -179,6 +158,34 @@ void Scene::Destroy(Actor actor)
     dead_actors.push_back(actor.ID);
     
     Actors::PrepareActorForDestruction(actor.ID);
+}
+
+/**
+ * The last step of the destruction for actors
+*/
+void Scene::DestroyFinalStep()
+{
+    // Destroys all of the dead actors
+    // TODO: Take another look at how to remove dead actors from a scene, this feels VERY slow
+    for (auto actor : dead_actors)
+    {
+        // Destroy all of the actors that have been prepped for destruction.
+        Actors::DestroyActor(actor);
+        
+        int index_to_remove = -1;
+        // Find the index of the actor within 'actors' and delete it
+        for (int i = 0; i < actors.size(); i++)
+        {
+            if (actor == actors[i])
+            {
+                index_to_remove = i;
+                break;
+            }
+        }
+        // Erase the dead actor
+        if (index_to_remove != -1) { actors.erase(actors.begin() + index_to_remove); }
+    }
+    dead_actors.clear();
 }
 
 //-------------------------------------------------------

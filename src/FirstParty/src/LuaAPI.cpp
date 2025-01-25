@@ -249,6 +249,7 @@ void LuaAPI::ExposeLuaAPI()
     // The "Actors" namespace
     (*GetLuaState())["Actors"] = GetLuaState()->create_table();
     (*GetLuaState())["Actors"]["GetName"] = &Actors::GetName;
+    (*GetLuaState())["Actors"]["SetName"] = &Actors::SetName;
     (*GetLuaState())["Actors"]["GetActorEnabled"] = &Actors::GetActorEnabled;
     (*GetLuaState())["Actors"]["SetActorEnabled"] = &Actors::SetActorEnabled;
 	(*GetLuaState())["Actors"]["RemoveComponent"] = &Actors::RemoveComponentFromActor;

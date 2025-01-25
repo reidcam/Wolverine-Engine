@@ -113,6 +113,9 @@ void EditorManager::EditorUpdate()
 {
     Actors::EditorStartComponents(editor_components_list);
     Actors::EditorUpdateComponents(editor_components_list);
+    // Processes all of the components removed from actors this frame
+    Actors::ProcessRemovedComponents();
+    Scene::DestroyFinalStep();
 }
 
 /**
@@ -596,6 +599,23 @@ void EditorManager::HierarchyView()
         // Alows developers to click on specifc actors and components to change values
         ImGui::Begin("Hierarchy View", &hierarchy, window_flags);
 
+        // Add new actors
+        if (ImGui::BeginMenu("Add Actor..."))
+        {
+            std::vector<std::string> list = ListAllTemplateTypes();
+            
+            std::sort(list.begin(), list.end());
+            
+            for (std::string name : list)
+            {
+                if (ImGui::MenuItem(name.c_str()))
+                {
+                    Scene::Instantiate(name);
+                }
+            }
+            ImGui::EndMenu();
+        }
+        
         // Find the selected actor
         for (int actor_id : Scene::GetAllActorsInScene())
         {
@@ -606,7 +626,7 @@ void EditorManager::HierarchyView()
 
             // If the checkbox is clicked toggle the actor's 'enabled' status
             // The ## hides the id for the item
-            std::string checkbox_id = "##" + actor_name;
+            std::string checkbox_id = "##" + actor_name + std::to_string(actor_id);
             const char* const_checkbox_id = &checkbox_id[0];
             if (ImGui::Checkbox(const_checkbox_id, &actor_enabled)) { Actors::SetActorEnabled(actor_id, actor_enabled); }
 
@@ -614,6 +634,25 @@ void EditorManager::HierarchyView()
 
             // If an actor is clicked display its components
             if (ImGui::Button(const_name)) { selected_actor_id = actor_id; };
+            
+            ImGui::SameLine();
+            
+            // If an actor is clicked display its components
+            Actor temp;
+            temp.ID = actor_id;
+            const char* const_delete_id = &("-" + checkbox_id)[0];
+            if (ImGui::Button(const_delete_id)) { Scene::Destroy(temp); };
+        }
+        
+        if (selected_actor_id != -1)
+        {
+            char* const_var_value = &Actors::GetName(selected_actor_id)[0];
+            ImGui::Text("Name: ");
+            ImGui::SameLine();
+            if (ImGui::InputText("##ActorName", const_var_value, 50) && (ImGui::IsItemEdited() && ImGui::IsItemDeactivated()))
+            {
+                Actors::SetName(selected_actor_id, const_var_value);
+            }
         }
 
         // Display the components of the selected actor
@@ -652,23 +691,27 @@ void EditorManager::HierarchyView()
                 }
             }
         }
-
-        if (ImGui::BeginMenu("Add"))
+        
+        // Menu for adding new components to actors in the scene
+        if (selected_actor_id != -1)
         {
-            std::vector<std::string> list = ListAllComponentTypes();
-            std::vector<std::string> native_list = ComponentManager::ListAllNativeComponentTypes();
-            list.insert(list.end(), native_list.begin(), native_list.end());
-
-            std::sort(list.begin(), list.end());
-
-            for (std::string name : list)
+            if (ImGui::BeginMenu("Add Component..."))
             {
-                if (ImGui::MenuItem(name.c_str()))
+                std::vector<std::string> list = ListAllComponentTypes();
+                std::vector<std::string> native_list = ComponentManager::ListAllNativeComponentTypes();
+                list.insert(list.end(), native_list.begin(), native_list.end());
+                
+                std::sort(list.begin(), list.end());
+                
+                for (std::string name : list)
                 {
-                    Actors::AddComponentToActor(selected_actor_id, name);
+                    if (ImGui::MenuItem(name.c_str()))
+                    {
+                        Actors::AddComponentToActor(selected_actor_id, name);
+                    }
                 }
+                ImGui::EndMenu();
             }
-            ImGui::EndMenu();
         }
 
         ImGui::End();

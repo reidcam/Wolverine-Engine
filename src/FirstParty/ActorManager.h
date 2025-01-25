@@ -107,6 +107,14 @@ public:
      * @returns             the name of the given actor
     */
     static std::string GetName(int actor_id);
+    
+    /**
+     * Sets this actors name
+     *
+     * @param   actor_id    the id of the actor that this function is acting on
+     * @param   new_name    the new name for the given actor
+    */
+    static void SetName(int actor_id, std::string new_name);
 
     /**
      * Returns this actors ID

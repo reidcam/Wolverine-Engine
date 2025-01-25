@@ -274,6 +274,20 @@ std::string Actors::GetName(int actor_id)
 }
 
 /**
+ * Sets this actors name
+ *
+ * @param   actor_id    the id of the actor that this function is acting on
+ * @param   new_name    the new name for the given actor
+*/
+void Actors::SetName(int actor_id, std::string new_name)
+{
+    int actor_index = GetIndex(actor_id);
+    if (actor_index == -1) {return;}
+    
+    names[actor_index] = new_name;
+}
+
+/**
  * Returns this actors ID
  *
  * @param   actor_id    the id of the actor that this function is acting on

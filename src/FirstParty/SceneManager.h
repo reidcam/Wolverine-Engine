@@ -66,6 +66,11 @@ public:
     */
     static void Destroy(Actor actor);
     
+    /**
+     * The last step of the destruction for actors
+    */
+    static void DestroyFinalStep();
+    
     //-------------------------------------------------------
     // Getters/Setters
     

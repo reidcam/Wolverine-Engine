@@ -201,6 +201,9 @@ void LoadTemplates()
             }
         }
     }
+    rapidjson::Document* template_document = new rapidjson::Document;
+    template_document->Parse("{\"name\": \"New_Actor\",\"components\": {}}");
+    loaded_templates["New_Actor"] = template_document;
 } // LoadTemplates()
 
 /**
@@ -219,6 +222,21 @@ rapidjson::Document* GetTemplate(std::string template_name)
     
     return loaded_templates[template_name];
 } // GetTemplate()
+
+/**
+ * Get a list of all the names of all the possible templates
+ *
+ * @returns                   the list of template names
+*/
+std::vector<std::string> ListAllTemplateTypes()
+{
+    std::vector<std::string> list;
+    for (auto& pair : loaded_templates)
+    {
+        list.push_back(pair.first);
+    }
+    return list;
+}
 
 //-------------------------------------------------------
 // Component Type Database
