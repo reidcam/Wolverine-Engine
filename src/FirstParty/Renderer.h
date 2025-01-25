@@ -14,6 +14,7 @@
 #include "SDL_image.h"
 #include "SDL_ttf.h"
 #include "glm/glm.hpp"
+#include "imgui.h"
 
 #include "RenderRequests.h"
 #include "ImageDB.h"

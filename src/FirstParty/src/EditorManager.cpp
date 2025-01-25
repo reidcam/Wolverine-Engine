@@ -39,7 +39,17 @@ void EditorManager::Init()
     
     // Set up imgui style
     ImGui::StyleColorsDark();
-    
+
+    // temp fix for background transparency REMOVE LATER AFTER JAM
+    auto& style = ImGui::GetStyle();
+    ImVec4* colors = style.Colors;
+
+    const ImVec4 bgColor = ImVec4(0.1, 0.1, 0.1, 0.0);
+    colors[ImGuiCol_WindowBg] = bgColor;
+    colors[ImGuiCol_ChildBg] = bgColor;
+    colors[ImGuiCol_TitleBg] = bgColor;
+    /////////////////////////////////
+
     // Set up platfomr/renderer backends
     ImGui_ImplSDL2_InitForSDLRenderer(RendererData::GetWindow(), RendererData::GetRenderer());
     ImGui_ImplSDLRenderer2_Init(RendererData::GetRenderer());
@@ -920,7 +930,7 @@ void EditorManager::ViewportWidget()
 {
     if (viewport) {
         const int DRAG_SENSE = 100;
-        ImGui::Begin("Viewport", NULL, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar);
+        ImGui::Begin("Viewport", NULL, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBackground);
         if (ImGui::IsMouseDown(ImGuiMouseButton_Right) && editor_mode)
         {
             float x = RendererData::GetCameraPosition().x + (-ImGui::GetMouseDragDelta(ImGuiMouseButton_Right).x / DRAG_SENSE);
@@ -937,11 +947,17 @@ void EditorManager::ViewportWidget()
             std::cout << RendererData::GetCameraZoom() << std::endl;
         }
 
-        ImageToImGUI();
-        TextToImGUI();
-        UIToImGUI();
-        PixelToImGUI();
-        LineToImGUI();
+        RendererData::RenderAndClearAllImageRequests();
+        RendererData::RenderAndClearAllTextRequests();
+        RendererData::RenderAndClearAllUI();
+        RendererData::RenderAndClearAllPixels();
+        RendererData::RenderAndClearAllLines();
+
+        //ImageToImGUI();
+        //TextToImGUI();
+        //UIToImGUI();
+        //PixelToImGUI();
+        //LineToImGUI();
         ImGui::End();
     }
 }

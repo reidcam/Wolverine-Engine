@@ -163,10 +163,14 @@ void RendererData::RenderAndClearAllImageRequests()
 
 		SDL_Point pivot_point = { static_cast<int>(request.pivot_x * tex_rect.w), static_cast<int>(request.pivot_y * tex_rect.h) };
 
+#ifndef NDEBUG // must be called from inside of an ImGui window
+		ImVec2 cam_dimensions = ImGui::GetWindowSize();
+		ImVec2 window_position = ImGui::GetWindowPos();
+#else
 		glm::ivec2 cam_dimensions = glm::ivec2(window_size.x, window_size.y);
-
-		tex_rect.x = static_cast<int>(final_rendering_position.x * PIXELS_PER_METER + cam_dimensions.x * 0.5f * (1.0f / zoom_factor) - pivot_point.x);
-		tex_rect.y = static_cast<int>(final_rendering_position.y * PIXELS_PER_METER + cam_dimensions.y * 0.5f * (1.0f / zoom_factor) - pivot_point.y);
+#endif
+		tex_rect.x = static_cast<int>(final_rendering_position.x * PIXELS_PER_METER + cam_dimensions.x * 0.5f * (1.0f / zoom_factor) - pivot_point.x + window_position.x);
+		tex_rect.y = static_cast<int>(final_rendering_position.y * PIXELS_PER_METER + cam_dimensions.y * 0.5f * (1.0f / zoom_factor) - pivot_point.y + window_position.y);
 
 		// Apply tint / alpha to texture
 		SDL_SetTextureColorMod(tex, request.r, request.g, request.b);
@@ -196,8 +200,15 @@ void RendererData::RenderAndClearAllTextRequests()
 		SDL_Texture* text_texture = ConvertTextToTexture(GetRenderer(), request.text, font_color, request.font, request.size);
 
 		SDL_Rect dest_rect;
+#ifndef NDEBUG // must be called from inside of an ImGui window
+		ImVec2 window_position = ImGui::GetWindowPos();
+		dest_rect.x = request.x + window_position.x;
+		dest_rect.y = request.y + window_position.y;
+#else
 		dest_rect.x = request.x;
 		dest_rect.y = request.y;
+#endif
+
 		SDL_QueryTexture(text_texture, nullptr, nullptr, &dest_rect.w, &dest_rect.h); // get w and h from the text
 
 		double angle = 0;
@@ -224,8 +235,14 @@ void RendererData::RenderAndClearAllUI()
 		SDL_Rect tex_rect;
 		SDL_QueryTexture(tex, NULL, NULL, &tex_rect.w, &tex_rect.h);
 
-		tex_rect.x = static_cast<int>(final_rendering_position.x);
-		tex_rect.y = static_cast<int>(final_rendering_position.y);
+#ifndef NDEBUG // must be called from inside of an ImGui window
+		ImVec2 window_position = ImGui::GetWindowPos();
+		tex_rect.x = static_cast<int>(request.x + window_position.x);
+		tex_rect.y = static_cast<int>(request.y + window_position.y);
+#else
+		tex_rect.x = static_cast<int>(request.x);
+		tex_rect.y = static_cast<int>(request.y);
+#endif
 
 		// Apply tint / alpha to texture
 		SDL_SetTextureColorMod(tex, request.r, request.g, request.b);
@@ -252,7 +269,13 @@ void RendererData::RenderAndClearAllPixels()
 
 	for (auto& request : pixel_draw_request_queue) {
 		SDL_SetRenderDrawColor(renderer, request.r, request.g, request.b, request.a);
+
+#ifndef NDEBUG // must be called from inside of an ImGui window
+		ImVec2 window_position = ImGui::GetWindowPos();
+		SDL_RenderDrawPoint(renderer, request.x + window_position.x, request.y + window_position.y);
+#else
 		SDL_RenderDrawPoint(renderer, request.x, request.y);
+#endif
 	}
 
 	pixel_draw_request_queue.clear();
@@ -272,11 +295,15 @@ void RendererData::RenderAndClearAllLines()
     for (auto& request : line_draw_request_queue) {
         SDL_SetRenderDrawColor(renderer, request.r, request.g, request.b, request.a);
         
-        glm::vec2 final_rendering_position1 = glm::vec2(request.x1, request.y1) - current_cam_pos;
-        glm::vec2 final_rendering_position2 = glm::vec2(request.x2, request.y2) - current_cam_pos;
-        
-        glm::ivec2 cam_dimensions = glm::ivec2(window_size.x, window_size.y);
-        
+#ifndef NDEBUG // must be called from inside of an ImGui window
+		ImVec2 cam_dimensions = ImGui::GetWindowSize();	
+#else
+		glm::ivec2 cam_dimensions = glm::ivec2(window_size.x, window_size.y);
+#endif  
+
+		glm::vec2 final_rendering_position1 = glm::vec2(request.x1, request.y1) - current_cam_pos;
+		glm::vec2 final_rendering_position2 = glm::vec2(request.x2, request.y2) - current_cam_pos;
+
         int x1 = static_cast<int>(final_rendering_position1.x * PIXELS_PER_METER + cam_dimensions.x * 0.5f * (1.0f / zoom_factor));
         int y1 = static_cast<int>(final_rendering_position1.y * PIXELS_PER_METER + cam_dimensions.y * 0.5f * (1.0f / zoom_factor));
         int x2 = static_cast<int>(final_rendering_position2.x * PIXELS_PER_METER + cam_dimensions.x * 0.5f * (1.0f / zoom_factor));
