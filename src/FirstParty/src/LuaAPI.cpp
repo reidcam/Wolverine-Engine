@@ -236,6 +236,7 @@ void LuaAPI::ExposeLuaAPI()
         "pivot_y", &SpriteRenderer::pivot_y,
         "rotation", &SpriteRenderer::rotation,
         "sorting_order", &SpriteRenderer::sorting_order,
+        "SetColor", &SpriteRenderer::SetColor,
         "OnUpdate", &SpriteRenderer::OnUpdate,
         "OnStart", &SpriteRenderer::OnStart,
         "OnDestroy", &SpriteRenderer::OnDestroy

@@ -10,6 +10,17 @@
 #include "PhysicsWorld.h"
 
 /**
+* Sets the color of this spriterenderer according to the given values
+*/
+void SpriteRenderer::SetColor(int r, int g, int b, int a)
+{
+    color[0] = r;
+    color[1] = g;
+    color[2] = b;
+    color[3] = a;
+}
+
+/**
 * Lifecycle function for initializing a sprite renderer
 */
 void SpriteRenderer::OnStart()
