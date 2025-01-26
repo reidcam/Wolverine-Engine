@@ -97,6 +97,14 @@ public:
     static void UpdateSceneLocal();
     
     /**
+     * Saves a created template in a json file
+     *
+     * @param   actor_id    the id of the actor to be templated
+     * @param   template_name   the name of the new template
+     */
+    static void CreateNewTemplate(int actor_id, std::string template_name);
+    
+    /**
      * Saves all of the changes made in the editor to the engine directory
      */
     static void SaveChanges();

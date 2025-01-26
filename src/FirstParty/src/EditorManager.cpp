@@ -155,6 +155,33 @@ void EditorManager::UpdateSceneLocal()
 }
 
 /**
+ * Saves a created template in a json file
+ *
+ * @param   actor_id    the id of the actor to be templated
+ * @param   template_name   the name of the new template
+ */
+void EditorManager::CreateNewTemplate(int actor_id, std::string template_name)
+{
+    rapidjson::Document new_template(rapidjson::kObjectType); // Init the template file as an object
+    // Create an allocator (required for memory management in RapidJSON)
+    rapidjson::Document::AllocatorType& allocator = new_template.GetAllocator();
+    rapidjson::Value template_json = Actors::SaveActorToJSON(actor_id, true, allocator);
+    
+    // Transform the actor into a string
+    rapidjson::StringBuffer buffer;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+    template_json.Accept(writer);
+//    std::cout << buffer.GetString() << std::endl;
+
+    new_template.Parse(buffer.GetString());
+    
+//    new_template.Accept(writer);
+//    std::cout << buffer.GetString() << std::endl;
+    std::string template_path = FileUtils::GetPath("resources/actor_templates/" + template_name + ".template");
+    EngineUtils::WriteJsonFile(template_path, new_template);
+}
+
+/**
  * Saves all of the changes made in the editor to the engine directory
  */
 void EditorManager::SaveChanges()
@@ -536,6 +563,20 @@ void EditorManager::HierarchyView()
             if (ImGui::InputText("##ActorName", const_var_value, 50) && (ImGui::IsItemEdited() && ImGui::IsItemDeactivated()))
             {
                 Actors::SetName(selected_actor_id, const_var_value);
+            }
+            
+            // Don't allow templating if this actor is already a template
+            if (Actors::GetTemplateName(selected_actor_id) == "")
+            {
+                if (ImGui::Button("Create Template"))
+                {
+                    CreateNewTemplate(selected_actor_id, Actors::GetName(selected_actor_id));
+                }
+            }
+            else
+            {
+                std::string text = "Template: " + Actors::GetTemplateName(selected_actor_id);
+                ImGui::Text(text.c_str());
             }
         }
 

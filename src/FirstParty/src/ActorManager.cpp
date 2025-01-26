@@ -612,13 +612,10 @@ rapidjson::Value Actors::SaveActorToJSON(int actor_id, bool as_template, rapidjs
                 j++;
             }
             
-            if (!as_template)
+            if (template_name == "")
             {
-                if (template_name == "")
-                {
-                    // Adds the 'key_value_type_pairs' object to the component
-                    json_comp.AddMember("__type_pairs", key_value_type_pairs, document_allocator);
-                }
+                // Adds the 'key_value_type_pairs' object to the component
+                json_comp.AddMember("__type_pairs", key_value_type_pairs, document_allocator);
             }
             
             if (!components.IsObject())
