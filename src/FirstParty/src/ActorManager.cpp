@@ -95,6 +95,7 @@ void Actors::ProcessAddedComponents()
             sol::function OnStart = (*component)["OnStart"];
             if (OnStart.valid())
             {
+                // NOTE TO SELF: ENGINE DOES NOT HANDLE spawning components inside of "OnStart" well
                 OnStart(*component);
             }
         }

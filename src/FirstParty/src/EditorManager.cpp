@@ -530,18 +530,19 @@ void EditorManager::HierarchyView()
         for (int actor_id : Scene::GetAllActorsInScene())
         {
             std::string actor_name = Actors::GetName(actor_id);
-            const char* const_name = &actor_name[0];
 
             bool actor_enabled = Actors::GetActorEnabled(actor_id);
 
             // If the checkbox is clicked toggle the actor's 'enabled' status
             // The ## hides the id for the item
-            std::string checkbox_id = "##" + actor_name + std::to_string(actor_id);
+            std::string checkbox_id = "##" + actor_name + std::to_string(actor_id) + "checkbox";
             const char* const_checkbox_id = &checkbox_id[0];
             if (ImGui::Checkbox(const_checkbox_id, &actor_enabled)) { Actors::SetActorEnabled(actor_id, actor_enabled); }
 
             ImGui::SameLine();
 
+            std::string name_id = actor_name + "##" + actor_name + std::to_string(actor_id);
+            const char* const_name = &name_id[0];
             // If an actor is clicked display its components
             if (ImGui::Button(const_name)) { selected_actor_id = actor_id; }
             
