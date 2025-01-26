@@ -8,7 +8,7 @@
 #include "LuaAPI.h"
 
 #include "Engine.h"
-
+#include <cmath>
 /**
 * Exposes all of the API functions to Sol to be used in Lua
 */
