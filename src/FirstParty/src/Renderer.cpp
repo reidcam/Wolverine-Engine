@@ -300,18 +300,19 @@ void RendererData::RenderAndClearAllLines()
         SDL_SetRenderDrawColor(renderer, request.r, request.g, request.b, request.a);
         
 #ifndef NDEBUG // must be called from inside of an ImGui window
-		ImVec2 cam_dimensions = ImGui::GetWindowSize();	
+        ImVec2 cam_dimensions = ImGui::GetWindowSize();
+        ImVec2 window_position = ImGui::GetWindowPos();
 #else
-		glm::ivec2 cam_dimensions = glm::ivec2(window_size.x, window_size.y);
-#endif  
+        glm::ivec2 cam_dimensions = glm::ivec2(window_size.x, window_size.y);
+#endif
 
 		glm::vec2 final_rendering_position1 = glm::vec2(request.x1, request.y1) - current_cam_pos;
 		glm::vec2 final_rendering_position2 = glm::vec2(request.x2, request.y2) - current_cam_pos;
-
-        int x1 = static_cast<int>(final_rendering_position1.x * PIXELS_PER_METER + cam_dimensions.x * 0.5f * (1.0f / zoom_factor));
-        int y1 = static_cast<int>(final_rendering_position1.y * PIXELS_PER_METER + cam_dimensions.y * 0.5f * (1.0f / zoom_factor));
-        int x2 = static_cast<int>(final_rendering_position2.x * PIXELS_PER_METER + cam_dimensions.x * 0.5f * (1.0f / zoom_factor));
-        int y2 = static_cast<int>(final_rendering_position2.y * PIXELS_PER_METER + cam_dimensions.y * 0.5f * (1.0f / zoom_factor));
+        
+        int x1 = static_cast<int>(final_rendering_position1.x * PIXELS_PER_METER + cam_dimensions.x * 0.5f * (1.0f / zoom_factor) + window_position.x);
+        int y1 = static_cast<int>(final_rendering_position1.y * PIXELS_PER_METER + cam_dimensions.y * 0.5f * (1.0f / zoom_factor) + window_position.y);
+        int x2 = static_cast<int>(final_rendering_position2.x * PIXELS_PER_METER + cam_dimensions.x * 0.5f * (1.0f / zoom_factor) + window_position.x);
+        int y2 = static_cast<int>(final_rendering_position2.y * PIXELS_PER_METER + cam_dimensions.y * 0.5f * (1.0f / zoom_factor) + window_position.y);
         
         SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
     }

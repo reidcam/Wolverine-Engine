@@ -101,7 +101,7 @@ int CheckConfigFiles()
         std::cout << "error: resources/ missing";
         return 1;
     }
-    if( CheckGameConfig() && RendererData::LoadRenderingConfig() )
+    if( RendererData::LoadRenderingConfig() && CheckGameConfig())
         return 0;
     return 1;
 }
