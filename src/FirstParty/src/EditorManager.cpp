@@ -14,6 +14,7 @@
 #include "PhysicsWorld.h"
 #include "ComponentDB.h"
 #include "LuaAPI.h"
+#include "TextDB.h"
 
 bool EditorManager::editor_mode = true; // True when the game is paused and edits can be made
 bool EditorManager::play_mode = false; // True after the play button is pressed until the stop button is pressed. No edits can be made in this mode.
@@ -1223,7 +1224,7 @@ void EditorManager::LoadFontsImGUI()
 
         // the font was not found with the size needed, load it
         if (!font_found) {
-            const std::string path = "resources/fonts/" + request.font + ".ttf";
+            const std::string path = FileUtils::GetPath("resources/fonts/") + request.font + ".ttf";
 
             if (FileUtils::DirectoryExists(path))
             {
