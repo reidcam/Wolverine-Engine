@@ -33,7 +33,7 @@ public:
 	*/
 	static inline void InitLuaState() {
 		l_state = new sol::state();
-		l_state->open_libraries(sol::lib::base, sol::lib::package, sol::lib::table);
+		l_state->open_libraries(sol::lib::base, sol::lib::package, sol::lib::table, sol::lib::math);
 	}
 
 	/**
