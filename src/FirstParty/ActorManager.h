@@ -163,6 +163,16 @@ public:
     static int LoadActorWithJSON(const rapidjson::Value& actor_data);
     
     /**
+     * Converts an actor into a json file so that the actor can be saved/instantiated easily
+     *
+     * @param   actor_id             the ID of the actor to be templatized
+     * @param   as_template      true if this actor should be saved in the form of a template
+     * @param   document_allocator      the allocator for the document this actor is going into
+     * @return                returns json representing the actor as a template
+    */
+    static rapidjson::Value SaveActorToJSON(int actor_id, bool as_template, rapidjson::Document::AllocatorType& document_allocator);
+    
+    /**
      * Prepares an actor for destruction later this frame
      * DO NOT USE: This function is for use inside of the scene and actor managers only.
      * In order to destroy an actor please use the "'destroy' function instead. This ensures that actors are properly prepared for destruction.
@@ -271,7 +281,6 @@ public:
      * @param    editor_components   a list of all the components that are needed for editor mode to function
      */
     static void EditorStartComponents(std::unordered_set<std::string> editor_components);
-    
 }; // Actors
 
 #endif /* ActorManager_h */

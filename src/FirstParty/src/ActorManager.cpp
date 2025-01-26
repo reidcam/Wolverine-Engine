@@ -498,6 +498,146 @@ int Actors::LoadActorWithJSON(const rapidjson::Value& actor_data)
 }
 
 /**
+ * Converts an actor into a json file so that the actor can be saved/instantiated easily
+ *
+ * @param   actor_id             the ID of the actor to be templatized
+ * @param   as_template      true if this actor should be saved in the form of a template
+ * @param   document_allocator      the allocator for the document this actor is going into
+ * @return                returns json representing the actor as a template
+*/
+rapidjson::Value Actors::SaveActorToJSON(int actor_id, bool as_template, rapidjson::Document::AllocatorType& document_allocator)
+{
+    rapidjson::Value actor(rapidjson::kObjectType); // Init the actor as an object
+    
+    // Adds the contents of the actor to its json object:
+    // Get the 'name' value
+    rapidjson::Value actor_name;
+    std::string name = Actors::GetName(actor_id);
+    actor_name.SetString(name.c_str(), document_allocator);
+    
+    // Add the 'name' value to the actor
+    actor.AddMember("name", actor_name, document_allocator);
+    
+    // Get the template of the actor
+    std::string template_name = Actors::GetTemplateName(actor_id);
+    if (!as_template) // This engine does not support nested templates (yet... :( )
+    {
+        if (template_name != "")
+        {
+            rapidjson::Value actor_template_name;
+            actor_template_name.SetString(template_name.c_str(), document_allocator);
+            actor.AddMember("template", actor_template_name, document_allocator);
+        }
+    }
+    // Get the 'components' value
+    rapidjson::Value components(rapidjson::kObjectType);
+    
+    // Add all of the components to the 'components' value
+    int number_of_components = Actors::GetNumberOfComponents(actor_id);
+    for (int i = 0; i < number_of_components; i++)
+    {
+        sol::table component = Actors::GetComponentByIndex(actor_id, i);
+        
+        if (component.valid())
+        {
+            rapidjson::Value json_comp(rapidjson::kObjectType); // Init the component as an object
+            
+            /*
+             Used to store the types of the keys and values for the variables in this component
+             so that the engine can properly translate the values back from json into lua when the scene is loaded
+             */
+            rapidjson::Value key_value_type_pairs(rapidjson::kObjectType);
+            
+            std::string component_type = component["type"];
+            
+            sol::table metatable = component[sol::metatable_key];
+            
+            // If component is not native, metatable needs to be indexed at __index
+            if (!ComponentManager::IsComponentTypeNative(component_type)) { metatable = metatable["__index"]; }
+            
+            // Loop through the varaiables and add them to our json component
+            int j = 0;
+            for (auto& variable : metatable)
+            {
+                std::string var_name = variable.first.as<std::string>();
+                
+                // Skip the variables that exist for engine use: key, actor, type, or any native component values added by Lua
+                if (var_name == "key" || var_name == "actor" ||
+                    var_name == "class_cast" || var_name == "REMOVED_FROM_ACTOR" || var_name == "class_check" ||
+                    var_name == "__type" || var_name == "__name") { continue; }
+                
+                // Skip functions
+                if (component[variable.first].get_type() == sol::type::function) { continue; }
+                
+                // Skip if the value is the same as it is in the metatable (except for type, which needs to always be displayed in the json), UNLESS THIS IS A TEMPLATE
+                if (!as_template)
+                {
+                    if (component[variable.first] == variable.second && var_name != "type") { continue; }
+                    
+                    // If the component is native, default values need to be checked in a special way
+                    if (ComponentManager::IsComponentTypeNative(component_type) && var_name != "type")
+                    {
+                        if (ComponentManager::IsDefaultValue(component_type, variable.first, component[variable.first]))
+                        {
+                            continue;
+                        }
+                    }
+                }
+                
+                if (variable.second.get_type() == sol::type::table)
+                {
+                    // Skip if the value is a table and its empty
+                    if (variable.second.as<sol::table>().empty()) { continue; }
+                }
+                
+                rapidjson::Value json_var;
+                // Gets the value of the lua value and stores it in a json value.
+                std::string key_value_pair = "string_";
+                key_value_pair += EngineUtils::LuaObjectToJson(json_var, component[variable.first], document_allocator);
+                
+                // Adds the key_value_pair to the 'key_value_type_pairs' object
+                rapidjson::Value pair;
+                pair.SetString(key_value_pair.c_str(), document_allocator);
+                rapidjson::Value keykey; // The key to the key, idk man...
+                keykey.SetString(to_string(j).c_str(), document_allocator);
+                key_value_type_pairs.AddMember(keykey, pair, document_allocator);
+                
+                // Gets the name of this variable as a string
+                rapidjson::Value variable_name;
+                variable_name.SetString(var_name.c_str(), document_allocator);
+                
+                // Adds the variable to the current component
+                json_comp.AddMember(variable_name, json_var, document_allocator);
+                
+                j++;
+            }
+            
+            if (!as_template)
+            {
+                if (template_name == "")
+                {
+                    // Adds the 'key_value_type_pairs' object to the component
+                    json_comp.AddMember("__type_pairs", key_value_type_pairs, document_allocator);
+                }
+            }
+            
+            if (!components.IsObject())
+            {
+                components.SetObject();
+            }
+            // Add this component to the 'components' list
+            rapidjson::Value component_id;
+            component_id.SetString(to_string(i).c_str(), document_allocator);
+            components.AddMember(component_id, json_comp, document_allocator);
+        }
+    }
+    // Add the 'components' value to the actor
+    actor.AddMember("components", components, document_allocator);
+    
+    return actor;
+}
+
+/**
  * Prepares an actor for destruction later this frame
  * DO NOT USE: This function is for use inside of the scene and actor managers only.
  * In order to destroy an actor please use the "'destroy' function instead. This ensures that actors are properly prepared for destruction.
