@@ -223,7 +223,7 @@ void DrawImgui::LoadFontsImGUI()
         if (!font_found) {
             const std::string path = FileUtils::GetPath("resources/fonts/") + request.font + ".ttf";
 
-            if (FileUtils::DirectoryExists(path))
+            if (FileUtils::DirectoryExists("resources/fonts/"))
             {
                 ImGuiIO& io = ImGui::GetIO();
                 ImFont* font = io.Fonts->AddFontFromFileTTF(path.c_str(), request.size);
