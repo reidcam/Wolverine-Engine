@@ -36,7 +36,7 @@ void EditorManager::Init()
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;   // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;    // Enable Gamepad Controls
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;       // Enable Docking
-    io.IniFilename = NULL; // Disable automatic .ini file handling for docking layouts
+    //io.IniFilename = NULL; // Disable automatic .ini file handling for docking layouts
     
     // Set up imgui style
     ImGui::StyleColorsDark();
@@ -799,14 +799,14 @@ void EditorManager::CheckEditorShortcuts()
 void EditorManager::ViewportDocking()
 {
     // Allows the viewport to be used as a docking space
-    ImGui::DockSpaceOverViewport(0U, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
+    ImGuiID dockspace_id = ImGui::DockSpaceOverViewport(0U, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
 
     // load the most recent user docking layout
-    if (first_frame) {
-        std::filesystem::path path = docking_layout_file_path.string() + "/" + user_docking_layout_file_name;
-        LoadDockingLayout(path.string());
-        first_frame = !first_frame;
-    }
+    //if (first_frame) {
+    //    std::filesystem::path path = docking_layout_file_path.string() + "/" + user_docking_layout_file_name;
+    //    LoadDockingLayout(path.string());
+    //    first_frame = !first_frame;
+    //}
 }
 
 /**
