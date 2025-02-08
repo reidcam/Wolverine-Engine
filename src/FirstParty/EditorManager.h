@@ -51,6 +51,9 @@ private:
     inline static std::filesystem::path selected_file;
     inline static std::filesystem::path current_path;
 
+    // bools for updating the editor scene
+    inline static bool attempt_to_open_scene = false;
+
     // bools to track if a window is shown
     inline static bool viewport = true;
     inline static bool hierarchy = true;
@@ -195,6 +198,12 @@ public:
     * windowed_fullscreen and exclusive_fullscreen variables
     */
     static void UpdateWindowFullScreenState();
+
+    /**
+    * Updates the current editor scene to the scene specified by the selected_file variable
+    * set in the file selector, if the scene exists
+    */
+    static void UpdateEditorCurrentScene();
 };
 
 #endif /* EditorManager.h */

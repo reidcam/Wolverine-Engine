@@ -97,8 +97,18 @@ void EditorManager::RenderEditor()
     HierarchyView();
     ModeSwitchButtons();
 
-    if (show_file_selector)
+    if (show_file_selector) {
         ShowFileSelector();
+
+        // must be attempting to open a scene and the file selector has to have been closed this frame
+        if (attempt_to_open_scene && !show_file_selector) {
+            UpdateEditorCurrentScene();
+        }
+    }
+    else {
+        attempt_to_open_scene = false;
+    }
+
     
     ViewportWidget();
 
@@ -743,6 +753,20 @@ void EditorManager::MainMenuBar()
             }
             ImGui::EndMenu();
         }
+
+        if (ImGui::BeginMenu("Scene")) {
+            if (ImGui::MenuItem("Load Scene")) {
+                attempt_to_open_scene = !attempt_to_open_scene;
+
+                // set the path to be the scene folder
+                string scene_folder_relative_path = "resources/scenes";
+                current_path = FileUtils::GetPath(scene_folder_relative_path);
+
+                // open the file selector for the user to choose the scene to open
+                show_file_selector = true;
+            }
+            ImGui::EndMenu();
+        }
         ImGui::EndMainMenuBar();
     }
 
@@ -953,4 +977,21 @@ void EditorManager::UpdateWindowFullScreenState()
         exlusive_full_screen = false;
         windowed_full_screen = false;
     }
+}
+
+/**
+* Updates the current editor scene to the scene specified by the selected_file variable
+* set in the file selector, if the scene exists
+*/
+void EditorManager::UpdateEditorCurrentScene()
+{
+    // change the scene using the selected file variable set by the file selector
+    string selected_scene = selected_file.filename().stem().string();
+    Scene::ChangeScene(selected_scene);
+
+    // reset the current path variable
+    current_path = std::filesystem::path(FileUtils::GetPath("resources"));
+
+    // reset the open scene variable
+    attempt_to_open_scene = false;
 }
