@@ -30,6 +30,19 @@ void ComponentManager::EstablishInheritance(sol::table& instance_table, sol::tab
     
     /* We must use the raw lua C-API (lua stack) to preform a "setmetatable" operation */
     instance_table[sol::metatable_key] = new_metatable;
+    
+    // Ensures that table variables inside of these components are inherited instead of passed by reference
+    // Without this table variables will the linked to the metatable of the component which can cause undefined behavior.
+    for (auto& variable : parent_table)
+    {
+        if (variable.second.get_type() == sol::type::table)
+        {
+            sol::table new_table = LuaAPI::GetLuaState()->create_table();
+            sol::table new_parent = variable.second.as<sol::table>();
+            EstablishInheritance(new_table, new_parent);
+            instance_table[variable.first.as<sol::lua_value>()] = new_table;
+        }
+    }
 }
 
 //-------------------------------------------------------
@@ -85,4 +98,39 @@ sol::table ComponentManager::NewNativeComponent(std::string component_type)
     
     sol::table null;
     return null;
+}
+
+/**
+ * Returns true if the value for the given variable on the given NATIVE component is the default value
+ *
+ *  @param    component_type    the component type to check the defaults of
+ *  @param    variable_key      the key of the variable to check the defaults of
+ *  @returns                    true if the variable is default, false otherwise
+ */
+bool ComponentManager::IsDefaultValue(std::string component_type, sol::object variable_key, sol::object value)
+{
+    sol::table default_component = NewNativeComponent(component_type);
+
+    if (default_component[variable_key] == value)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+/**
+ * Lists all of the native components
+ *
+ *  @returns                    A list of all native components
+ */
+std::vector<std::string> ComponentManager::ListAllNativeComponentTypes()
+{
+    std::vector<std::string> list =
+    {
+        "Rigidbody",
+        "SpriteRenderer",
+        "ParticleSystem"
+    };
+    return list;
 }

@@ -44,6 +44,11 @@ public:
     bool enabled = true;
 
     /**
+    * Sets the color of this spriterenderer according to the given values
+    */
+    void SetColor(int r, int g, int b, int a);
+    
+    /**
     * Lifecycle function for initializing the sprite renderer
     */
     void OnStart();

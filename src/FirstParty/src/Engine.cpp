@@ -21,6 +21,10 @@
 #include "Engine.h"
 #include "EngineUtils.h"
 
+#ifndef NDEBUG
+#include "EditorManager.h"
+#endif
+
 bool EngineData::quit = false;   // True if the game should be quit out of.
 
 //-------------------------------------------------------
@@ -68,7 +72,16 @@ void Initialize()
         // error with config files
     }
     
+    // initialize the renderer and keeps track of it
     RendererData::Init(EngineData::game_title);
+    EngineData::window_renderer_map[RendererData::GetWindow()] = RendererData::GetRenderer();
+    
+#ifndef NDEBUG
+    // Initializes imgui and the editor
+    // GUIRenderer::Init(EngineData::game_title);
+    // EngineData::window_renderer_map[GUIRenderer::GetWindow()] = GUIRenderer::GetRenderer();
+    EditorManager::Init();
+#endif
     
     // Load Assets
     // Do this here because the renderer needs to be initialized before these assets can be loaded.
@@ -88,7 +101,7 @@ int CheckConfigFiles()
         std::cout << "error: resources/ missing";
         return 1;
     }
-    if( CheckGameConfig() && RendererData::LoadRenderingConfig() )
+    if( RendererData::LoadRenderingConfig() && CheckGameConfig())
         return 0;
     return 1;
 }
@@ -107,7 +120,10 @@ bool CheckGameConfig()
     }
     if(game_config.HasMember("initial_scene")){
         std::string initial_scene = game_config["initial_scene"].GetString();
+        Scene::initial_scene_name = initial_scene;
         Scene::new_scene_name = initial_scene;
+        Scene::default_camera_pos = RendererData::GetCameraPosition();
+        Scene::default_camera_zoom = RendererData::GetCameraZoom();
         Scene::LoadNewScene();
     }
     else {
@@ -126,46 +142,96 @@ bool CheckGameConfig()
 */
 int GameLoop()
 {
-    LuaAPI::IncrementFrameCounter();
+#ifndef NDEBUG
+    // Esures that modes are only switched at the start of any given frame
+    if (EditorManager::trigger_editor_mode_toggle)
+    {
+        EditorManager::ToggleEditorMode();
+        EditorManager::trigger_editor_mode_toggle = false;
+    }
+#endif
+    
+    // Used to pause certain engine functions if editor mode is active
+    bool editor_mode = false;
+#ifndef NDEBUG
+    editor_mode = EditorManager::GetEditorMode();
+#endif
+    
+    if (!editor_mode)
+    {
+        LuaAPI::IncrementFrameCounter();
+    }
 
     if (EngineData::quit)
     {
+#ifndef NDEBUG
+        // Cleans up the imgui context
+        EditorManager::Cleanup();
+        GUIRenderer::Cleanup();
+#endif
+        RendererData::Cleanup();
         return 1;
     }
     
     // Process all SDL events
     SDL_Event event;
-    while(SDL_PollEvent(&event))
+    while (SDL_PollEvent(&event))
     {
+#ifndef NDEBUG
+        // Pass events to imgui for editor
+        EditorManager::ImGuiProcessSDLEvent(&event);
+#endif
+
         Input::ProcessEvent(event);
         if (event.type == SDL_QUIT)
         {
+            EngineData::quit = true;
+        }
+        else if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE) {
             EngineData::quit = true;
         }
     }
     
     SDL_RenderClear(RendererData::GetRenderer()); // clear the renderer with the render clear color
     
-    Scene::UpdateActors();
+#ifndef NDEBUG
+    // SDL_RenderClear(GUIRenderer::GetRenderer());
+#endif
     
-    // Box2D Physics
-
-    if (PhysicsWorld::world_initialized) {
-        InitializeCollisions();
-        PhysicsWorld::AdvanceWorld();
-        PhysicsWorld::world->DebugDraw();
+    if (!editor_mode)
+    {
+        Scene::UpdateActors();
+        
+        // Box2D Physics
+        if (PhysicsWorld::world_initialized) {
+            InitializeCollisions();
+            PhysicsWorld::AdvanceWorld();
+            PhysicsWorld::world->DebugDraw();
+        }
     }
+#ifndef NDEBUG
+    else
+    {
+        EditorManager::EditorUpdate();
+    }
+#endif
 
-    // RENDER STUFF HERE
+    // RENDER STUFF HERE    
+#ifndef NDEBUG
+    EditorManager::RenderEditor();
+#else
     RendererData::RenderAndClearAllImageRequests();
     RendererData::RenderAndClearAllTextRequests();
     RendererData::RenderAndClearAllPixels();
     RendererData::RenderAndClearAllLines();
     RendererData::RenderAndClearAllUI();
-    
-    PhysicsWorld::AdvanceWorld();
+#endif
     
     SDL_RenderPresent(RendererData::GetRenderer()); // present the frame into the window
+    
+#ifndef NDEBUG
+    // SDL_RenderPresent(GUIRenderer::GetRenderer()); // present the frame into the window
+#endif
     
     Input::LateUpdate();
     

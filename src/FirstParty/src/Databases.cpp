@@ -73,7 +73,7 @@ SDL_Texture* GetImage(std::string image_name)
     if (loaded_images.find(image_name) == loaded_images.end())
     {
         std::cout << "error: missing image " << image_name;
-        exit(0);
+        return loaded_images.begin()->second;
     }
     
     return loaded_images[image_name];
@@ -201,6 +201,9 @@ void LoadTemplates()
             }
         }
     }
+    rapidjson::Document* template_document = new rapidjson::Document;
+    template_document->Parse("{\"name\": \"New_Actor\",\"components\": {}}");
+    loaded_templates["New_Actor"] = template_document;
 } // LoadTemplates()
 
 /**
@@ -220,6 +223,21 @@ rapidjson::Document* GetTemplate(std::string template_name)
     return loaded_templates[template_name];
 } // GetTemplate()
 
+/**
+ * Get a list of all the names of all the possible templates
+ *
+ * @returns                   the list of template names
+*/
+std::vector<std::string> ListAllTemplateTypes()
+{
+    std::vector<std::string> list;
+    for (auto& pair : loaded_templates)
+    {
+        list.push_back(pair.first);
+    }
+    return list;
+}
+
 //-------------------------------------------------------
 // Component Type Database
 
@@ -237,10 +255,11 @@ void LoadComponentTypes()
     {
         for (const auto& file : std::filesystem::directory_iterator(FileUtils::GetPath(path)))
         {
-            if (file.path() != path + "/.DS_Store")
+            
+            std::string type_name = file.path().stem().string();
+            
+            if (type_name != ".DS_Store")
             {
-                std::string type_name = file.path().stem().string();
-
                 sol::load_result script = LuaAPI::GetLuaState()->load_file(file.path().string().c_str());
                 if (script.valid())
                 {
@@ -249,6 +268,9 @@ void LoadComponentTypes()
                     
                     // Attaches the script to a lua table for easier member access
                     sol::table component_table = (*LuaAPI::GetLuaState())[type_name.c_str()];
+                    
+                    // Adds the type to this component so we don't have to re-add it later
+                    component_table["type"] = type_name;
                     
                     // Load the component type into our database
                     loaded_component_types.insert(
@@ -283,6 +305,21 @@ std::shared_ptr<sol::table> GetComponentType(std::string component_name)
     }
     
     return loaded_component_types[component_name];
+}
+
+/**
+ * Get a list of all the names of all the possible components
+ *
+ * @returns                   the list of component names
+*/
+std::vector<std::string> ListAllComponentTypes()
+{
+    std::vector<std::string> list;
+    for (auto& pair : loaded_component_types)
+    {
+        list.push_back(pair.first);
+    }
+    return list;
 }
 
 //-------------------------------------------------------

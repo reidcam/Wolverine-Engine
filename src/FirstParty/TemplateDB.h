@@ -24,4 +24,11 @@ void LoadTemplates();
 */
 rapidjson::Document* GetTemplate(std::string template_name);
 
+/**
+ * Get a list of all the names of all the possible templates
+ *
+ * @returns                   the list of template names
+*/
+std::vector<std::string> ListAllTemplateTypes();
+
 #endif /* TemplateDB_h */

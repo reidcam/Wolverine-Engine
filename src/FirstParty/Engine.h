@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <iostream>
+#include <unordered_map>
 
 #include "SDL.h"
 #include "SDL_image.h"
@@ -18,6 +19,10 @@
 #include "LuaAPI.h"
 #include "CollisionDetector.h"
 #include "PhysicsWorld.h"
+
+#ifndef NDEBUG
+#include "GUIRenderer.h"
+#endif
 
 using namespace std;
 
@@ -28,6 +33,8 @@ struct EngineData
     */
     static bool quit;
     inline static std::string game_title = "";
+    inline static std::unordered_map<SDL_Window*, SDL_Renderer*> window_renderer_map = {};
+    inline static std::vector<SDL_Window*> windows_to_destroy = {};
 }; // EngineData
 
 /**

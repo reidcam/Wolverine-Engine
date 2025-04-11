@@ -24,4 +24,11 @@ void LoadComponentTypes();
 */
 std::shared_ptr<sol::table> GetComponentType(std::string component_name);
 
+/**
+ * Get a list of all the names of all the possible components
+ *
+ * @returns                   the list of component names
+*/
+std::vector<std::string> ListAllComponentTypes();
+
 #endif /* ComponentDB_h */

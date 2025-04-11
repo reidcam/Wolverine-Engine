@@ -12,6 +12,7 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <queue>
 
 #include "TemplateDB.h"
@@ -48,6 +49,7 @@ private:
     
     // The attributes of all the loaded actors
     static std::vector<std::string> names;
+    static std::vector<std::string> templates;
     static std::vector<int> IDs;
     static std::vector<bool> actor_enabled;
     
@@ -105,6 +107,14 @@ public:
      * @returns             the name of the given actor
     */
     static std::string GetName(int actor_id);
+    
+    /**
+     * Sets this actors name
+     *
+     * @param   actor_id    the id of the actor that this function is acting on
+     * @param   new_name    the new name for the given actor
+    */
+    static void SetName(int actor_id, std::string new_name);
 
     /**
      * Returns this actors ID
@@ -113,6 +123,31 @@ public:
      * @returns             the ID of the given actor
     */
     static int GetID(int actor_id);
+    
+    /**
+    * Gets wether or not an actor is enabled
+    *
+    * @param     actor_id    the id of the actor that this function is acting on
+    * @return                a bool for whether or not the actor is enabled
+    */
+    static bool GetActorEnabled(int actor_id);
+    
+    /**
+    * Sets wether or not an actor is enabled
+    *
+    * @param     actor_id    the id of the actor that this function is acting on
+    * @param    is_enabled  the new enabled status of the actor
+    */
+    static void SetActorEnabled(int actor_id, bool is_enabled);
+    
+    /**
+     * Returns this actors template name
+     *
+     * @param   actor_id    the id of the actor that this function is acting on
+     * @returns             the name of the template of the given actor, bank string if it does not have a template
+    */
+    static std::string GetTemplateName(int actor_id);
+
     
     //-------------------------------------------------------
     // Misc.
@@ -128,14 +163,14 @@ public:
     static int LoadActorWithJSON(const rapidjson::Value& actor_data);
     
     /**
-     * Loads the data from JSON into an existing lua value
-     * DO NOT USE: This function is for use inside of the scene and actor managers only.
+     * Converts an actor into a json file so that the actor can be saved/instantiated easily
      *
-     * @param   value    the lua value that will store the given data
-     * @param   data     the JSON that will be processed into the table
-     * @param   type     the intended type of the lua value
+     * @param   actor_id             the ID of the actor to be templatized
+     * @param   as_template      true if this actor should be saved in the form of a template
+     * @param   document_allocator      the allocator for the document this actor is going into
+     * @return                returns json representing the actor as a template
     */
-    static void JsonToLuaObject(sol::lua_value& value, const rapidjson::Value& data, sol::type type);
+    static rapidjson::Value SaveActorToJSON(int actor_id, bool as_template, rapidjson::Document::AllocatorType& document_allocator);
     
     /**
      * Prepares an actor for destruction later this frame
@@ -156,7 +191,7 @@ public:
     static void DestroyActor(int actor_id);
     
     //-------------------------------------------------------
-    // Components.
+    // Components
     
     /**
      * Removes a component from an actor and marks it for deletion
@@ -165,6 +200,14 @@ public:
      * @param   component    the component to be removed
     */
     static void RemoveComponentFromActor(int actor_id, sol::table component);
+
+    /**
+     * Adds a new component to an actor
+     *
+     * @param   actor_id     the id of the actor that this function is acting on
+     * @param   component_type    the type of component to be added
+    */
+    static void AddComponentToActor(int actor_id, std::string component_type);
     
     /**
      * Gets the first component on the given actor with the given type if it exists.
@@ -193,14 +236,6 @@ public:
     static sol::table GetComponentByIndex(int actor_id, int component_index);
 
     /**
-    * Gets where or not an actor is enabled
-    * 
-    * @param     actor_id    the id of the actor that this function is acting on
-    * @return                a bool for whether or not the actor is enabled
-    */
-    static bool GetActorEnabled(int actor_id);
-
-    /**
      * Gets all of the components on the given actor with the given type if they exist.
      *
      * @param   actor_id    the id of the actor that this function is acting on
@@ -218,6 +253,34 @@ public:
     */
     static sol::table GetComponentByKey(int actor_id, std::string key);
     
+    //-------------------------------------------------------
+    // Editor Tools
+    
+    /**
+     * Clears all of the components and actors from this manager
+     * Used to do a hard reset of invincible actors and components before loading a new scene
+    */
+    static void ResetManager();
+    
+    /**
+     * Loops through all the components and ONLY runs onupdate if its type is needed for the editor.
+     * This is primarily used to trigger SpriteRenderers and other visual components for the EDITOR in editor mode.
+     *
+     * Not very DRY I know...
+     *
+     * @param    editor_components   a list of all the components that are needed for editor mode to function
+     */
+    static void EditorUpdateComponents(std::unordered_set<std::string> editor_components);
+    
+    /**
+     * Loops through all the components and ONLY runs onstart if its type is needed for the editor.
+     * This is primarily used to prepare SpriteRenderers and other visual components for the EDITOR in editor mode.
+     *
+     * Not very DRY I know...
+     *
+     * @param    editor_components   a list of all the components that are needed for editor mode to function
+     */
+    static void EditorStartComponents(std::unordered_set<std::string> editor_components);
 }; // Actors
 
 #endif /* ActorManager_h */

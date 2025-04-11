@@ -11,6 +11,7 @@
 
 #include "ActorManager.h"
 #include "SceneDB.h"
+#include "glm/glm.hpp"
 
 class Scene
 {
@@ -21,8 +22,11 @@ private:
     static std::vector<int> actors; // A list of active actors indexes
     static std::vector<int> dead_actors; // A list of actors that need to be deleted this frame
 public:
+    static std::string initial_scene_name; // The name of the first scene to be loaded in the game
     static std::string new_scene_name; // The name of the new scene we're loading into
     static bool load_new_scene; // True if we want to load a new scene at the end of this frame
+    static glm::vec2 default_camera_pos; // The default camera position for this scene
+    static float default_camera_zoom; // The default camera position for this scene
     //-------------------------------------------------------
     // Lifecycle Functions
     
@@ -62,6 +66,11 @@ public:
     */
     static void Destroy(Actor actor);
     
+    /**
+     * The last step of the destruction for actors
+    */
+    static void DestroyFinalStep();
+    
     //-------------------------------------------------------
     // Getters/Setters
     
@@ -96,6 +105,24 @@ public:
      * @returns       the found actor
     */
     static Actor FindActorByID(int ID);
+    
+    //-------------------------------------------------------
+    // Editor Tools
+    
+    /**
+     * Clears all of the data from this manager
+     * NOTE: DO NOT EXPOSE TO LUA! This function is primarily meant to reset the game for the editor
+     * Could cause unintended behavior if used improperly
+    */
+    static void ResetManager();
+    
+    /**
+     * Returns a copy of the 'actors' vector
+     * NOTE: DO NOT EXPOSE TO LUA! This function is primarily meant to pass actor data to the editor
+     * Could cause unintended behavior if used improperly
+    */
+    static std::vector<int> GetAllActorsInScene();
+    
 }; // Scene
 
 #endif /* SceneManager_h */

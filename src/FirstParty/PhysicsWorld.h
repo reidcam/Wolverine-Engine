@@ -90,6 +90,20 @@ public:
 		if (PhysicsWorld::world_initialized)
 			PhysicsWorld::world->Step(1.0f / 60.0f, 8, 3);
 	};
+    
+    /**
+    * Resets the b2World
+    * NOTE: DO NOT EXPOSE TO LUA! This function is primarily meant to reset the game for the editor
+    * Could cause unintended behavior if used improperly
+    */
+    inline static void ResetWorld()
+    {
+        if (PhysicsWorld::world_initialized)
+        {
+            PhysicsWorld::world_initialized = false;
+            delete PhysicsWorld::world;
+        }
+    };
 };
 
 #endif

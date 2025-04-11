@@ -7,6 +7,8 @@
 
 #include "LuaAPI.h"
 
+#include "Engine.h"
+#include <cmath>
 /**
 * Exposes all of the API functions to Sol to be used in Lua
 */
@@ -234,6 +236,7 @@ void LuaAPI::ExposeLuaAPI()
         "pivot_y", &SpriteRenderer::pivot_y,
         "rotation", &SpriteRenderer::rotation,
         "sorting_order", &SpriteRenderer::sorting_order,
+        "SetColor", &SpriteRenderer::SetColor,
         "OnUpdate", &SpriteRenderer::OnUpdate,
         "OnStart", &SpriteRenderer::OnStart,
         "OnDestroy", &SpriteRenderer::OnDestroy
@@ -247,15 +250,17 @@ void LuaAPI::ExposeLuaAPI()
     // The "Actors" namespace
     (*GetLuaState())["Actors"] = GetLuaState()->create_table();
     (*GetLuaState())["Actors"]["GetName"] = &Actors::GetName;
+    (*GetLuaState())["Actors"]["SetName"] = &Actors::SetName;
     (*GetLuaState())["Actors"]["GetActorEnabled"] = &Actors::GetActorEnabled;
-    (*GetLuaState())["Actors"]["RemoveComponent"] = &Actors::RemoveComponentFromActor;
+    (*GetLuaState())["Actors"]["SetActorEnabled"] = &Actors::SetActorEnabled;
+	(*GetLuaState())["Actors"]["RemoveComponent"] = &Actors::RemoveComponentFromActor;
+	(*GetLuaState())["Actors"]["AddComponent"] = &Actors::AddComponentToActor;
     (*GetLuaState())["Actors"]["GetComponentByType"] = &Actors::GetComponentByType;
     (*GetLuaState())["Actors"]["GetComponentsByType"] = &Actors::GetComponentsByType;
     (*GetLuaState())["Actors"]["GetComponentByKey"] = &Actors::GetComponentByKey;
     (*GetLuaState())["Actors"]["Instantiate"] = &Scene::Instantiate;
     (*GetLuaState())["Actors"]["Destroy"] = &Scene::Destroy;
 }
-
 
 void deny_write() { std::cout << "error: attempt to modify a dead lua table" << std::endl; }
 
@@ -295,7 +300,9 @@ void LuaAPI::DeleteLuaTable(std::shared_ptr<sol::table> table)
 */
 void LuaAPI::Log(const std::string& message)
 {
+#ifndef NDEBUG
 	std::cout << message + "\n";
+#endif
 }
 
 /**
@@ -314,7 +321,7 @@ void LuaAPI::LogError(const std::string& message)
 */
 void LuaAPI::Quit()
 {
-	exit(0);
+    EngineData::quit = true;
 }
 
 /**

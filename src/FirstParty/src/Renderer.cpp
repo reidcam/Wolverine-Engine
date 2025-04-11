@@ -14,8 +14,18 @@
 SDL_Texture* RendererData::ConvertTextToTexture(SDL_Renderer* renderer, const std::string& text, const SDL_Color& font_color, const std::string font_name, const int font_size)
 {
 	SDL_Surface* text_surface = TTF_RenderText_Solid(GetFont(font_name, font_size), text.c_str(), font_color);
-	SDL_Texture* text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
-	SDL_FreeSurface(text_surface);
+	SDL_Texture* text_texture = nullptr;
+	if (!text_surface) {
+		printf("TTF_RenderText_Blended Error: %s\n", TTF_GetError());
+	}
+	else {
+		text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
+		SDL_FreeSurface(text_surface);
+
+		if (!text_texture) {
+			printf("SDL_CreateTextureFromSurface Error: %s\n", SDL_GetError());
+		}
+	}
 
 	return text_texture;
 }
@@ -27,7 +37,7 @@ SDL_Texture* RendererData::ConvertTextToTexture(SDL_Renderer* renderer, const st
 */
 void RendererData::Init(const std::string& title)
 {
-    SDL_Window* window = SDL_CreateWindow(title.c_str(), window_position.x, window_position.y, window_size.x, window_size.y, SDL_WINDOW_SHOWN);
+    SDL_Window* window = SDL_CreateWindow(title.c_str(), window_position.x, window_position.y, window_size.x, window_size.y, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
     SetWindow(window);
     SDL_Renderer* renderer = SDL_CreateRenderer(RendererData::window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
     SetRenderer(renderer);
@@ -153,10 +163,14 @@ void RendererData::RenderAndClearAllImageRequests()
 
 		SDL_Point pivot_point = { static_cast<int>(request.pivot_x * tex_rect.w), static_cast<int>(request.pivot_y * tex_rect.h) };
 
+#ifndef NDEBUG // must be called from inside of an ImGui window
+		ImVec2 cam_dimensions = ImGui::GetWindowSize();
+		ImVec2 window_position = ImGui::GetWindowPos();
+#else
 		glm::ivec2 cam_dimensions = glm::ivec2(window_size.x, window_size.y);
-
-		tex_rect.x = static_cast<int>(final_rendering_position.x * PIXELS_PER_METER + cam_dimensions.x * 0.5f * (1.0f / zoom_factor) - pivot_point.x);
-		tex_rect.y = static_cast<int>(final_rendering_position.y * PIXELS_PER_METER + cam_dimensions.y * 0.5f * (1.0f / zoom_factor) - pivot_point.y);
+#endif
+		tex_rect.x = static_cast<int>(final_rendering_position.x * PIXELS_PER_METER + cam_dimensions.x * 0.5f * (1.0f / zoom_factor) - pivot_point.x + window_position.x);
+		tex_rect.y = static_cast<int>(final_rendering_position.y * PIXELS_PER_METER + cam_dimensions.y * 0.5f * (1.0f / zoom_factor) - pivot_point.y + window_position.y);
 
 		// Apply tint / alpha to texture
 		SDL_SetTextureColorMod(tex, request.r, request.g, request.b);
@@ -183,11 +197,18 @@ void RendererData::RenderAndClearAllTextRequests()
 {
 	for (auto& request : text_draw_request_queue) {
 		SDL_Color font_color = { static_cast<Uint8>(request.r), static_cast<Uint8>(request.g), static_cast<Uint8>(request.b), static_cast<Uint8>(request.a) };
-		SDL_Texture* text_texture = ConvertTextToTexture(renderer, request.text, font_color, request.font, request.size);
+		SDL_Texture* text_texture = ConvertTextToTexture(GetRenderer(), request.text, font_color, request.font, request.size);
 
 		SDL_Rect dest_rect;
+#ifndef NDEBUG // must be called from inside of an ImGui window
+		ImVec2 window_position = ImGui::GetWindowPos();
+		dest_rect.x = request.x + window_position.x;
+		dest_rect.y = request.y + window_position.y;
+#else
 		dest_rect.x = request.x;
 		dest_rect.y = request.y;
+#endif
+
 		SDL_QueryTexture(text_texture, nullptr, nullptr, &dest_rect.w, &dest_rect.h); // get w and h from the text
 
 		double angle = 0;
@@ -213,17 +234,27 @@ void RendererData::RenderAndClearAllUI()
 		SDL_Texture* tex = GetImage(request.image_name);
 		SDL_Rect tex_rect;
 		SDL_QueryTexture(tex, NULL, NULL, &tex_rect.w, &tex_rect.h);
+		tex_rect.w *= request.scale_x;
+		tex_rect.h *= request.scale_y;
 
-		tex_rect.x = static_cast<int>(final_rendering_position.x);
-		tex_rect.y = static_cast<int>(final_rendering_position.y);
+		SDL_Point pivot_point = { static_cast<int>(request.pivot_x * tex_rect.w), static_cast<int>(request.pivot_y * tex_rect.h) };
+
+#ifndef NDEBUG // must be called from inside of an ImGui window
+		ImVec2 window_position = ImGui::GetWindowPos();
+		tex_rect.x = static_cast<int>(request.x + window_position.x);
+		tex_rect.y = static_cast<int>(request.y + window_position.y);
+#else
+		tex_rect.x = static_cast<int>(request.x);
+		tex_rect.y = static_cast<int>(request.y);
+#endif
 
 		// Apply tint / alpha to texture
 		SDL_SetTextureColorMod(tex, request.r, request.g, request.b);
 		SDL_SetTextureAlphaMod(tex, request.a);
 
 		// Preform draw
-		SDL_RenderCopyEx(GetRenderer(), tex, NULL, &tex_rect, 0,
-			NULL, SDL_FLIP_NONE);
+		SDL_RenderCopyEx(GetRenderer(), tex, NULL, &tex_rect, request.rotation_degrees,
+			&pivot_point, SDL_FLIP_NONE);
 
 		// Remove tint / alpha from texture
 		SDL_SetTextureColorMod(tex, 255, 255, 255);
@@ -242,7 +273,13 @@ void RendererData::RenderAndClearAllPixels()
 
 	for (auto& request : pixel_draw_request_queue) {
 		SDL_SetRenderDrawColor(renderer, request.r, request.g, request.b, request.a);
+
+#ifndef NDEBUG // must be called from inside of an ImGui window
+		ImVec2 window_position = ImGui::GetWindowPos();
+		SDL_RenderDrawPoint(renderer, request.x + window_position.x, request.y + window_position.y);
+#else
 		SDL_RenderDrawPoint(renderer, request.x, request.y);
+#endif
 	}
 
 	pixel_draw_request_queue.clear();
@@ -262,15 +299,20 @@ void RendererData::RenderAndClearAllLines()
     for (auto& request : line_draw_request_queue) {
         SDL_SetRenderDrawColor(renderer, request.r, request.g, request.b, request.a);
         
-        glm::vec2 final_rendering_position1 = glm::vec2(request.x1, request.y1) - current_cam_pos;
-        glm::vec2 final_rendering_position2 = glm::vec2(request.x2, request.y2) - current_cam_pos;
-        
+#ifndef NDEBUG // must be called from inside of an ImGui window
+        ImVec2 cam_dimensions = ImGui::GetWindowSize();
+        ImVec2 window_position = ImGui::GetWindowPos();
+#else
         glm::ivec2 cam_dimensions = glm::ivec2(window_size.x, window_size.y);
+#endif
+
+		glm::vec2 final_rendering_position1 = glm::vec2(request.x1, request.y1) - current_cam_pos;
+		glm::vec2 final_rendering_position2 = glm::vec2(request.x2, request.y2) - current_cam_pos;
         
-        int x1 = static_cast<int>(final_rendering_position1.x * PIXELS_PER_METER + cam_dimensions.x * 0.5f * (1.0f / zoom_factor));
-        int y1 = static_cast<int>(final_rendering_position1.y * PIXELS_PER_METER + cam_dimensions.y * 0.5f * (1.0f / zoom_factor));
-        int x2 = static_cast<int>(final_rendering_position2.x * PIXELS_PER_METER + cam_dimensions.x * 0.5f * (1.0f / zoom_factor));
-        int y2 = static_cast<int>(final_rendering_position2.y * PIXELS_PER_METER + cam_dimensions.y * 0.5f * (1.0f / zoom_factor));
+        int x1 = static_cast<int>(final_rendering_position1.x * PIXELS_PER_METER + cam_dimensions.x * 0.5f * (1.0f / zoom_factor) + window_position.x);
+        int y1 = static_cast<int>(final_rendering_position1.y * PIXELS_PER_METER + cam_dimensions.y * 0.5f * (1.0f / zoom_factor) + window_position.y);
+        int x2 = static_cast<int>(final_rendering_position2.x * PIXELS_PER_METER + cam_dimensions.x * 0.5f * (1.0f / zoom_factor) + window_position.x);
+        int y2 = static_cast<int>(final_rendering_position2.y * PIXELS_PER_METER + cam_dimensions.y * 0.5f * (1.0f / zoom_factor) + window_position.y);
         
         SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
     }
@@ -303,16 +345,22 @@ void RendererData::DrawUI(const std::string& image_name, const float x, const fl
 * Creates a UI draw request at the specified screen position, with the color {r, g, b, a},
 * and in the given sorting layer
 *
-* @param	image_name		The name of the image to be draw
-* @param	x				The x position to draw the image at
-* @param	y				The y position to draw the image at
-* @param	r				[0, 255] How red the image is
-* @param	g				[0, 255] How green the image is
-* @param	b				[0, 255] How blue the image is
-* @param	a				[0, 255] The alpha value of the image
-* @param	sorting_order	The sorting layer that the image should be drawn in
+* @param	image_name			The name of the image to be draw
+* @param	x					The x position to draw the image at
+* @param	y					The y position to draw the image at
+* @param	r					[0, 255] How red the image is
+* @param	g					[0, 255] How green the image is
+* @param	b					[0, 255] How blue the image is
+* @param	a					[0, 255] The alpha value of the image
+* @param	sorting_order		The sorting layer that the image should be drawn in
+* @param	scale_x				The scale to draw the x-axis. 1 is normal
+* @param	scale_y				The scale to draw the y-axis. 1 is normal
+* @param	pivot_x				[0, 1] Where on the x position of the image should be located. 0 is the left side of the image and 1 is the right.
+* @param	pivot_y				[0, 1] Where on the y position of the image should be located. 0 is the top side of the image and 1 is the bottom.
+* @param	rotation_degrees	The rotation of the image in degrees
 */
-void RendererData::DrawUIEx(const std::string& image_name, const float x, const float y, const float r, const float g, const float b, const float a, const float sorting_order)
+void RendererData::DrawUIEx(const std::string& image_name, const float x, const float y, const float r, const float g, const float b, const float a, const float sorting_order, 
+	const float scale_x, const float scale_y, const float pivot_x, const float pivot_y, const float rotation_degrees)
 {
 	UIRenderRequest obj;
 	obj.image_name = image_name;
@@ -323,6 +371,11 @@ void RendererData::DrawUIEx(const std::string& image_name, const float x, const 
 	obj.b = static_cast<int>(b);
 	obj.a = static_cast<int>(a);
 	obj.sorting_order = static_cast<int>(sorting_order);
+	obj.scale_x = scale_x;
+	obj.scale_y = scale_y;
+	obj.pivot_x = pivot_x;
+	obj.pivot_y = pivot_y;
+	obj.rotation_degrees = static_cast<int>(rotation_degrees);
 
 	ui_draw_request_queue.push_back(obj);
 }
@@ -499,4 +552,24 @@ void RendererData::SetCameraZoom(const float new_zoom_factor)
 float RendererData::GetCameraZoom()
 {
 	return zoom_factor;
+}
+
+/**
+* Gets the current size of the window
+*
+* @returns	  the current size of the window
+*/
+glm::vec2 RendererData::GetWindowSize()
+{
+	return window_size;
+}
+
+/**
+ * Cleans up the SDL renderer and window
+ */
+void RendererData::Cleanup()
+{
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
 }

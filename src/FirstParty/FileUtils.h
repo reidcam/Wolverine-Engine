@@ -74,6 +74,21 @@ public:
     {
         return std::filesystem::exists(std::filesystem::path(GetPath(path)));
     }
+    
+    /**
+    * Removes the file extension off of a file name
+    * 
+    * @param    file_name    the name of the file to remove the extension of
+    * @returns               file_name minus the file extension
+    */
+    static inline std::string removeExtension(const std::string& file_name) 
+    {
+        size_t lastDot = file_name.find_last_of(".");
+        if (lastDot == std::string::npos) {
+            return file_name; // No extension found
+        }
+        return file_name.substr(0, lastDot);
+    }
 };
 
 #endif /* FileUtilities_h */

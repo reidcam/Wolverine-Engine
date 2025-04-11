@@ -14,6 +14,7 @@
 #include "SDL_image.h"
 #include "SDL_ttf.h"
 #include "glm/glm.hpp"
+#include "imgui.h"
 
 #include "RenderRequests.h"
 #include "ImageDB.h"
@@ -61,7 +62,9 @@ private:
 	* @param	new_window    A SDL_Window* to the new window
 	*/
 	inline static void SetWindow(SDL_Window* new_window) { RendererData::window = new_window; } // SetWindow()
-
+public:
+    inline static const int PIXELS_PER_METER = 100;
+    
 	/**
 	* Turns a string into an SDL_Texture using the specified font perameters
 	*
@@ -73,9 +76,6 @@ private:
 	* @returns	    A SDL_Texture* to a SDL_Texture
 	*/
 	static SDL_Texture* ConvertTextToTexture(SDL_Renderer* renderer, const std::string& text, const SDL_Color& font_color, const std::string font_name, const int font_size);
-
-public:
-    inline static const int PIXELS_PER_METER = 100;
     
 	/**
 	* Returns a pointer to the SDL_Window
@@ -178,17 +178,22 @@ public:
 	* Creates a UI draw request at the specified screen position, with the color {r, g, b, a},
 	* and in the given sorting layer
 	*
-	* @param	image_name		The name of the image to be draw
-	* @param	x				The x position to draw the image at
-	* @param	y				The y position to draw the image at
-	* @param	r				[0, 255] How red the image is
-	* @param	g				[0, 255] How green the image is
-	* @param	b				[0, 255] How blue the image is
-	* @param	a				[0, 255] The alpha value of the image
-	* @param	sorting_order	The sorting layer that the image should be drawn in
+	* @param	image_name			The name of the image to be draw
+	* @param	x					The x position to draw the image at
+	* @param	y					The y position to draw the image at
+	* @param	r					[0, 255] How red the image is
+	* @param	g					[0, 255] How green the image is
+	* @param	b					[0, 255] How blue the image is
+	* @param	a					[0, 255] The alpha value of the image
+	* @param	sorting_order		The sorting layer that the image should be drawn in
+	* @param	scale_x				The scale to draw the x-axis. 1 is normal
+	* @param	scale_y				The scale to draw the y-axis. 1 is normal
+	* @param	pivot_x				[0, 1] Where on the x position of the image should be located. 0 is the left side of the image and 1 is the right.
+	* @param	pivot_y				[0, 1] Where on the y position of the image should be located. 0 is the top side of the image and 1 is the bottom.
+	* @param	rotation_degrees	The rotation of the image in degrees
 	*/
 	static void DrawUIEx(const std::string& image_name, const float x, const float y, const float r, const float g,
-		const float b, const float a, const float sorting_order);
+		const float b, const float a, const float sorting_order, const float scale_x, const float scale_y, const float pivot_x, const float pivot_y, const float rotation_degrees);
 
 	/**
 	* Creates an image draw request at the specified screen position using the image with name 'image_name'
@@ -290,6 +295,53 @@ public:
 	* @returns	  the current zoom factor of the camera
 	*/
 	static float GetCameraZoom();
+
+	/**
+	* Gets the current size of the window
+	*
+	* @returns	  the current size of the window
+	*/
+	static glm::vec2 GetWindowSize();
+    
+    /**
+     * Cleans up the SDL renderer and window
+     */
+    static void Cleanup();
+
+	/**
+	* Gets a pointer to the image_draw_request_queue
+	* 
+	* @returns    a pointer to the image_draw_request_queue
+	*/
+	static inline std::deque<ImageDrawRequest>* GetImageDrawRequestQueue() { return &image_draw_request_queue; };
+
+	/**
+	* Gets a pointer to the image_draw_request_queue
+	*
+	* @returns    a pointer to the text_draw_request_queue
+	*/
+	static inline std::deque<TextRenderRequest>* GetTextDrawRequestQueue() { return &text_draw_request_queue; };
+
+	/**
+	* Gets a pointer to the image_draw_request_queue
+	*
+	* @returns    a pointer to the ui_draw_request_queue
+	*/
+	static inline std::deque<UIRenderRequest>* GetUIDrawRequestQueue() { return &ui_draw_request_queue; };
+
+	/**
+	* Gets a pointer to the image_draw_request_queue
+	*
+	* @returns    a pointer to the pixel_draw_request_queue
+	*/
+	static inline std::deque<PixelDrawRequest>* GetPixelDrawRequestQueue() { return &pixel_draw_request_queue; };
+
+	/**
+	* Gets a pointer to the image_draw_request_queue
+	*
+	* @returns    a pointer to the line_draw_request_queue
+	*/
+	static inline std::deque<LineDrawRequest>* GetLineDrawRequestQueue() { return &line_draw_request_queue; };
 };
 
 /**
