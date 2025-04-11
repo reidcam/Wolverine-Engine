@@ -83,6 +83,7 @@ void Rigidbody::OnStart()
 
 	// must be called after the body is created
 	SetRotation(rotation);
+
 }
 
 /**

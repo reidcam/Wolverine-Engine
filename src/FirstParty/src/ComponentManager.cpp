@@ -30,19 +30,6 @@ void ComponentManager::EstablishInheritance(sol::table& instance_table, sol::tab
     
     /* We must use the raw lua C-API (lua stack) to preform a "setmetatable" operation */
     instance_table[sol::metatable_key] = new_metatable;
-    
-    // Ensures that table variables inside of these components are inherited instead of passed by reference
-    // Without this table variables will the linked to the metatable of the component which can cause undefined behavior.
-    for (auto& variable : parent_table)
-    {
-        if (variable.second.get_type() == sol::type::table)
-        {
-            sol::table new_table = LuaAPI::GetLuaState()->create_table();
-            sol::table new_parent = variable.second.as<sol::table>();
-            EstablishInheritance(new_table, new_parent);
-            instance_table[variable.first.as<sol::lua_value>()] = new_table;
-        }
-    }
 }
 
 //-------------------------------------------------------
