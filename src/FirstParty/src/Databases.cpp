@@ -52,7 +52,7 @@ void LoadImages()
     {
         for (const auto& file : std::filesystem::directory_iterator(FileUtils::GetPath(path)))
         {
-            if (file.path() != path + "/.DS_Store")
+            if (file.path() != FileUtils::GetPath(path) + "/.DS_Store")
             {
                 SDL_Renderer* r = RendererData::GetRenderer();
                 SDL_Texture* img = IMG_LoadTexture(r, file.path().string().c_str());
@@ -95,7 +95,7 @@ void LoadSounds()
     {
         for (const auto& file : std::filesystem::directory_iterator(FileUtils::GetPath(path)))
         {
-            if (file.path() != path + "/.DS_Store")
+            if (file.path() != FileUtils::GetPath(path) + "/.DS_Store")
             {
                 Mix_OpenAudio(48000, AUDIO_S16SYS, 1, 1024);
                 Mix_Chunk* sound = Mix_LoadWAV(file.path().string().c_str());
@@ -140,7 +140,7 @@ void LoadFonts()
     {
         for (const auto& file : std::filesystem::directory_iterator(FileUtils::GetPath(path)))
         {
-            if (file.path() != path + "/.DS_Store")
+            if (file.path() != FileUtils::GetPath(path) + "/.DS_Store")
             {
                 loaded_fonts[file.path().filename().stem().stem().string()][16] = TTF_OpenFont(file.path().string().c_str(), 16);
             }
@@ -192,7 +192,7 @@ void LoadTemplates()
     {
         for (const auto& file : std::filesystem::directory_iterator(FileUtils::GetPath(path)))
         {
-            if (file.path() != path + "/.DS_Store")
+            if (file.path() != FileUtils::GetPath(path) + "/.DS_Store")
             {
                 rapidjson::Document* template_document = new rapidjson::Document;
                 EngineUtils::ReadJsonFile(file.path().string(), *template_document);
@@ -201,6 +201,7 @@ void LoadTemplates()
             }
         }
     }
+    // Add a dummy actor to the templates list so we can easily make new actors in the editor
     rapidjson::Document* template_document = new rapidjson::Document;
     template_document->Parse("{\"name\": \"New_Actor\",\"components\": {}}");
     loaded_templates["New_Actor"] = template_document;
@@ -338,7 +339,7 @@ void LoadScenePaths()
     {
         for (const auto& file : std::filesystem::directory_iterator(FileUtils::GetPath(path)))
         {
-            if (file.path() != path + "/.DS_Store")
+            if (file.path() != FileUtils::GetPath(path) + "/.DS_Store")
             {
                 std::string scene_name = file.path().stem().string();
                 loaded_scene_paths[scene_name] = file.path().string();

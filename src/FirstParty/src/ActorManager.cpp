@@ -10,6 +10,7 @@
 
 #include "ActorManager.h"
 #include "LuaAPI.h"
+#include "EngineUtils.h"
 
 int Actors::num_total_actors = 0; // The total number of actors created during runtime
 int Actors::num_loaded_actors = 0; // The number of actors currently loaded in the game
@@ -595,6 +596,24 @@ rapidjson::Value Actors::SaveActorToJSON(int actor_id, bool as_template, rapidjs
                 // Gets the value of the lua value and stores it in a json value.
                 std::string key_value_pair = "string_";
                 key_value_pair += EngineUtils::LuaObjectToJson(json_var, component[variable.first], document_allocator);
+                
+                // TODO: If actor is a template, skip if value is the same as template value
+                if (template_name != "")
+                {
+//                    rapidjson::Value template_value = (*GetTemplate(template_name)).FindMember(var_name.c_str())->value;
+                    rapidjson::Document* t = GetTemplate(template_name);
+                    std::string l = "type";
+                    std::string c = "components";
+                    
+                    auto tn = t->FindMember(c.c_str())->value.FindMember(to_string(i).c_str())->value.FindMember(var_name.c_str());
+                    if (tn != t->MemberEnd())
+                    {
+                        if (EngineUtils::JsonEquals(json_var, tn->value))
+                        {
+                            continue;
+                        }
+                    }
+                }
                 
                 // Adds the key_value_pair to the 'key_value_type_pairs' object
                 rapidjson::Value pair;

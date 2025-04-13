@@ -204,6 +204,11 @@ public:
     * set in the file selector, if the scene exists
     */
     static void UpdateEditorCurrentScene();
+    
+    /**
+     * Reloads all of the databases
+     */
+    static void ReloadDatabases();
 };
 
 #endif /* EditorManager.h */

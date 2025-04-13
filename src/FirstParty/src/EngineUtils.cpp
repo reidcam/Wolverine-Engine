@@ -218,6 +218,54 @@ void EngineUtils::CombineJsonDocuments(rapidjson::Document& d1, rapidjson::Docum
 }
 
 /**
+ * Returns true if lhs and rhs are DEEPLY EQUAL to each other
+ */
+bool EngineUtils::JsonEquals(const rapidjson::Value& lhs, const rapidjson::Value& rhs)
+{
+    // If the types aren't equal, the values cannot be equal
+    if (lhs.GetType() != rhs.GetType()) { return false; }
+    
+    // Compare basic primitives
+    if (lhs.IsNull()) { return true; }
+    if (lhs.IsBool()) { return lhs.GetBool() == rhs.GetBool(); }
+    if (lhs.IsInt())  { return lhs.GetInt() == rhs.GetInt(); }
+    if (lhs.IsFloat())  { return lhs.GetFloat() == rhs.GetFloat(); }
+    if (lhs.IsDouble())  { return lhs.GetDouble() == rhs.GetDouble(); }
+    if (lhs.IsString())  { return lhs.GetString() == rhs.GetString(); }
+    
+    // Compare arrays
+    if (lhs.IsArray())
+    {
+        // Items cannot be equal if they aren't the same size
+        if (lhs.Size() != rhs.Size()) { return false; }
+        
+        for (rapidjson::SizeType i = 0; i < lhs.Size(); i++)
+        {
+            if (!JsonEquals(lhs[i], rhs[i])) { return false; }
+        }
+        
+        return true;
+    }
+    
+    // Compare objects
+    if (lhs.IsObject())
+    {
+        // Items cannot be equal if they aren't the same size
+        if (lhs.MemberCount() != rhs.MemberCount()) { return false; }
+        
+        for (auto iter = lhs.MemberBegin(); iter != lhs.MemberEnd(); iter++)
+        {
+            // Check if rhs has the member at all
+            if (!rhs.HasMember(iter->name)) { return false; }
+            if (!JsonEquals(iter->value, rhs[iter->name])) { return false; }
+        }
+        return true;
+    }
+        
+    return false;
+}
+
+/**
  * Loads the data from JSON into an existing lua value
  * DO NOT USE: This function is for use inside of the scene and actor managers only.
  *

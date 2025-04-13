@@ -12,9 +12,14 @@
 #include "EditorManager.h"
 #include "SceneManager.h"
 #include "PhysicsWorld.h"
-#include "ComponentDB.h"
 #include "LuaAPI.h"
+
 #include "TextDB.h"
+#include "ComponentDB.h"
+#include "AudioDB.h"
+#include "ImageDB.h"
+#include "TemplateDB.h"
+#include "SceneDB.h"
 
 bool EditorManager::editor_mode = true; // True when the game is paused and edits can be made
 bool EditorManager::play_mode = false; // True after the play button is pressed until the stop button is pressed. No edits can be made in this mode.
@@ -450,7 +455,7 @@ void EditorManager::ModeSwitchButtons()
     
     // Window Position
     int imgui_window_x = (window_w / 2) - (imgui_window_w / 2);
-    int imgui_window_y = 0.0f;
+    int imgui_window_y = 20.0f;
     ImGui::SetNextWindowPos(ImVec2(imgui_window_x, imgui_window_y));
     
     // Alows developers to activate the play modes and editor modes
@@ -460,6 +465,7 @@ void EditorManager::ModeSwitchButtons()
         if (ImGui::Button("Play"))
         {
             // TOOD: Hot reload all modified scripts
+            ReloadDatabases();
             SaveChanges();
             editor_mode = false;
             play_mode = true;
@@ -664,6 +670,9 @@ void EditorManager::MainMenuBar()
             if (ImGui::MenuItem("Save", "Crtl+S")) {
                 SaveChanges();
             }
+            if (ImGui::MenuItem("Refresh Resources", "Crtl+R")) {
+                ReloadDatabases();
+            }
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Window")) {
@@ -793,6 +802,9 @@ void EditorManager::CheckEditorShortcuts()
     }    
     if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_S)) && ImGui::GetIO().KeyCtrl) {
         SaveChanges();
+    }    
+    if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_R)) && ImGui::GetIO().KeyCtrl) {
+        ReloadDatabases();
     }
     if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_F)) && ImGui::GetIO().KeyCtrl) {
         show_file_selector = !show_file_selector;
@@ -994,4 +1006,17 @@ void EditorManager::UpdateEditorCurrentScene()
 
     // reset the open scene variable
     attempt_to_open_scene = false;
+}
+
+/**
+ * Reloads all of the databases
+ */
+void EditorManager::ReloadDatabases()
+{
+    LoadFonts();
+    LoadImages();
+    LoadSounds();
+    LoadTemplates();
+    LoadScenePaths();
+    LoadComponentTypes();
 }

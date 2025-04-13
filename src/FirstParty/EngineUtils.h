@@ -43,6 +43,11 @@ public:
     static void CombineJsonDocuments(rapidjson::Document& d1, rapidjson::Document& d2, rapidjson::Document& out_document);
     
     /**
+     * Returns true if lhs and rhs are DEEPLY EQUAL to each other
+     */
+    static bool JsonEquals(const rapidjson::Value& lhs, const rapidjson::Value& rhs);
+    
+    /**
      * Loads the data from JSON into an existing lua value
      * DO NOT USE: This function is for use inside of the scene and actor managers only.
      *

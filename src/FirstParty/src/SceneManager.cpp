@@ -115,10 +115,10 @@ void Scene::LoadNewScene()
                 EngineUtils::CombineJsonDocuments(lhs, rhs, combined_actor);
                 
                  // FOR TESTS: Output the combined JSON as a string
-                 rapidjson::StringBuffer buffer;
-                 rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-                 combined_actor.Accept(writer);
-                 std::cout << buffer.GetString() << std::endl;
+//                 rapidjson::StringBuffer buffer;
+//                 rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+//                 combined_actor.Accept(writer);
+//                 std::cout << buffer.GetString() << std::endl;
                 
                 actors.push_back(Actors::LoadActorWithJSON(combined_actor));
             }
@@ -140,8 +140,29 @@ void Scene::LoadNewScene()
 */
 int Scene::Instantiate(std::string actor_template_name)
 {
-    // Creates the actor
-    int new_actor_id = Actors::LoadActorWithJSON(*GetTemplate(actor_template_name));
+    int new_actor_id = 0;
+    
+    if (actor_template_name != "New_Actor") // Adds the template name to the new actor's json if its being created from a valid template
+    {
+        rapidjson::Document new_actor;
+        
+        rapidjson::Document lhs;
+        std::string temp = "{ \"template\": \"" + actor_template_name + "\" }";
+        lhs.Parse(temp.c_str());
+        rapidjson::Document rhs;
+        rhs.CopyFrom(*GetTemplate(actor_template_name), rhs.GetAllocator());
+        
+        EngineUtils::CombineJsonDocuments(lhs, rhs, new_actor);
+        
+        // Creates the actor
+        new_actor_id = Actors::LoadActorWithJSON(new_actor);
+    }
+    else
+    {
+        // Creates the actor
+        new_actor_id = Actors::LoadActorWithJSON(*GetTemplate(actor_template_name));
+    }
+    
     // Adds the actor to the scene
     actors.push_back(new_actor_id);
     

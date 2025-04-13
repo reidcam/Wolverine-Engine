@@ -78,8 +78,6 @@ void Initialize()
     
 #ifndef NDEBUG
     // Initializes imgui and the editor
-    // GUIRenderer::Init(EngineData::game_title);
-    // EngineData::window_renderer_map[GUIRenderer::GetWindow()] = GUIRenderer::GetRenderer();
     EditorManager::Init();
 #endif
     
