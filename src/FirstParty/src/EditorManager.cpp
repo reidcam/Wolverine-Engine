@@ -10,6 +10,7 @@
 #include <stdio.h>
 
 #include "EditorManager.h"
+#include "TemplateEditor.h"
 #include "SceneManager.h"
 #include "PhysicsWorld.h"
 #include "LuaAPI.h"
@@ -69,6 +70,9 @@ void EditorManager::Init()
     // get all of the .ini files in resources/editor_layouts
     editor_layout_files = GetEditorLayouts();
     
+    // TODO: DELETE!! THIS IS FOR TESTING!!!
+    TemplateEditorWindow::ChangeTemplate("testT");
+    
     // Get all of the data from the editor.config
 }
 
@@ -100,6 +104,7 @@ void EditorManager::RenderEditor()
     // Create all of the ImGui windows
     MainMenuBar();
     HierarchyView();
+    TemplateEditorWindow::TemplateEditor();
     ModeSwitchButtons();
 
     if (show_file_selector) {
@@ -222,6 +227,19 @@ void EditorManager::SaveChanges()
     
     // Save Actor_Templates
     std::filesystem::copy(FileUtils::GetPath("resources/actor_templates"), save_to_path + "/actor_templates", copy_options);
+}
+
+/**
+ * Reloads all of the databases
+ */
+void EditorManager::ReloadDatabases()
+{
+    LoadFonts();
+    LoadImages();
+    LoadSounds();
+    LoadTemplates();
+    LoadScenePaths();
+    LoadComponentTypes();
 }
 
 //-------------------------------------------------------
@@ -500,6 +518,51 @@ void EditorManager::ModeSwitchButtons()
 }
 
 /**
+ * Displays the components of the given actor in a standardized way
+ *
+ * @param   actor_id    the ID of the actor to display
+ */
+void EditorManager::DisplayActor(int actor_id)
+{
+    // Display the components of the actor
+    int number_of_components = Actors::GetNumberOfComponents(actor_id);
+    for (int i = 0; i < number_of_components; i++)
+    {
+        sol::table component = Actors::GetComponentByIndex(actor_id, i);
+
+        if (component.valid())
+        {
+            std::string component_type = component["type"];
+            std::string label = component_type + "##" + std::to_string(actor_id) + std::to_string(i);
+            const char* const_type = &component_type[0];
+
+            // If a component is clicked display its properties
+            if (ImGui::CollapsingHeader(label.c_str()))
+            {
+                sol::table metatable = component[sol::metatable_key];
+
+                // If component is native, metatable needs to be indexed at __index
+                if (!ComponentManager::IsComponentTypeNative(component_type)) { metatable = metatable["__index"]; }
+
+                // Table allows us to cleanly format our variables
+                ImGui::BeginTable(const_type, 2);
+
+                ImGui::TableSetupColumn("one", ImGuiTableColumnFlags_WidthFixed, 100.0f); // Default to 100.0f
+                ImGui::TableSetupColumn("two", ImGuiTableColumnFlags_WidthStretch);
+
+                for (auto& variable : metatable)
+                {
+                    sol::lua_value key = variable.first;
+                    // Sets this row of the table to be the variable with the given key
+                    VariableView(&component, key);
+                }
+                ImGui::EndTable();
+            }
+        }
+    }
+}
+
+/**
  * Creates the actor hierarchy view
  */
 void EditorManager::HierarchyView()
@@ -596,43 +659,9 @@ void EditorManager::HierarchyView()
                 ImGui::Text(text.c_str());
             }
         }
-
-        // Display the components of the selected actor
-        int number_of_components = Actors::GetNumberOfComponents(selected_actor_id);
-        for (int i = 0; i < number_of_components; i++)
-        {
-            sol::table component = Actors::GetComponentByIndex(selected_actor_id, i);
-
-            if (component.valid())
-            {
-                std::string component_type = component["type"];
-                std::string label = component_type + "##" + std::to_string(selected_actor_id) + std::to_string(i);
-                const char* const_type = &component_type[0];
-
-                // If a component is clicked display its properties
-                if (ImGui::CollapsingHeader(label.c_str()))
-                {
-                    sol::table metatable = component[sol::metatable_key];
-
-                    // If component is native, metatable needs to be indexed at __index
-                    if (!ComponentManager::IsComponentTypeNative(component_type)) { metatable = metatable["__index"]; }
-
-                    // Table allows us to cleanly format our variables
-                    ImGui::BeginTable(const_type, 2);
-
-                    ImGui::TableSetupColumn("one", ImGuiTableColumnFlags_WidthFixed, 100.0f); // Default to 100.0f
-                    ImGui::TableSetupColumn("two", ImGuiTableColumnFlags_WidthStretch);
-
-                    for (auto& variable : metatable)
-                    {
-                        sol::lua_value key = variable.first;
-                        // Sets this row of the table to be the variable with the given key
-                        VariableView(&component, key);
-                    }
-                    ImGui::EndTable();
-                }
-            }
-        }
+        
+        // Display the selected actor
+        DisplayActor(selected_actor_id);
         
         // Menu for adding new components to actors in the scene
         if (selected_actor_id != -1)
@@ -935,37 +964,32 @@ void EditorManager::ViewportWidget()
 {
     if (viewport) {
         const int DRAG_SENSE = 100;
-        ImGui::Begin("Viewport", NULL, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBackground);
-        if (ImGui::IsWindowHovered())
+        if (ImGui::Begin("Viewport", NULL, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBackground))
         {
-            if (ImGui::IsMouseDown(ImGuiMouseButton_Right) && editor_mode)
+            if (ImGui::IsWindowHovered())
             {
-                float x = RendererData::GetCameraPosition().x + (-ImGui::GetMouseDragDelta(ImGuiMouseButton_Right).x / DRAG_SENSE);
-                float y = RendererData::GetCameraPosition().y + (-ImGui::GetMouseDragDelta(ImGuiMouseButton_Right).y / DRAG_SENSE);
-                ImGui::ResetMouseDragDelta(ImGuiMouseButton_Right);
-                RendererData::SetCameraPosition(x, y);
+                if (ImGui::IsMouseDown(ImGuiMouseButton_Right) && editor_mode)
+                {
+                    float x = RendererData::GetCameraPosition().x + (-ImGui::GetMouseDragDelta(ImGuiMouseButton_Right).x / DRAG_SENSE);
+                    float y = RendererData::GetCameraPosition().y + (-ImGui::GetMouseDragDelta(ImGuiMouseButton_Right).y / DRAG_SENSE);
+                    ImGui::ResetMouseDragDelta(ImGuiMouseButton_Right);
+                    RendererData::SetCameraPosition(x, y);
+                }
+                
+                float scroll_wheel = ImGui::GetIO().MouseWheel;
+                if (scroll_wheel != 0 && editor_mode)
+                {
+                    float old_zoom = RendererData::GetCameraZoom();
+                    RendererData::SetCameraZoom(old_zoom + (scroll_wheel / 10));
+                }
             }
             
-            float scroll_wheel = ImGui::GetIO().MouseWheel;
-            if (scroll_wheel != 0 && editor_mode)
-            {
-                float old_zoom = RendererData::GetCameraZoom();
-                RendererData::SetCameraZoom(old_zoom + (scroll_wheel / 10));
-                std::cout << RendererData::GetCameraZoom() << std::endl;
-            }
+            RendererData::RenderAndClearAllImageRequests();
+            RendererData::RenderAndClearAllTextRequests();
+            RendererData::RenderAndClearAllUI();
+            RendererData::RenderAndClearAllPixels();
+            RendererData::RenderAndClearAllLines();
         }
-
-        RendererData::RenderAndClearAllImageRequests();
-        RendererData::RenderAndClearAllTextRequests();
-        RendererData::RenderAndClearAllUI();
-        RendererData::RenderAndClearAllPixels();
-        RendererData::RenderAndClearAllLines();
-
-        //ImageToImGUI();
-        //TextToImGUI();
-        //UIToImGUI();
-        //PixelToImGUI();
-        //LineToImGUI();
         ImGui::End();
     }
 }
@@ -1006,17 +1030,4 @@ void EditorManager::UpdateEditorCurrentScene()
 
     // reset the open scene variable
     attempt_to_open_scene = false;
-}
-
-/**
- * Reloads all of the databases
- */
-void EditorManager::ReloadDatabases()
-{
-    LoadFonts();
-    LoadImages();
-    LoadSounds();
-    LoadTemplates();
-    LoadScenePaths();
-    LoadComponentTypes();
 }

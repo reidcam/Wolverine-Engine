@@ -597,10 +597,9 @@ rapidjson::Value Actors::SaveActorToJSON(int actor_id, bool as_template, rapidjs
                 std::string key_value_pair = "string_";
                 key_value_pair += EngineUtils::LuaObjectToJson(json_var, component[variable.first], document_allocator);
                 
-                // TODO: If actor is a template, skip if value is the same as template value
+                // If actor is a template, skip if value is the same as template value
                 if (template_name != "")
                 {
-//                    rapidjson::Value template_value = (*GetTemplate(template_name)).FindMember(var_name.c_str())->value;
                     rapidjson::Document* t = GetTemplate(template_name);
                     std::string l = "type";
                     std::string c = "components";

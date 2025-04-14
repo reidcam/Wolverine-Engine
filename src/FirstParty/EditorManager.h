@@ -112,6 +112,11 @@ public:
      */
     static void SaveChanges();
     
+    /**
+     * Reloads all of the databases
+     */
+    static void ReloadDatabases();
+    
     //-------------------------------------------------------
     // Getters/Setters
     
@@ -140,6 +145,13 @@ public:
      * Creates the mode switching buttons
      */
     static void ModeSwitchButtons();
+    
+    /**
+     * Displays the components of the given actor in a standardized way
+     *
+     * @param   actor_id    the ID of the actor to display
+     */
+    static void DisplayActor(int actor_id);
     
     /**
      * Creates the actor hierarchy view
@@ -204,11 +216,6 @@ public:
     * set in the file selector, if the scene exists
     */
     static void UpdateEditorCurrentScene();
-    
-    /**
-     * Reloads all of the databases
-     */
-    static void ReloadDatabases();
 };
 
 #endif /* EditorManager.h */
