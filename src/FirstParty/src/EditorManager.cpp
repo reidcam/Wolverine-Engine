@@ -69,10 +69,6 @@ void EditorManager::Init()
 
     // get all of the .ini files in resources/editor_layouts
     editor_layout_files = GetEditorLayouts();
-    
-    // TODO: DELETE!! THIS IS FOR TESTING!!!
-    TemplateEditorWindow::ChangeTemplate("testT");
-    
     // Get all of the data from the editor.config
 }
 
