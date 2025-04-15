@@ -304,7 +304,7 @@ void Scene::ResetManager()
     actors.clear();
     dead_actors.clear();
     
-    new_scene_name = initial_scene_name;
+    new_scene_name = current_scene_name;
     LoadNewScene();
 }
 
