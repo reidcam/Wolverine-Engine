@@ -10,6 +10,7 @@
 #define TemplateEditor_h
 
 #include "EditorManager.h"
+#include "ShallowActorClass.h"
 
 class TemplateEditorWindow
 {
@@ -17,10 +18,10 @@ private:
     static inline bool show_template_editor = true;
     
     // Template the window is displaying
-    static inline std::string selected_template = "TestT";
+    static inline std::string selected_template = "";
     
-    // ID of the dummy actor we're using to showcase the template
-    static inline int dummy_id = -1;
+    // Pointer to the shallow actor we're using to represent the template
+    static inline ShallowActor* template_rep = nullptr;
     
     /*
      * Saves the changes made to the current template, then update all current instances in the scene

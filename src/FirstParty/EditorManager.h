@@ -154,6 +154,13 @@ public:
     static void DisplayActor(int actor_id);
     
     /**
+     * Displays the given component
+     *
+     * @param   component    the component to display
+     */
+    static void DisplayComponent(sol::table component);
+    
+    /**
      * Creates the actor hierarchy view
      */
     static void HierarchyView();

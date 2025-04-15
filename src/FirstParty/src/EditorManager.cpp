@@ -529,35 +529,46 @@ void EditorManager::DisplayActor(int actor_id)
     for (int i = 0; i < number_of_components; i++)
     {
         sol::table component = Actors::GetComponentByIndex(actor_id, i);
+        DisplayComponent(component);
+    }
+}
 
-        if (component.valid())
+/**
+ * Displays the given component
+ *
+ * @param   component    the component to display
+ */
+void EditorManager::DisplayComponent(sol::table component)
+{
+    if (component.valid())
+    {
+        std::string component_key = component["key"];
+        std::string component_type = component["type"];
+        int actor_id = component["actor"].get<Actor>().ID;
+        std::string label = component_type + "##" + std::to_string(actor_id) + component_key;
+        const char* const_type = &component_type[0];
+
+        // If a component is clicked display its properties
+        if (ImGui::CollapsingHeader(label.c_str()))
         {
-            std::string component_type = component["type"];
-            std::string label = component_type + "##" + std::to_string(actor_id) + std::to_string(i);
-            const char* const_type = &component_type[0];
+            sol::table metatable = component[sol::metatable_key];
 
-            // If a component is clicked display its properties
-            if (ImGui::CollapsingHeader(label.c_str()))
+            // If component is native, metatable needs to be indexed at __index
+            if (!ComponentManager::IsComponentTypeNative(component_type)) { metatable = metatable["__index"]; }
+
+            // Table allows us to cleanly format our variables
+            ImGui::BeginTable(const_type, 2);
+
+            ImGui::TableSetupColumn("one", ImGuiTableColumnFlags_WidthFixed, 100.0f); // Default to 100.0f
+            ImGui::TableSetupColumn("two", ImGuiTableColumnFlags_WidthStretch);
+
+            for (auto& variable : metatable)
             {
-                sol::table metatable = component[sol::metatable_key];
-
-                // If component is native, metatable needs to be indexed at __index
-                if (!ComponentManager::IsComponentTypeNative(component_type)) { metatable = metatable["__index"]; }
-
-                // Table allows us to cleanly format our variables
-                ImGui::BeginTable(const_type, 2);
-
-                ImGui::TableSetupColumn("one", ImGuiTableColumnFlags_WidthFixed, 100.0f); // Default to 100.0f
-                ImGui::TableSetupColumn("two", ImGuiTableColumnFlags_WidthStretch);
-
-                for (auto& variable : metatable)
-                {
-                    sol::lua_value key = variable.first;
-                    // Sets this row of the table to be the variable with the given key
-                    VariableView(&component, key);
-                }
-                ImGui::EndTable();
+                sol::lua_value key = variable.first;
+                // Sets this row of the table to be the variable with the given key
+                VariableView(&component, key);
             }
+            ImGui::EndTable();
         }
     }
 }

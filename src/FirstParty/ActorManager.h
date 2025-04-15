@@ -17,6 +17,7 @@
 
 #include "TemplateDB.h"
 #include "ComponentManager.h"
+#include "ShallowActorClass.h"
 
 using namespace std;
 
@@ -35,6 +36,9 @@ public:
 class Actors
 {
 private:
+    // The shallow actor reflection should have access to database
+    friend class ShallowActor;
+    
     static int num_total_actors; // The total number of actors created during runtime
     static int num_loaded_actors; // The number of actors currently loaded in the game
     

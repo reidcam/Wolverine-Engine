@@ -24,16 +24,16 @@ void TemplateEditorWindow::SaveTemplateChanges()
      */
     
     // Step 1
-    int new_dummy_id = Actors::LoadActorWithJSON(*GetTemplate(selected_template));
-    Actors::SetName(new_dummy_id, selected_template + ":TEMPLATE_TEMP");
+    int dummy_id = Actors::LoadActorWithJSON(*GetTemplate(selected_template));
+    Actors::SetName(dummy_id, selected_template + ":TEMPLATE");
     
     // Step 2
     std::unordered_map<int, std::vector<sol::object>> modified_values; // Map of compoent index to the changed values within those components
-    int number_of_components = Actors::GetNumberOfComponents(dummy_id);
+    int number_of_components = template_rep->components.size();
     for (int i = 0; i < number_of_components; i++)
     {
-        sol::table component_temp = Actors::GetComponentByIndex(dummy_id, i);
-        sol::table component_inst = Actors::GetComponentByIndex(new_dummy_id, i);
+        sol::table component_temp = *template_rep->components[i];
+        sol::table component_inst = Actors::GetComponentByIndex(dummy_id, i);
         
         if (component_temp.valid() && component_inst.valid())
         {
@@ -75,8 +75,8 @@ void TemplateEditorWindow::SaveTemplateChanges()
             for (auto pair : modified_values)
             {
                 sol::table component =  Actors::GetComponentByIndex(actor, pair.first);
-                sol::table component_temp = Actors::GetComponentByIndex(dummy_id, pair.first);
-                sol::table component_inst = Actors::GetComponentByIndex(new_dummy_id, pair.first);
+                sol::table component_temp = *template_rep->components[pair.first];
+                sol::table component_inst = Actors::GetComponentByIndex(dummy_id, pair.first);
                 
                 for (auto variable_key : pair.second)
                 {
@@ -88,6 +88,7 @@ void TemplateEditorWindow::SaveTemplateChanges()
                         {
                             // TODO: copy by value instead of reference
                             component[variable_key] = component_temp[variable_key];
+                            component_inst[variable_key] = component_temp[variable_key];
                         }
                     }
                 }
@@ -95,13 +96,13 @@ void TemplateEditorWindow::SaveTemplateChanges()
         }
     }
     
-    // #4
-    Actors::PrepareActorForDestruction(new_dummy_id);
-    Actors::DestroyActor(new_dummy_id);
-    
     // Update the template
     EditorManager::CreateNewTemplate(dummy_id, selected_template);
     LoadTemplates();
+    
+    // #4
+    Actors::PrepareActorForDestruction(dummy_id);
+    Actors::DestroyActor(dummy_id);
 }
 
 /*
@@ -118,25 +119,18 @@ void TemplateEditorWindow::ToggleWindow()
  */
 void TemplateEditorWindow::ChangeTemplate(std::string to_edit)
 {
-    // If there is a previous template, save its changes before moving on
-    if (selected_template != "" && dummy_id != -1)
+    // Delete the old template rep if it exists
+    if (template_rep != nullptr)
     {
-//        SaveTemplateChanges();
-        Actors::PrepareActorForDestruction(dummy_id);
-        Actors::DestroyActor(dummy_id);
+        delete template_rep;
+        template_rep = nullptr;
     }
     
     selected_template = to_edit;
     if (to_edit != "")
     {
         // Creates the actor
-        dummy_id = Actors::LoadActorWithJSON(*GetTemplate(to_edit));
-        Actors::SetName(dummy_id, to_edit + ":TEMPLATE");
-        Actors::SetActorEnabled(dummy_id, false);
-    }
-    else // Basically set the window to edit nothing
-    {
-        dummy_id = -1;
+        template_rep = new ShallowActor(to_edit);
     }
 }
 
@@ -173,13 +167,12 @@ void TemplateEditorWindow::TemplateEditor()
             SaveTemplateChanges();
         }
         
-        if (selected_template != "") // Don't display editor if template is invalid
+        if (template_rep != nullptr) // Don't display editor if template is invalid
         {
-            if (dummy_id != -1) // don't display actor if ID is invalid
+            for (auto component : template_rep->components)
             {
-                EditorManager::DisplayActor(dummy_id);
+                EditorManager::DisplayComponent(*component);
             }
-            
         }
         
         ImGui::End();
