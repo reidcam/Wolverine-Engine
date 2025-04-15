@@ -266,6 +266,52 @@ bool EngineUtils::JsonEquals(const rapidjson::Value& lhs, const rapidjson::Value
 }
 
 /**
+ * Returns true if lhs and rhs are DEEPLY EQUAL to each other
+ */
+bool EngineUtils::LuaEquals(const sol::object& lhs, const sol::object& rhs)
+{
+    // If the types aren't equal, the values cannot be equal
+    if (lhs.get_type() != rhs.get_type()) { return false; }
+    
+    // Compare basic primitives
+    if (lhs.get_type() == sol::type::lua_nil) { return true; }
+    if (lhs.is<bool>()) { return lhs.as<bool>() == rhs.as<bool>(); }
+    if (lhs.is<int>())  { return lhs.as<int>() == rhs.as<int>(); }
+    if (lhs.is<float>())  {
+        float l = lhs.as<float>();
+        float r = rhs.as<float>();
+        return l == r;
+    }
+    if (lhs.is<double>())  { return lhs.as<double>() == rhs.as<double>(); }
+    if (lhs.is<std::string>())  {
+        std::string l = lhs.as<std::string>();
+        std::string r = rhs.as<std::string>();
+        return lhs.as<std::string>() == rhs.as<std::string>();
+    }
+    
+    // Compare tables
+    if (lhs.get_type() == sol::type::table)
+    {
+        sol::table t_lhs = lhs.as<sol::table>();
+        sol::table t_rhs = rhs.as<sol::table>();
+        
+        // Items cannot be equal if they aren't the same size
+        if (t_lhs.size() != t_rhs.size()) { return false; }
+        
+        for (auto iter = t_lhs.begin(); iter != t_lhs.end(); iter++)
+        {
+            // Check if rhs has the member at all
+            if (!t_rhs[(*iter).first].valid()) { return false; }
+            if (!LuaEquals((*iter).second, t_rhs[(*iter).first])) { return false; }
+        }
+        return true;
+    }
+        
+    // TODO: Update for new user datatypes
+    return false;
+}
+
+/**
  * Loads the data from JSON into an existing lua value
  * DO NOT USE: This function is for use inside of the scene and actor managers only.
  *

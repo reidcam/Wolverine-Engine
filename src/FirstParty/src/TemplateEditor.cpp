@@ -15,10 +15,12 @@
  */
 void TemplateEditorWindow::SaveTemplateChanges()
 {
+    if (!EditorManager::GetEditorMode()) { return; }
     /*
      #1: Create a new instance of the template
      #2: Compare all of the data in the new instance to the changed version, cache the components and variables that are different
-     #3: Loop through all existing actors of the template type, update the cached components with the values from the updated version of the template
+     #3: Loop through all existing actors of the template type, update the cached components with the values from the updated version of the template IFF they're different from the instance's values
+     #4: Delete the template instance
      */
     
     // Step 1
@@ -54,8 +56,10 @@ void TemplateEditorWindow::SaveTemplateChanges()
                 
                 // Skip functions
                 if (component_temp[variable.first].get_type() == sol::type::function) { continue; }
-                
-                if (component_inst[variable.first].get<sol::object>() != component_temp[variable.first].get<sol::object>())
+                // Skip userdata (TODO: when custom datatypes are allowed remove this line)
+                if (component_temp[variable.first].get_type() == sol::type::userdata) { continue; }
+
+                if (!EngineUtils::LuaEquals(component_inst[variable.first], component_temp[variable.first]))
                 {
                     modified_values[i].push_back(variable.first);
                 }
@@ -71,18 +75,33 @@ void TemplateEditorWindow::SaveTemplateChanges()
             for (auto pair : modified_values)
             {
                 sol::table component =  Actors::GetComponentByIndex(actor, pair.first);
-                sol::table dummy_component = Actors::GetComponentByIndex(dummy_id, pair.first);
+                sol::table component_temp = Actors::GetComponentByIndex(dummy_id, pair.first);
+                sol::table component_inst = Actors::GetComponentByIndex(new_dummy_id, pair.first);
                 
                 for (auto variable_key : pair.second)
                 {
-//                    component[variable_key] = dummy_component[variable_key];
+                    if (component[variable_key].valid())
+                    {
+                        std::string var_name = variable_key.as<std::string>();
+                        // If the variable is equal to the old value, set it to the new one
+                        if (EngineUtils::LuaEquals(component[variable_key], component_inst[variable_key]))
+                        {
+                            // TODO: copy by value instead of reference
+                            component[variable_key] = component_temp[variable_key];
+                        }
+                    }
                 }
             }
         }
     }
     
+    // #4
+    Actors::PrepareActorForDestruction(new_dummy_id);
+    Actors::DestroyActor(new_dummy_id);
+    
     // Update the template
     EditorManager::CreateNewTemplate(dummy_id, selected_template);
+    LoadTemplates();
 }
 
 /*
@@ -102,7 +121,7 @@ void TemplateEditorWindow::ChangeTemplate(std::string to_edit)
     // If there is a previous template, save its changes before moving on
     if (selected_template != "" && dummy_id != -1)
     {
-        SaveTemplateChanges();
+//        SaveTemplateChanges();
         Actors::PrepareActorForDestruction(dummy_id);
         Actors::DestroyActor(dummy_id);
     }
@@ -113,6 +132,7 @@ void TemplateEditorWindow::ChangeTemplate(std::string to_edit)
         // Creates the actor
         dummy_id = Actors::LoadActorWithJSON(*GetTemplate(to_edit));
         Actors::SetName(dummy_id, to_edit + ":TEMPLATE");
+        Actors::SetActorEnabled(dummy_id, false);
     }
     else // Basically set the window to edit nothing
     {

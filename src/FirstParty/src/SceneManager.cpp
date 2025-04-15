@@ -166,6 +166,8 @@ int Scene::Instantiate(std::string actor_template_name)
     // Adds the actor to the scene
     actors.push_back(new_actor_id);
     
+    Actors::SetName(new_actor_id, "New \"" + actor_template_name + "\"");
+    
     return new_actor_id;
 }
 

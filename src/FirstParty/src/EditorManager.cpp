@@ -444,6 +444,10 @@ void EditorManager::VariableView(sol::table* table, sol::lua_value key)
             ImGui::Text(const_var_value);
         }
     }
+    if (value.get_type() == sol::type::userdata)
+    {
+        ImGui::Text("USER DATATYPE");
+    }
     
     // Move on to the next row of the table
     ImGui::TableNextRow();

@@ -231,25 +231,23 @@ void Actors::ProcessRemovedComponents()
         // Skip caling "OnDestroy" on this component if the actor or component aren't enabled
         if (!enabled_actor || !enabled_component)
         {
-            continue;
-        }
-        
-        // Call "OnDestroy" if this component has it.
-        try
-        {
-            sol::function OnDestroy = (*component)["OnDestroy"];
-            if (OnDestroy.valid())
+            // Call "OnDestroy" if this component has it.
+            try
             {
-                OnDestroy(*component);
+                sol::function OnDestroy = (*component)["OnDestroy"];
+                if (OnDestroy.valid())
+                {
+                    OnDestroy(*component);
+                }
             }
-        }
-        catch(const std::exception& e)
-        {
-            std::string errorMessage = e.what();
+            catch(const std::exception& e)
+            {
+                std::string errorMessage = e.what();
 #ifdef _WIN32
-            std::replace(errorMessage.begin(), errorMessage.end(), '\\', '/');
+                std::replace(errorMessage.begin(), errorMessage.end(), '\\', '/');
 #endif
-            std::cout << "\033[31m" << names[actor_index] << " : " << errorMessage << "\033[0m" << std::endl;
+                std::cout << "\033[31m" << names[actor_index] << " : " << errorMessage << "\033[0m" << std::endl;
+            }
         }
         
         // Deletes the component
@@ -570,7 +568,7 @@ rapidjson::Value Actors::SaveActorToJSON(int actor_id, bool as_template, rapidjs
                 
                 // Skip functions
                 if (component[variable.first].get_type() == sol::type::function) { continue; }
-                
+
                 // Skip if the value is the same as it is in the metatable (except for type, which needs to always be displayed in the json), UNLESS THIS IS A TEMPLATE
                 if (!as_template)
                 {
