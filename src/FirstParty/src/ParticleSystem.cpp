@@ -245,7 +245,7 @@ void ParticleSystem::RenderParticle(Particle* particle)
     int particleWidth = 0;
     int particleHeight = 0;
     SDL_QueryTexture(GetImage(image), NULL, NULL, &particleWidth, &particleHeight);
-    float particleScale = particle->size / (particleWidth / RendererData::PIXELS_PER_METER);
+    float particleScale = particle->size / ((float)particleWidth / (float)RendererData::PIXELS_PER_METER);
     
     RendererData::DrawImageEx(image, position.x, position.y, rotation, particleScale, particleScale, 0.5f, 0.5f, particle->color[0], particle->color[1], particle->color[2], particle->color[3], sorting_order);
 }

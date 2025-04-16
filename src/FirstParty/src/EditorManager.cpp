@@ -298,7 +298,7 @@ void EditorManager::VariableView(sol::table* table, sol::lua_value key)
     
     // Sets the first column to be the name of the variable
     ImGui::TableNextColumn();
-    ImGui::PushFont(DrawImgui::GetImGuiFont("PixelOperator8", 10));
+//    ImGui::PushFont(DrawImgui::GetImGuiFont("PixelOperator8", 10));
     ImGui::TextColored(ImVec4(255, 255, 0, 255), const_var_name);
     
     // Moves to the second column to get ready to be the value of the variable

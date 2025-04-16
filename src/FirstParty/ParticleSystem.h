@@ -44,7 +44,7 @@ public:
     std::queue<Particle*> particles;
     
     // Base component values
-    std::string type = "Rigidbody";
+    std::string type = "ParticleSystem";
     std::string key = "???";
     Actor* actor = nullptr;
     bool REMOVED_FROM_ACTOR = false;
