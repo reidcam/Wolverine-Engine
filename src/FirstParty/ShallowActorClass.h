@@ -16,10 +16,13 @@
 
 #include "sol/sol.hpp"
 
+class Actor;
 //    Defines the "ShallowActor" class: an ENGINE-ONLY class used for generating small, temporary versions of an actor class that are detatched from the ActorManager's systems
 // This class exists purely for extracting data from the ActorManager, do NOT attempt to call any methods from the stored components or undefined befahiour will occur.
 class ShallowActor
 {
+private:
+    Actor* dummy;
 public:
     // The shallow actor's components
     std::vector<std::shared_ptr<sol::table>> components;

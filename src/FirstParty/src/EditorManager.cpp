@@ -69,6 +69,8 @@ void EditorManager::Init()
 
     // get all of the .ini files in resources/editor_layouts
     editor_layout_files = GetEditorLayouts();
+    
+    // 
     // Get all of the data from the editor.config
 }
 
@@ -296,7 +298,8 @@ void EditorManager::VariableView(sol::table* table, sol::lua_value key)
     
     // Sets the first column to be the name of the variable
     ImGui::TableNextColumn();
-    ImGui::Text(const_var_name);
+    ImGui::PushFont(DrawImgui::GetImGuiFont("PixelOperator8", 10));
+    ImGui::TextColored(ImVec4(255, 255, 0, 255), const_var_name);
     
     // Moves to the second column to get ready to be the value of the variable
     ImGui::TableNextColumn();
@@ -306,6 +309,7 @@ void EditorManager::VariableView(sol::table* table, sol::lua_value key)
     {
         std::string variable_value = value.as<std::string>();
         char* const_var_value = &variable_value[0];
+
         if (ImGui::InputText(const_invisible_id, const_var_value, 100) && (ImGui::IsItemEdited() && ImGui::IsItemDeactivated()))
         {
             (*table)[key] = const_var_value;

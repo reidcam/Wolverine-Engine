@@ -28,6 +28,11 @@ ShallowActor::ShallowActor(std::string type)
     for (int i = 0; i < number_of_components; i++)
     {
         components.push_back(std::make_shared<sol::table>(Actors::GetComponentByIndex(dummy_id, i)));
+        
+        // Sanitize components actor reference
+        dummy = new Actor();
+        dummy->ID = -1;
+        Actors::GetComponentByIndex(dummy_id, i)["actor"] = dummy;
     }
     
     // clear new actor's components and erase it
@@ -41,4 +46,5 @@ ShallowActor::~ShallowActor()
     {
         LuaAPI::DeleteLuaTable(component);
     }
+    delete dummy;
 }
