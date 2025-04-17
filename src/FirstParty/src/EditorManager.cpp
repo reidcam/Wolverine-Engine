@@ -604,10 +604,10 @@ void EditorManager::DisplayComponent(sol::table component, std::shared_ptr<sol::
         // If a component is clicked display its properties
         if (ImGui::CollapsingHeader(label.c_str()))
         {
-            sol::table metatable = component[sol::metatable_key];
+            sol::table metatable = component[sol::metatable_key].get_or<sol::table>(sol::lua_nil);
 
             // If component is native, metatable needs to be indexed at __index
-            if (!ComponentManager::IsComponentTypeNative(component_type)) { metatable = metatable["__index"]; }
+            if (!ComponentManager::IsComponentTypeNative(component_type)) { metatable = metatable["__index"].get_or<sol::table>(sol::lua_nil); }
             if (!metatable.valid()) { return; } // return if metatable is invalid
 
             // Table allows us to cleanly format our variables
@@ -950,14 +950,16 @@ void EditorManager::CheckEditorShortcuts()
 void EditorManager::ViewportDocking()
 {
     // Allows the viewport to be used as a docking space
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, IM_COL32(0, 0, 0, 0));
     ImGuiID dockspace_id = ImGui::DockSpaceOverViewport(0U, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
+    ImGui::PopStyleColor();
 
     // load the most recent user docking layout
-    //if (first_frame) {
-    //    std::filesystem::path path = docking_layout_file_path.string() + "/" + user_docking_layout_file_name;
-    //    LoadDockingLayout(path.string());
-    //    first_frame = !first_frame;
-    //}
+    if (first_frame) {
+        std::filesystem::path path = docking_layout_file_path.string() + "/" + user_docking_layout_file_name;
+        LoadDockingLayout(path.string());
+        first_frame = !first_frame;
+    }
 }
 
 /**

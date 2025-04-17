@@ -300,11 +300,16 @@ bool EngineUtils::LuaEquals(const sol::object& lhs, const sol::object& rhs)
         // Items cannot be equal if they aren't the same size
         if (t_lhs.size() != t_rhs.size()) { return false; }
         
-        for (auto iter = t_lhs.begin(); iter != t_lhs.end(); iter++)
+        
+        for (auto iter = t_lhs.begin(); iter != t_lhs.end(); ++iter)
         {
+            // Prevent proxy casting
+            sol::object key = (*iter).first.as<sol::object>();
+            sol::object lhs_val = (*iter).second.as<sol::object>();
+            sol::object rhs_val = t_rhs[key].get_or<sol::object>(sol::lua_nil);
             // Check if rhs has the member at all
-            if (!t_rhs[(*iter).first].valid()) { return false; }
-            if (!LuaEquals((*iter).second.as<sol::object>(), t_rhs[(*iter).first].get<sol::object>())) { return false; }
+            if (!lhs_val.valid() || !rhs_val.valid()) { return false; }
+            if (!LuaEquals(lhs_val, rhs_val)) { return false; }
         }
         return true;
     }

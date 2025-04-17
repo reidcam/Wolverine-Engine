@@ -8,6 +8,7 @@
 
 #include "TemplateEditor.h"
 #include "SceneManager.h"
+#include "ComponentManager.h"
 
 /*
  * Saves the changes made to the current template, then update all current instances in the scene
@@ -170,7 +171,17 @@ void TemplateEditorWindow::TemplateEditor()
         {
             for (auto component : template_rep->components)
             {
-                EditorManager::DisplayComponent(*component);
+                std::string component_type = (*component)["type"].get<std::string>();
+                std::shared_ptr<sol::table> og_comp;
+                if (ComponentManager::IsComponentTypeNative(component_type))
+                {
+                    og_comp  = std::make_shared<sol::table>(ComponentManager::NewNativeComponent(component_type));
+                }
+                else
+                {
+                    og_comp = GetComponentType(component_type);
+                }
+                EditorManager::DisplayComponent(*component, og_comp);
             }
         }
         

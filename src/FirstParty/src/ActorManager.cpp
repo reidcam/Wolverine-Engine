@@ -570,7 +570,7 @@ rapidjson::Value Actors::SaveActorToJSON(int actor_id, bool as_template, rapidjs
                 if (component[variable.first].get_type() == sol::type::function) { continue; }
 
                 // Skip if the value is the same as it is in the metatable (except for type, which needs to always be displayed in the json), UNLESS THIS IS A TEMPLATE
-                if (!as_template)
+                if (!as_template && template_name == "")
                 {
                     if (component[variable.first] == variable.second && var_name != "type") { continue; }
                     
