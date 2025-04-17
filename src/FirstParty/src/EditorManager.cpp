@@ -70,8 +70,38 @@ void EditorManager::Init()
     // get all of the .ini files in resources/editor_layouts
     editor_layout_files = GetEditorLayouts();
     
-    // 
-    // Get all of the data from the editor.config
+    // Add fonts that we need for editor rendering:
+    std::vector<std::pair<std::string, int>> editor_fonts; // #1 = font name, #2 = font size
+    editor_fonts.push_back(std::pair<std::string, int>("PixelOperator8", 10));
+    editor_fonts.push_back(std::pair<std::string, int>("PixelOperator8-Bold", 10));
+    for (auto iter : editor_fonts)
+    {
+        const std::string path = FileUtils::GetPath("editor_resources/fonts/") + iter.first + ".ttf";
+        
+        if (FileUtils::DirectoryExists("editor_resources/fonts/"))
+        {
+            ImGuiIO& io = ImGui::GetIO();
+            ImFont* font = io.Fonts->AddFontFromFileTTF(path.c_str(), iter.second);
+            
+            if (font == nullptr) {
+                std::cerr << "Failed to load font!" << std::endl;
+            }
+            else {
+                io.Fonts->Build();
+                
+                DrawImgui::AddImGuiFont(iter.first, font); // save the font for later
+                
+                // these two lines must be called whenever loading fonts between frames
+                ImGui_ImplSDLRenderer2_DestroyDeviceObjects();
+                ImGui_ImplSDLRenderer2_CreateDeviceObjects();
+            }
+        }
+        else {
+            // output an error and move to the next request
+            std::cout << "font " + iter.first + "does not exist at " + path << std::endl;
+            continue;
+        }
+    }
 }
 
 /**
@@ -299,7 +329,7 @@ void EditorManager::VariableView(sol::table* table, sol::lua_value key)
     // Sets the first column to be the name of the variable
     ImGui::TableNextColumn();
 //    ImGui::PushFont(DrawImgui::GetImGuiFont("PixelOperator8", 10));
-    ImGui::TextColored(ImVec4(255, 255, 0, 255), const_var_name);
+    ImGui::Text(const_var_name);
     
     // Moves to the second column to get ready to be the value of the variable
     ImGui::TableNextColumn();
@@ -530,10 +560,28 @@ void EditorManager::DisplayActor(int actor_id)
 {
     // Display the components of the actor
     int number_of_components = Actors::GetNumberOfComponents(actor_id);
+    
+    // Get a shallow actor of the template if it exists (For determining if a template instance in the scene has default values or not)
+    std::string actor_template = Actors::GetTemplateName(actor_id);
+    std::shared_ptr<ShallowActor> template_reference = nullptr;
+    if (actor_template != "")
+    {
+        template_reference = GetReferenceTemplate(actor_template);
+    }
+    
+    // Loop through and display each component
     for (int i = 0; i < number_of_components; i++)
     {
         sol::table component = Actors::GetComponentByIndex(actor_id, i);
-        DisplayComponent(component);
+        if (template_reference != nullptr) // if actor is a template, pass through template reference for default value checking
+        {
+            std::shared_ptr<sol::table> compare_component = template_reference->components[i];
+            DisplayComponent(component, compare_component);
+        }
+        else
+        {
+            DisplayComponent(component);
+        }
     }
 }
 
@@ -541,8 +589,9 @@ void EditorManager::DisplayActor(int actor_id)
  * Displays the given component
  *
  * @param   component    the component to display
+ * @param   compare_component   component to compare against, usually from a template if one exists
  */
-void EditorManager::DisplayComponent(sol::table component)
+void EditorManager::DisplayComponent(sol::table component, std::shared_ptr<sol::table> compare_component)
 {
     if (component.valid())
     {
@@ -559,6 +608,7 @@ void EditorManager::DisplayComponent(sol::table component)
 
             // If component is native, metatable needs to be indexed at __index
             if (!ComponentManager::IsComponentTypeNative(component_type)) { metatable = metatable["__index"]; }
+            if (!metatable.valid()) { return; } // return if metatable is invalid
 
             // Table allows us to cleanly format our variables
             ImGui::BeginTable(const_type, 2);
@@ -569,8 +619,29 @@ void EditorManager::DisplayComponent(sol::table component)
             for (auto& variable : metatable)
             {
                 sol::lua_value key = variable.first;
+                
+                ImFont* font = DrawImgui::GetImGuiFont("PixelOperator8", 10);
+                
+                // If this component is on a templated actor and its a non-default value, make it bold for easy debugging
+                if (compare_component != nullptr)
+                {
+                    // If value is non-default
+                    if (!EngineUtils::LuaEquals(component[key].get<sol::object>(), (*compare_component)[key].get<sol::object>()))
+                    {
+                        font = DrawImgui::GetImGuiFont("PixelOperator8-Bold", 10);
+                    }
+                }
+
+                if (font) {
+                    ImGui::PushFont(font);
+                }
+                
                 // Sets this row of the table to be the variable with the given key
                 VariableView(&component, key);
+                
+                if (font) {
+                    ImGui::PopFont();
+                }
             }
             ImGui::EndTable();
         }

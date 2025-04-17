@@ -273,6 +273,8 @@ bool EngineUtils::LuaEquals(const sol::object& lhs, const sol::object& rhs)
     // If the types aren't equal, the values cannot be equal
     if (lhs.get_type() != rhs.get_type()) { return false; }
     
+    if (lhs.get_type() == sol::type::function) { return true; }
+    
     // Compare basic primitives
     if (lhs.get_type() == sol::type::lua_nil) { return true; }
     if (lhs.is<bool>()) { return lhs.as<bool>() == rhs.as<bool>(); }
@@ -302,7 +304,7 @@ bool EngineUtils::LuaEquals(const sol::object& lhs, const sol::object& rhs)
         {
             // Check if rhs has the member at all
             if (!t_rhs[(*iter).first].valid()) { return false; }
-            if (!LuaEquals((*iter).second, t_rhs[(*iter).first])) { return false; }
+            if (!LuaEquals((*iter).second.as<sol::object>(), t_rhs[(*iter).first].get<sol::object>())) { return false; }
         }
         return true;
     }

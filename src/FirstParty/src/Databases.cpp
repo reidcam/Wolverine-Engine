@@ -33,6 +33,7 @@ std::unordered_map<std::string, SDL_Texture*> loaded_images; // All of the loade
 std::unordered_map<std::string, Mix_Chunk*> loaded_sounds; // All of the loaded sounds
 std::unordered_map<std::string, std::unordered_map<int, TTF_Font*>> loaded_fonts; // All of the loaded fonts
 std::unordered_map<std::string, rapidjson::Document*> loaded_templates; // All of the loaded templates
+std::unordered_map<std::string, std::shared_ptr<ShallowActor>> template_references; // All of the template references
 std::unordered_map<std::string, std::shared_ptr<sol::table>> loaded_component_types; // All of the loaded component types
 std::unordered_map<std::string, std::string> loaded_scene_paths; // All of the loaded scene paths
 
@@ -223,6 +224,32 @@ rapidjson::Document* GetTemplate(std::string template_name)
     
     return loaded_templates[template_name];
 } // GetTemplate()
+
+/**
+ * Gets a shallow actor of the given template
+ * @param   template_name   the name of the template to get from the database
+ * @returns                A shallow actor of the specified template
+ */
+std::shared_ptr<ShallowActor> GetReferenceTemplate(std::string template_name)
+{
+    if (template_references.find(template_name) == template_references.end())
+    {
+        // Ensure that the template actually exists
+        if (loaded_templates.find(template_name) != loaded_templates.end())
+        {
+            // Create shallow actor and return it
+            template_references[template_name] = std::make_shared<ShallowActor>(template_name);
+            return template_references[template_name];
+        }
+        else
+        {
+            std::cout << "error: missing reference template " << template_name;
+            exit(0);
+        }
+    }
+    
+    return template_references[template_name];
+}
 
 /**
  * Get a list of all the names of all the possible templates

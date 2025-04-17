@@ -37,6 +37,7 @@ ShallowActor::ShallowActor(std::string type)
     
     // clear new actor's components and erase it
     Actors::components[Actors::id_to_index[dummy_id]].clear();
+    Actors::num_total_actors--; // Leave no trace
     Actors::PrepareActorForDestruction(dummy_id);
     Actors::DestroyActor(dummy_id);
 }

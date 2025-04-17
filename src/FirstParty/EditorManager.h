@@ -20,6 +20,7 @@
 #include "ComponentManager.h"
 #include "FileUtils.h"
 #include "EditorStyle.h"
+#include "ShallowActorClass.h"
 #include "DrawImgui.h"
 
 #include "imgui.h"
@@ -41,7 +42,8 @@ private:
     
     inline static std::unordered_set<std::string> editor_components_list
     {
-      "SpriteRenderer",
+        "SpriteRenderer",
+        "ParticleSystem"
     };
 
     inline static std::string user_docking_layout_file_name = "imgui";
@@ -157,8 +159,9 @@ public:
      * Displays the given component
      *
      * @param   component    the component to display
+     * @param   compare_component   component to compare against, usually from a template if one exists
      */
-    static void DisplayComponent(sol::table component);
+    static void DisplayComponent(sol::table component, std::shared_ptr<sol::table> compare_component = nullptr);
     
     /**
      * Creates the actor hierarchy view

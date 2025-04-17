@@ -274,6 +274,14 @@ ImFont* DrawImgui::GetImGuiFont(const std::string& name, const float size)
 }
 
 /**
+* Add a specified font for ImGui
+*/
+void DrawImgui::AddImGuiFont(const std::string& name, ImFont* font)
+{
+    imgui_fonts[name].push_back(font);
+}
+
+/**
 * Calculates new texture coordinates based on the original coordinates, the angle of rotation, and the image's center
 *
 * @parameters    uv        The original texture coordinates

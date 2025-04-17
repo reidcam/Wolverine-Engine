@@ -63,6 +63,11 @@ public:
     * @returns    A ImFont* to the specified font if it exists, nullptr otherwise
     */
     static ImFont* GetImGuiFont(const std::string& name, const float size);
+    
+    /**
+    * Add a specified font for ImGui
+    */
+    static void AddImGuiFont(const std::string& name, ImFont* font);
 
     /**
    * Calculates new texture coordinates based on the original coordinates, the angle of rotation, and the image's center

@@ -21,7 +21,7 @@ private:
     static inline std::string selected_template = "";
     
     // Pointer to the shallow actor we're using to represent the template
-    static inline ShallowActor* template_rep = nullptr;
+    static inline std::shared_ptr<ShallowActor> template_rep = nullptr;
     
     /*
      * Saves the changes made to the current template, then update all current instances in the scene

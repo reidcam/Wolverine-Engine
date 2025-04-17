@@ -10,6 +10,7 @@
 #define TemplateDB_h
 
 #include "EngineUtils.h"
+#include "ShallowActorClass.h"
 
 /**
  * Loads all of the templates in the resources/actor_templates directory
@@ -23,6 +24,13 @@ void LoadTemplates();
  * @returns                 the template with the specified name
 */
 rapidjson::Document* GetTemplate(std::string template_name);
+
+/**
+ * Gets a shallow actor of the given template
+ * @param   template_name   the name of the template to get from the database
+ * @returns                A shallow actor of the specified template
+ */
+std::shared_ptr<ShallowActor> GetReferenceTemplate(std::string template_name);
 
 /**
  * Get a list of all the names of all the possible templates

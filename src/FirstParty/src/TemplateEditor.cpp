@@ -122,15 +122,14 @@ void TemplateEditorWindow::ChangeTemplate(std::string to_edit)
     // Delete the old template rep if it exists
     if (template_rep != nullptr)
     {
-        delete template_rep;
         template_rep = nullptr;
     }
     
     selected_template = to_edit;
     if (to_edit != "")
     {
-        // Creates the actor
-        template_rep = new ShallowActor(to_edit);
+        // Gets the template reference
+        template_rep = GetReferenceTemplate(to_edit);
     }
 }
 
