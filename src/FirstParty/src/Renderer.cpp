@@ -295,6 +295,7 @@ void RendererData::RenderAndClearAllPixels()
 void RendererData::RenderAndClearAllLines()
 {
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND); // needed to ensure that alpha works
+    SDL_RenderSetScale(renderer, zoom_factor, zoom_factor);
 
     for (auto& request : line_draw_request_queue) {
         SDL_SetRenderDrawColor(renderer, request.r, request.g, request.b, request.a);
@@ -317,6 +318,7 @@ void RendererData::RenderAndClearAllLines()
         SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
     }
 
+    SDL_RenderSetScale(renderer, 1, 1);
     line_draw_request_queue.clear();
 
     // reset renderer when finished

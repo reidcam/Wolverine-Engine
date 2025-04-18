@@ -1069,14 +1069,24 @@ void EditorManager::ViewportWidget()
                 {
                     float old_zoom = RendererData::GetCameraZoom();
                     RendererData::SetCameraZoom(old_zoom + (scroll_wheel / 10));
+//                    std::cout << RendererData::GetCameraZoom() << '\n';
                 }
             }
             
+            if (editor_mode)
+            {
+                for (int i = -1000; i < 1000; ++i)
+                {
+                    RendererData::DrawLine(i, 1000, i, -1000, 255, 255, 255, 255);
+                    RendererData::DrawLine(1000, i, -1000, i, 255, 255, 255, 255);
+                }
+            }
+            
+            RendererData::RenderAndClearAllLines();
             RendererData::RenderAndClearAllImageRequests();
             RendererData::RenderAndClearAllTextRequests();
             RendererData::RenderAndClearAllUI();
             RendererData::RenderAndClearAllPixels();
-            RendererData::RenderAndClearAllLines();
         }
         ImGui::End();
     }
