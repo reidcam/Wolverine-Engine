@@ -42,21 +42,12 @@ void EditorManager::Init()
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;   // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;    // Enable Gamepad Controls
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;       // Enable Docking
-    //io.IniFilename = NULL; // Disable automatic .ini file handling for docking layouts
+    io.IniFilename = nullptr; //  Disable automatic .ini file handling for docking layouts
     
     // Set up imgui style
-    ImGui::StyleColorsDark();
-
-    // temp fix for background transparency REMOVE LATER AFTER JAM
-    auto& style = ImGui::GetStyle();
-    ImVec4* colors = style.Colors;
-
-    const ImVec4 bgColor = ImVec4(0.1, 0.1, 0.1, 0.0);
-    colors[ImGuiCol_WindowBg] = bgColor;
-    colors[ImGuiCol_ChildBg] = bgColor;
-    colors[ImGuiCol_TitleBg] = bgColor;
-    /////////////////////////////////
-
+//    ImGui::StyleColorsDark();
+    EditorStyle::SoftCherryStyle();
+    
     // Set up platfomr/renderer backends
     ImGui_ImplSDL2_InitForSDLRenderer(RendererData::GetWindow(), RendererData::GetRenderer());
     ImGui_ImplSDLRenderer2_Init(RendererData::GetRenderer());
@@ -64,12 +55,16 @@ void EditorManager::Init()
     // init file path
     docking_layout_file_path = std::filesystem::path(FileUtils::GetPath("editor_resources/editor_layouts"));
     
+
     // set path for file viewer
     current_path = std::filesystem::path(FileUtils::GetPath("resources"));
 
     // get all of the .ini files in resources/editor_layouts
     editor_layout_files = GetEditorLayouts();
     
+    std::filesystem::path path = docking_layout_file_path.string() + "/" + user_docking_layout_file_name;
+    LoadDockingLayout(path.string());
+
     // Add fonts that we need for editor rendering:
     std::vector<std::pair<std::string, int>> editor_fonts; // #1 = font name, #2 = font size
     editor_fonts.push_back(std::pair<std::string, int>("PixelOperator8", 10));
@@ -328,7 +323,6 @@ void EditorManager::VariableView(sol::table* table, sol::lua_value key)
     
     // Sets the first column to be the name of the variable
     ImGui::TableNextColumn();
-//    ImGui::PushFont(DrawImgui::GetImGuiFont("PixelOperator8", 10));
     ImGui::Text(const_var_name);
     
     // Moves to the second column to get ready to be the value of the variable
@@ -478,7 +472,6 @@ void EditorManager::VariableView(sol::table* table, sol::lua_value key)
     {
         ImGui::Text("USER DATATYPE");
     }
-    
     // Move on to the next row of the table
     ImGui::TableNextRow();
 }
@@ -622,6 +615,7 @@ void EditorManager::DisplayComponent(sol::table component, std::shared_ptr<sol::
                 
                 ImFont* font = DrawImgui::GetImGuiFont("PixelOperator8", 10);
                 
+                bool override_var = false;
                 // If this component is on a templated actor and its a non-default value, make it bold for easy debugging
                 if (compare_component != nullptr)
                 {
@@ -629,6 +623,7 @@ void EditorManager::DisplayComponent(sol::table component, std::shared_ptr<sol::
                     if (!EngineUtils::LuaEquals(component[key].get<sol::object>(), (*compare_component)[key].get<sol::object>()))
                     {
                         font = DrawImgui::GetImGuiFont("PixelOperator8-Bold", 10);
+                        override_var = true;
                     }
                 }
 
@@ -641,6 +636,16 @@ void EditorManager::DisplayComponent(sol::table component, std::shared_ptr<sol::
                 
                 if (font) {
                     ImGui::PopFont();
+                }
+                std::cout << ImGui::TableGetRowIndex() << '\n';
+                
+                if (ImGui::Button("WOW") && override_var)
+                {
+                    ImGui::SetTooltip("Permanently deletes the selected item.");
+                    if (ImGui::IsItemClicked() && ImGui::IsMouseClicked(ImGuiMouseButton_Right))
+                    {
+                        std::cout << "WE";
+                    }
                 }
             }
             ImGui::EndTable();
@@ -951,15 +956,17 @@ void EditorManager::ViewportDocking()
 {
     // Allows the viewport to be used as a docking space
     ImGui::PushStyleColor(ImGuiCol_WindowBg, IM_COL32(0, 0, 0, 0));
-    ImGuiID dockspace_id = ImGui::DockSpaceOverViewport(0U, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
+//    ImGuiID dockspace_id = ImGui::DockSpace(0x11111111);
+    ImGuiID dockspace_id = ImGui::DockSpaceOverViewport(0x11111111, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
+//    std::cout << dockspace_id << '\n';
     ImGui::PopStyleColor();
 
-    // load the most recent user docking layout
-    if (first_frame) {
-        std::filesystem::path path = docking_layout_file_path.string() + "/" + user_docking_layout_file_name;
-        LoadDockingLayout(path.string());
-        first_frame = !first_frame;
-    }
+//    // load the most recent user docking layout
+//    if (first_frame) {
+//        std::filesystem::path path = docking_layout_file_path.string() + "/" + user_docking_layout_file_name;
+//        LoadDockingLayout(path.string());
+//        first_frame = !first_frame;
+//    }
 }
 
 /**
@@ -1072,6 +1079,11 @@ void EditorManager::ViewportWidget()
 //                    std::cout << RendererData::GetCameraZoom() << '\n';
                 }
             }
+            
+            ImVec2 cam_dimensions = ImGui::GetWindowSize();
+            ImVec2 window_position = ImGui::GetWindowPos();
+            SDL_Rect clip_rect = { (int)window_position.x, (int)window_position.y, (int)cam_dimensions.x, (int)cam_dimensions.y };
+            SDL_RenderSetClipRect(RendererData::GetRenderer(), &clip_rect);
             
             if (editor_mode)
             {
