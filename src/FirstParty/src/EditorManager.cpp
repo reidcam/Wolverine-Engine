@@ -322,7 +322,7 @@ void EditorManager::VariableView(sol::table* table, sol::lua_value key)
     const char* const_invisible_id = &invisible_id[0];
     
     // Sets the first column to be the name of the variable
-    ImGui::TableNextColumn();
+//    ImGui::TableNextColumn();
     ImGui::Text(const_var_name);
     
     // Moves to the second column to get ready to be the value of the variable
@@ -410,7 +410,7 @@ void EditorManager::VariableView(sol::table* table, sol::lua_value key)
             ImGui::TableSetupColumn("one", ImGuiTableColumnFlags_WidthFixed, 10.0f); // Default to 10.0f
             ImGui::TableSetupColumn("two", ImGuiTableColumnFlags_WidthFixed, 10.0f);
             ImGui::TableSetupColumn("three", ImGuiTableColumnFlags_WidthStretch);
-
+            ImGui::TableNextColumn();
             // Keeps track of the table element we're on while iterating, used to create unique display IDs for the
             // delete button of each element.
             int i = 0;
@@ -435,14 +435,13 @@ void EditorManager::VariableView(sol::table* table, sol::lua_value key)
                 sol::lua_value item_key = item.first;
                 if (!found_items[item_key].valid())
                 {
-                    ImGui::TableNextColumn();
-
                     std::string table_element_id = std::string(const_invisible_id) + std::to_string(i);
                     if (ImGui::Button(std::string("-" + table_element_id).c_str()))
                     {
-                        std::cout << table_element_id << std::endl;
                         variable_value[item_key] = sol::lua_nil;
                     }
+                    
+                    ImGui::TableNextColumn();
                 
                     // Sets this row of the table to be the variable with the given key
                     VariableView(&variable_value, item_key);
@@ -474,6 +473,7 @@ void EditorManager::VariableView(sol::table* table, sol::lua_value key)
     }
     // Move on to the next row of the table
     ImGui::TableNextRow();
+    ImGui::TableNextColumn();
 }
 
 /**
@@ -608,6 +608,7 @@ void EditorManager::DisplayComponent(sol::table component, std::shared_ptr<sol::
 
             ImGui::TableSetupColumn("one", ImGuiTableColumnFlags_WidthFixed, 100.0f); // Default to 100.0f
             ImGui::TableSetupColumn("two", ImGuiTableColumnFlags_WidthStretch);
+            ImGui::TableNextColumn();
 
             for (auto& variable : metatable)
             {
@@ -634,19 +635,32 @@ void EditorManager::DisplayComponent(sol::table component, std::shared_ptr<sol::
                 // Sets this row of the table to be the variable with the given key
                 VariableView(&component, key);
                 
+                if (override_var == true)
+                {
+                    auto max = ImGui::GetItemRectMin();
+                    auto min = ImVec2(max.x - (ImGui::GetColumnWidth() + 5), ImGui::GetItemRectMax().y);
+                    if (ImGui::IsWindowFocused())
+                    {
+                        if (ImGui::GetMousePos().x > min.x && ImGui::GetMousePos().x < max.x
+                            && ImGui::GetMousePos().y < min.y && ImGui::GetMousePos().y > max.y)
+                        {
+                            ImGui::SetTooltip("Right-Click to reset value");
+                            ImGui::GetWindowDrawList()->AddRectFilled(min, max, IM_COL32(255, 255, 255, 100));
+                            if (ImGui::IsMouseDown(ImGuiMouseButton_Right))
+                            {
+                                if (component[key].valid() && (*compare_component)[key].valid())
+                                {
+                                    component[key] = (*compare_component)[key].get<sol::object>();
+                                }
+                            }
+                        }
+                    }
+                }
+                
                 if (font) {
                     ImGui::PopFont();
                 }
-                std::cout << ImGui::TableGetRowIndex() << '\n';
-                
-                if (ImGui::Button("WOW") && override_var)
-                {
-                    ImGui::SetTooltip("Permanently deletes the selected item.");
-                    if (ImGui::IsItemClicked() && ImGui::IsMouseClicked(ImGuiMouseButton_Right))
-                    {
-                        std::cout << "WE";
-                    }
-                }
+//                std::cout << ImGui::TableGetRowIndex() << '\n';
             }
             ImGui::EndTable();
         }
