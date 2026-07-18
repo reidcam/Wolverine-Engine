@@ -206,6 +206,13 @@ public:
     * set in the file selector, if the scene exists
     */
     static void UpdateEditorCurrentScene();
+
+    /**
+    * Applys the current layout that the user selected from the main menu bar.
+    * 
+    * NOTE: This must be called before imGui::NewFrame is called
+    */
+    static void ApplyPendingLayout();
 };
 
 #endif /* EditorManager.h */

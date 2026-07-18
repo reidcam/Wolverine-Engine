@@ -84,11 +84,7 @@ void EditorManager::RenderEditor()
     ImGui_ImplSDLRenderer2_NewFrame();
     ImGui_ImplSDL2_NewFrame();
     DrawImgui::LoadFontsImGUI(); // NOTE: Must be called before ImGui::NewFrame() and after ImGui::Render()
-
-    if (!pending_layout_to_load.empty()) {
-        LoadDockingLayout(pending_layout_to_load.string());
-        pending_layout_to_load.clear();
-    }
+    ApplyPendingLayout();
 
     ImGui::NewFrame();
     
@@ -998,4 +994,17 @@ void EditorManager::UpdateEditorCurrentScene()
 
     // reset the open scene variable
     attempt_to_open_scene = false;
+}
+
+/**
+* Applys the current layout that the user selected from the main menu bar.
+*
+* NOTE: This must be called before imGui::NewFrame is called
+*/
+void EditorManager::ApplyPendingLayout()
+{
+    if (!pending_layout_to_load.empty()) {
+        LoadDockingLayout(pending_layout_to_load.string());
+        pending_layout_to_load.clear();
+    }
 }
