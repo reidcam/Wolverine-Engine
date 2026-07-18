@@ -84,6 +84,12 @@ void EditorManager::RenderEditor()
     ImGui_ImplSDLRenderer2_NewFrame();
     ImGui_ImplSDL2_NewFrame();
     DrawImgui::LoadFontsImGUI(); // NOTE: Must be called before ImGui::NewFrame() and after ImGui::Render()
+
+    if (!pending_layout_to_load.empty()) {
+        LoadDockingLayout(pending_layout_to_load.string());
+        pending_layout_to_load.clear();
+    }
+
     ImGui::NewFrame();
     
     ViewportDocking();
@@ -706,15 +712,13 @@ void EditorManager::MainMenuBar()
             }
 
             if (ImGui::MenuItem("Default")) { // need to create a defualt layout
-                std::filesystem::path path = docking_layout_file_path.string() + "/" + user_docking_layout_file_name;
-                LoadDockingLayout(path.string());
+                pending_layout_to_load = docking_layout_file_path.string() + "/" + user_docking_layout_file_name;
             }
 
             // create menu items for each .ini file that exists in resources/editor_layouts
             for (const std::string& file : editor_layout_files) {
                 if (file != user_docking_layout_file_name && ImGui::MenuItem(file.c_str())) {
-                    std::filesystem::path path = docking_layout_file_path.string() + "/" + file;
-                    LoadDockingLayout(path.string());
+                    pending_layout_to_load = docking_layout_file_path.string() + "/" + file;
                 }
             }
 
