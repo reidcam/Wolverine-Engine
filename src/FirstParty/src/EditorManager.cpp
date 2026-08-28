@@ -97,7 +97,6 @@ void EditorManager::RenderEditor()
     // Create all of the ImGui windows
     MainMenuBar();
     HierarchyView();
-    ModeSwitchButtons();
 
     if (show_file_selector) {
         ShowFileSelector();
@@ -429,73 +428,6 @@ void EditorManager::VariableView(sol::table* table, sol::lua_value key)
 }
 
 /**
- * Creates the mode switching buttons
- */
-void EditorManager::ModeSwitchButtons()
-{
-    // Flags
-    bool* display_window = new bool(true);
-    ImGuiWindowFlags flags = 0;
-    flags |= ImGuiWindowFlags_NoMove;
-    flags |= ImGuiWindowFlags_NoResize;
-    flags |= ImGuiWindowFlags_NoTitleBar;
-    
-    // variables to store the window size
-    int window_w = 0;
-    int window_h = 0;
-    SDL_GetWindowSize(RendererData::GetWindow(), &window_w, &window_h);
-    
-    // Window Size
-    int imgui_window_w = 110.0f;
-    int imgui_window_h = 40.0f;
-    ImGui::SetNextWindowSize(ImVec2(imgui_window_w, imgui_window_h));
-    
-    // Window Position
-    int imgui_window_x = (window_w / 2) - (imgui_window_w / 2);
-    int imgui_window_y = 0.0f;
-    ImGui::SetNextWindowPos(ImVec2(imgui_window_x, imgui_window_y));
-    
-    // Alows developers to activate the play modes and editor modes
-    ImGui::Begin("Play/Pause", display_window, flags);
-    if (!play_mode)
-    {
-        if (ImGui::Button("Play"))
-        {
-            // TOOD: Hot reload all modified scripts
-            SaveChanges();
-            editor_mode = false;
-            play_mode = true;
-            PhysicsWorld::ResetWorld();
-            Scene::ResetManager();
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("Pause") && play_mode) {trigger_editor_mode_toggle = true;}
-    }
-    else
-    {
-        if (ImGui::Button("Stop"))
-        {
-            // TOOD: Hot reload all modified scenes and scripts
-            editor_mode = true;
-            play_mode = false;
-            PhysicsWorld::ResetWorld();
-            Scene::ResetManager();
-        }
-        ImGui::SameLine();
-        if (editor_mode)
-        {
-            if (ImGui::Button("Unpause")) { trigger_editor_mode_toggle = true; }
-        }
-        else
-        {
-            if (ImGui::Button("Pause")) { trigger_editor_mode_toggle = true; }
-        }
-    }
-    ImGui::End();
-    delete display_window;
-}
-
-/**
  * Creates the actor hierarchy view
  */
 void EditorManager::HierarchyView()
@@ -767,6 +699,42 @@ void EditorManager::MainMenuBar()
             }
             ImGui::EndMenu();
         }
+
+        if (!play_mode) {
+            if (ImGui::MenuItem("Play")) {
+                // TOOD: Hot reload all modified scripts
+                SaveChanges();
+                editor_mode = false;
+                play_mode = true;
+                PhysicsWorld::ResetWorld();
+                Scene::ResetManager();
+            }
+        }
+        else {
+            if (ImGui::MenuItem("Stop")) {
+                // TOOD: Hot reload all modified scenes and scripts
+                editor_mode = true;
+                play_mode = false;
+                PhysicsWorld::ResetWorld();
+                Scene::ResetManager();
+            }
+        }
+
+        if (play_mode) {
+            if (editor_mode)
+            {
+                if (ImGui::MenuItem("Unpause")) {
+                    trigger_editor_mode_toggle = true;
+                }
+            }
+            else
+            {
+                if (ImGui::MenuItem("Pause")) {
+                    trigger_editor_mode_toggle = true;
+                }
+            }
+        }
+
         ImGui::EndMainMenuBar();
     }
 
